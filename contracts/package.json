@@ -1,0 +1,20 @@
+{
+  "name": "world-computer-sculpture-garden",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "0xfff",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.9",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-deploy": "^0.12.4"
+  },
+  "dependencies": {
+    "solady": "^0.0.237"
+  }
+}

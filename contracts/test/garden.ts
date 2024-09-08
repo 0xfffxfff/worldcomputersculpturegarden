@@ -1,0 +1,50 @@
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { expect } from "chai";
+import hre from "hardhat";
+
+describe("Garden", function () {
+  async function deployFixture() {
+    const [owner, acc1] = await hre.ethers.getSigners();
+
+    const StaticExample = await hre.ethers.getContractFactory(
+      "ExampleSculptureStatic"
+    );
+    const example1 = await StaticExample.deploy();
+    const DynamicExample = await hre.ethers.getContractFactory(
+      "ExampleSculptureDynamic"
+    );
+    const example2 = await DynamicExample.deploy();
+
+    const ExampleRemoteWork = await hre.ethers.getContractFactory("ExampleRemoteWork");
+    const RemoteArtwork = await hre.ethers.getContractFactory("RemoteArtwork");
+    const remoteArtwork = await RemoteArtwork.deploy();
+    const example3 = await ExampleRemoteWork.deploy(await remoteArtwork.getAddress());
+
+    const Garden = await hre.ethers.getContractFactory("Garden");
+    const garden = await Garden.deploy([
+      await example1.getAddress(),
+      await example2.getAddress(),
+      await example3.getAddress(),
+    ]);
+
+    const Web = await hre.ethers.getContractFactory("Web");
+    const web = await Web.deploy(await garden.getAddress());
+
+    return { garden, Garden, web, Web, owner, acc1 };
+  }
+
+  describe("Deployment", function () {
+    it("Should deploy", async function () {
+      const { garden } = await loadFixture(deployFixture);
+      await expect(await garden.getAddress()).to.be.properAddress;
+    });
+  });
+
+  describe("Web", function () {
+    it("Should render html", async function () {
+      const { web, owner } = await loadFixture(deployFixture);
+      const html = await web.content();
+      expect(html).to.contain("Example");
+    });
+  });
+});
