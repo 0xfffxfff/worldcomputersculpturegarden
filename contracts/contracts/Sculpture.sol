@@ -12,5 +12,5 @@ interface Sculpture {
     function urls() external view returns (string[] memory);
 
     function text() external view returns (string memory);
-    
+
 }
