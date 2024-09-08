@@ -42,5 +42,5 @@ contract ExampleRemoteWork is Sculpture {
         return string.concat("Is Art: ", IRemoteArtwork(remoteArtwork).isArt() ? "Yes" : "No");
     }
 
-    function links() public view override returns (string[] memory links) {} // empty
+    function urls() public view override returns (string[] memory urls) {} // empty
 }

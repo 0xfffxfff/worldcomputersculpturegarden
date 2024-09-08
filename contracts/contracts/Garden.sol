@@ -60,10 +60,10 @@ contract Garden is Sculpture {
         return "here be exhibition text";
     }
 
-    function links() public view returns (string[] memory) {
-        string[] memory links_;
+    function urls() public view returns (string[] memory) {
+        string[] memory urls_;
         // Here be a link
-        return links_;
+        return urls_;
     }
 
 

@@ -25,5 +25,5 @@ contract ExampleSculptureStatic is Sculpture {
         return "This is an example sculpture that is static.";
     }
 
-    function links() public view override returns (string[] memory links) {} // empty
+    function urls() public view override returns (string[] memory urls) {} // empty
 }

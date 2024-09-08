@@ -9,15 +9,8 @@ interface Sculpture {
 
     function addresses() external view returns (address[] memory);
 
-    function links() external view returns (string[] memory);
+    function urls() external view returns (string[] memory);
 
     function text() external view returns (string memory);
-
-    // function representation(string memory mimetype) external view returns (string memory);
-
-    // function canconicalRepresentation() external view returns (string memory);
-
-    // How should this be presented/displayed/shown/represented?
-    // function representation() external view returns (string memory);
-
+    
 }

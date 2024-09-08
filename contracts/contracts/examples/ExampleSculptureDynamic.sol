@@ -29,5 +29,5 @@ contract ExampleSculptureDynamic is Sculpture {
         return string.concat("This is an example that is dynamicly rendering it's fields.<br/> Block number: ", LibString.toString(block.number), " / Timestamp: ", LibString.toString(block.timestamp));
     }
 
-    function links() public view override returns (string[] memory links) {} // empty
+    function urls() public view override returns (string[] memory urls) {} // empty
 }
