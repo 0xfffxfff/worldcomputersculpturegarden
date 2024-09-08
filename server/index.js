@@ -6,21 +6,16 @@ const deploymentArtifact = require('../contracts/deployments/localhost/Web.json'
 
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT || 3333;
 const CACHE_EXPIRATION_TIME = 12 * 1000; // 12 seconds
 const CACHE_ENABLED = process.env.CACHE_ENABLED === 'false' ? false : true; // Enable/disable cache
+const RPC_URL = process.env.RPC_URL || 'http://localhost:8545'; // Default to localhost
+const PORT = process.env.PORT || 3333;
 
-let latestHtml = '';  // Store the latest successful HTML response
-let lastUpdated = null; // To track when the last update occurred
+const app = express();
+let latestHtml = '', lastUpdated = null;
 
 // Setup provider and contract
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const contractAddress = process.env.CONTRACT_ADDRESS;
-
-// const contractABI = [
-//     "function content() public view returns (string memory)"
-// ];
+const provider = new ethers.JsonRpcProvider(RPC_URL);
 const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
 
 app.get('/', async (req, res) => {
@@ -55,6 +50,6 @@ app.get('/', async (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
