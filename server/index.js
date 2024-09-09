@@ -30,7 +30,7 @@ app.get('/', async (req, res) => {
 
     try {
         console.log("Fetching HTML from contract");
-        const htmlString = await contract.content(); // Call the contract method
+        const htmlString = await contract.html(); // Call the contract method
         latestHtml = htmlString;  // Update the cached HTML
         lastUpdated = now; // Store the time of the update
         res.setHeader('Content-Type', 'text/html');

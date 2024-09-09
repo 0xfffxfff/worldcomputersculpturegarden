@@ -2,23 +2,28 @@
 pragma solidity ^0.8.24;
 
 import "./Sculpture.sol";
+import "./Web.sol";
 
 contract Garden is Sculpture {
 
     address[] public sculptures;
-
     address public render;
 
-    constructor(address[] memory _sculptures) {
+    constructor(address[] memory _sculptures, address _render) {
         sculptures = _sculptures;
+        render = _render;
     }
-
-    // fallback() external payable {
-    //     revert(content());
-    // }
 
     receive() external payable {
         sign();
+    }
+
+    fallback() external payable {
+        revert(IWeb(render).html());
+    }
+
+    function html() external view returns (string memory) {
+        return IWeb(render).html();
     }
 
     function getSculptures() public view returns (address[] memory) {

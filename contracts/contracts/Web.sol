@@ -11,7 +11,28 @@ interface IGarden {
     function getSculptures() external view returns (address[] memory);
 }
 
-contract Web {
+interface IWeb {
+    function html() external view returns (string memory);
+}
+
+contract Web is IWeb, Ownable {
+    address public garden;
+    address public renderer;
+
+    constructor() {
+        _initializeOwner(msg.sender);
+    }
+
+    function html() external view returns (string memory) {
+        return GardenRenderer(renderer).html();
+    }
+
+    function setRenderer(address _renderer) public onlyOwner {
+        renderer = _renderer;
+    }
+}
+
+contract GardenRenderer {
 
     address immutable public garden;
 
@@ -19,7 +40,7 @@ contract Web {
         garden = _garden;
     }
 
-    function content() public view returns (string memory) {
+    function html() public view returns (string memory) {
         string memory html = "<html>";
         html = string.concat(html,
             "<style>"

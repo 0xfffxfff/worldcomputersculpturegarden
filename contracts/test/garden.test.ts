@@ -20,16 +20,21 @@ describe("Garden", function () {
     const example3 = await ExampleRemoteWork.deploy(await remoteArtwork.getAddress());
     const example4 = await(await hre.ethers.getContractFactory("ExampleSculptureStaticLongUrl")).deploy();
 
+    const Web = await hre.ethers.getContractFactory("Web");
+    const web = await Web.deploy();
+
     const Garden = await hre.ethers.getContractFactory("Garden");
     const garden = await Garden.deploy([
       await example1.getAddress(),
       await example2.getAddress(),
       await example3.getAddress(),
       await example4.getAddress(),
-    ]);
+    ], await web.getAddress());
 
-    const Web = await hre.ethers.getContractFactory("Web");
-    const web = await Web.deploy(await garden.getAddress());
+    const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
+    const renderer = await GardenRenderer.deploy(await garden.getAddress());
+
+    await (await web.setRenderer(await renderer.getAddress())).wait();
 
     return { garden, Garden, web, Web, owner, acc1 };
   }
@@ -44,7 +49,7 @@ describe("Garden", function () {
   describe("Web", function () {
     it("Should render html", async function () {
       const { web, owner } = await loadFixture(deployFixture);
-      const html = await web.content();
+      const html = await web.html();
       expect(html).to.contain("Example");
     });
   });

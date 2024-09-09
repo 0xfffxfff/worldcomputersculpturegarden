@@ -8,13 +8,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const garden = await deployments.get("Garden");
 
-  await deploy("Web", {
+  const renderer = await deploy("GardenRenderer", {
     args: [garden.address],
     from: deployer,
     log: true
   });
 
+  const web = await deployments.get("Web");
+  const webContract = await hre.ethers.getContractAt("Web", web.address);
+  await webContract.setRenderer(renderer.address);
+
 };
 
 export default func;
-func.tags = ["Web"];
+func.tags = ["GardenRenderer"];
