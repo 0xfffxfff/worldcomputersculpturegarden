@@ -16,12 +16,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [(await deploy("RemoteArtwork", { from: deployer })).address],
     from: deployer
   });
+  const example4 = await deploy("ExampleSculptureStaticLongUrl", {
+    from: deployer
+  });
 
   await deploy("Garden", {
     args: [[
       example1.address,
       example2.address,
       example3.address,
+      example4.address
     ]],
     from: deployer,
     gasLimit: 18_000_000,

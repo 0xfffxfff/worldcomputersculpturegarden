@@ -28,7 +28,8 @@ contract Web {
             'html { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 590px; margin: 5em auto; }",
+            ".c { max-width: 590px; margin: 5em auto; word-break: break-all; }",
+            "a { color: inherit; text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             ".s { margin: 5em 0 5em; }",
             "</style>"
@@ -67,6 +68,10 @@ unicode"          </pre>",
             for (uint256 j = 0; j < addresses.length; j++) {
                 html = string.concat(html, "<p>", LibString.toHexString(addresses[j]), "</p>");
             }
+            string[] memory urls = sculpture.urls();
+            for (uint256 j = 0; j < urls.length; j++) {
+                html = string.concat(html, renderUrl(urls[j]), '<br/>');
+            }
             string memory text = sculpture.text();
             if (bytes(text).length > 0) {
                 html = string.concat(html, "<p>", text, "</p>");
@@ -81,5 +86,47 @@ unicode"          </pre>",
         html = string.concat(html, "</div></body></html>");
         return html;
     }
+
+    function stripURL(string memory url) internal pure returns (string memory) {
+        bytes memory urlBytes = bytes(url);
+        uint256 length = urlBytes.length;
+        uint256 start = 0;
+        uint256 end = length;
+
+        // Find the position of "://", which indicates the end of the protocol
+        for (uint256 i = 0; i < length - 2; i++) {
+            if (urlBytes[i] == ":" && urlBytes[i + 1] == "/" && urlBytes[i + 2] == "/") {
+                start = i + 3; // Skip the "://"
+                break;
+            }
+        }
+
+        // Find position of "?" or "#" to determine the end of the main URL
+        for (uint256 i = start; i < length; i++) {
+            if (urlBytes[i] == "?" || urlBytes[i] == "#") {
+                end = i;
+                break;
+            }
+        }
+
+        // Remove trailing slash if present
+        if (end > start && urlBytes[end - 1] == "/") {
+            end -= 1;
+        }
+
+        // Create a new byte array to store the stripped URL
+        bytes memory strippedUrlBytes = new bytes(end - start);
+        for (uint256 i = start; i < end; i++) {
+            strippedUrlBytes[i - start] = urlBytes[i];
+        }
+
+        return string(strippedUrlBytes);
+    }
+
+    function renderUrl(string memory url) internal pure returns (string memory) {
+        string memory strippedUrl = stripURL(url);
+        return string.concat('<a href="', url, '" target="_blank" rel="noopener noreferrer">', strippedUrl ,'</a>');
+    }
+
 
 }

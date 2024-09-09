@@ -14,17 +14,18 @@ describe("Garden", function () {
       "ExampleSculptureDynamic"
     );
     const example2 = await DynamicExample.deploy();
-
     const ExampleRemoteWork = await hre.ethers.getContractFactory("ExampleRemoteWork");
     const RemoteArtwork = await hre.ethers.getContractFactory("RemoteArtwork");
     const remoteArtwork = await RemoteArtwork.deploy();
     const example3 = await ExampleRemoteWork.deploy(await remoteArtwork.getAddress());
+    const example4 = await(await hre.ethers.getContractFactory("ExampleSculptureStaticLongUrl")).deploy();
 
     const Garden = await hre.ethers.getContractFactory("Garden");
     const garden = await Garden.deploy([
       await example1.getAddress(),
       await example2.getAddress(),
       await example3.getAddress(),
+      await example4.getAddress(),
     ]);
 
     const Web = await hre.ethers.getContractFactory("Web");
