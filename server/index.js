@@ -8,7 +8,7 @@ dotenv.config();
 
 const CACHE_EXPIRATION_TIME = 12 * 1000; // 12 seconds
 const CACHE_ENABLED = process.env.CACHE_ENABLED === 'false' ? false : true; // Enable/disable cache
-const RPC_URL = process.env.RPC_URL || 'http://localhost:8545'; // Default to localhost
+const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:8545'; // Default to localhost
 const PORT = process.env.PORT || 3333;
 
 const app = express();
