@@ -12,6 +12,7 @@ cd contracts
 npm i
 npx hardhat node
 # in a separate window
+npx hardhat deploy --network localhost --reset
 ```
 
 2. Run server to render page from contract:
