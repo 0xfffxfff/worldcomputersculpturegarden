@@ -237,16 +237,16 @@ interface Sculpture {
 
     function authors() external view returns (string[] memory);
 
-    function addresses() external view returns (string[] memory);
+    function addresses() external view returns (address[] memory);
+
+    function urls() external view returns (string[] memory);
 
     function text() external view returns (string memory);
 
-    function content() external view returns (string memory);
-
     // NOTE: These fields will be included as HTML in the
     // contract-generated exhibition page. All fields can
-    // return empty values if not applicable. You may break
-    // out of your confines within the show page using CSS.
+    // return empty values if not applicable.
+
 }
 </pre
       ><i>Last Updated: Aug 28, 2024</i>
