@@ -1,6 +1,6 @@
 # Contract Show: World Computer Sculpture Garden
 
-Feel free to reach out for questions either on Discord 0xfff, by email to 0xfff@protonmail or on X/Twitter via [@0xShiroi](https://twitter.com/0xShiroi)
+Feel free to reach out for questions either on Discord (0xfff), by email to 0xfff@protonmail or on X/Twitter via [@0xShiroi](https://twitter.com/0xShiroi)
 
 ## How to run the test setup
 The test setup consist of a local hardhat node + a tiny express server that fetches the html page of the contract page and serves it at localhost:3333
@@ -24,4 +24,4 @@ npx nodemon --watch ../contracts/deployments index.js
 # or simply: node index.js
 ```
 
-You can now visit [http://localhost:3333](localhost:3333) which pulls
+You can now visit [localhost:3333](http://localhost:3333) which pulls the HTML directly from the local contract.

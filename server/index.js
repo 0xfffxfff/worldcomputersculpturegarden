@@ -2,7 +2,7 @@ const express = require('express');
 const { ethers } = require('ethers');
 const dotenv = require('dotenv');
 
-const deploymentArtifact = require('../contracts/deployments/localhost/Web.json');
+const deploymentArtifact = require('../contracts/deployments/localhost/Garden.json');
 
 dotenv.config();
 

@@ -1,18 +1,30 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.27;
 
+import "solady/src/auth/Ownable.sol";
 import "./Sculpture.sol";
 import "./Web.sol";
 
-contract Garden is Sculpture {
+contract Garden is Sculpture, Ownable {
 
     address[] public sculptures;
-    address public render;
+
+    address public immutable render;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Init
+    ///////////////////////////////////////////////////////////////////////////
 
     constructor(address[] memory _sculptures, address _render) {
         sculptures = _sculptures;
         render = _render;
+
+        _initializeOwner(msg.sender);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Stop by and say hi
+    ///////////////////////////////////////////////////////////////////////////
 
     receive() external payable {
         sign();
@@ -26,12 +38,20 @@ contract Garden is Sculpture {
         return IWeb(render).html();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Sculpture Management
+    ///////////////////////////////////////////////////////////////////////////
+
     function getSculptures() public view returns (address[] memory) {
         return sculptures;
     }
 
+    function setSculptures(address[] memory _sculptures) public onlyOwner {
+        sculptures = _sculptures;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    // Show
+    // Show/Sculpture
     ///////////////////////////////////////////////////////////////////////////
 
     function title() external pure returns (string memory) {
