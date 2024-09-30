@@ -85,8 +85,12 @@ unicode"          </pre>",
             string memory title = sculpture.title();
             html = string.concat(html, '<div class="s"');
             string[] memory authors = sculpture.authors();
-            for (uint256 j = 0; j < authors.length; j++) {
-                html = string.concat(html, "<p>", authors[j], "</p>");
+            if (authors.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < authors.length; j++) {
+                    html = string.concat(html, authors[j], "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             if (bytes(title).length > 0) {
                 html = string.concat(html, "<h2><i>", title, "</i></h2>");
@@ -94,12 +98,20 @@ unicode"          </pre>",
                 html = string.concat(html, "<h2><i>", "Untitled", "</i></h2>");
             }
             address[] memory addresses = sculpture.addresses();
-            for (uint256 j = 0; j < addresses.length; j++) {
-                html = string.concat(html, "<p>", LibString.toHexString(addresses[j]), "</p>");
+            if (addresses.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < addresses.length; j++) {
+                    html = string.concat(html, LibString.toHexString(addresses[j]), "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             string[] memory urls = sculpture.urls();
-            for (uint256 j = 0; j < urls.length; j++) {
-                html = string.concat(html, renderUrl(urls[j]), '<br/>');
+            if (urls.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < urls.length; j++) {
+                    html = string.concat(html, renderUrl(urls[j]), "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             string memory text = sculpture.text();
             if (bytes(text).length > 0) {
