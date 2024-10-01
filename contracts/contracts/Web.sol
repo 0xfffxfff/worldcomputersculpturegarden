@@ -52,7 +52,7 @@ contract GardenRenderer {
             ".c { max-width: 590px; margin: 5em auto; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
-            ".s { margin: 5em 0; }",
+            ".s { margin: 10em 0; }",
             ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             "pre { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
@@ -77,7 +77,7 @@ unicode"          </pre>",
         '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br />with special thanks to ',
         '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
         "</p>",
-        "<br /><br />");
+        "<br />");
 
         address[] memory sculptures = IGarden(garden).getSculptures();
         for (uint256 i = 0; i < sculptures.length; i++) {
