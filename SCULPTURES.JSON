@@ -1,0 +1,16 @@
+{
+    "artists": [
+        "0xhaiku",
+        "113",
+        "figure31",
+        "sarahfriend",
+        "material",
+        "rheamyers",
+        "paulseidler"
+    ],
+    "sculptures": {
+        "11155111": {
+            "paulseidler": "0x6a7139325371a314Fe1374063869F89cB7c09D57"
+        }
+    }
+}

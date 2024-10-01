@@ -49,7 +49,7 @@ contract GardenRenderer {
             'html { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 590px; margin: 5em auto; word-break: break-all; }",
+            ".c { max-width: 590px; margin: 5em auto; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
             ".s { margin: 5em 0; }",
