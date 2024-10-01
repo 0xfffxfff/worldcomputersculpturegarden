@@ -4,7 +4,7 @@ import { CacheHeaders } from "cdn-cache-control";
 
 const deploymentArtifact = require('../../../contracts/deployments/sepolia/Garden.json');
 
-const CACHE_EXPIRATION_TIME = 12 * 1000; // 12 seconds
+const CACHE_EXPIRATION_TIME = 12;
 const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
 
 export default async (req: Request, context: Context) => {
