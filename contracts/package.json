@@ -15,6 +15,7 @@
     "hardhat-deploy": "^0.12.4"
   },
   "dependencies": {
+    "@chainlink/env-enc": "^1.0.5",
     "solady": "^0.0.237"
   }
 }
