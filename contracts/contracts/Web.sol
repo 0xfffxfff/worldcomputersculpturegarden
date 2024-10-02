@@ -49,10 +49,12 @@ contract GardenRenderer {
             'html { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 590px; margin: 5em auto; word-break: break-all; }",
-            "a { color: inherit; text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            ".c { max-width: 590px; margin: 5em auto; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
-            ".s { margin: 5em 0 5em; }",
+            "a { color: inherit; text-decoration: underline; }",
+            ".s { margin: 10em 0; }",
+            ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            "pre { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
         );
         html = string.concat(
@@ -68,8 +70,14 @@ unicode"                       ⚘\n",
 unicode"            ⚘\n",
 unicode"          </pre>",
             "<br><br>",
-            "<h1>", Sculpture(garden).title() ,"</h1>");
-            // "<p>", Sculpture(garden).text(), "</p>"
+            "<h1>", Sculpture(garden).title() ,"</h1>"
+            '<br /><br />',
+        '<p>',
+        'A contract show organized by ',
+        '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br />with special thanks to ',
+        '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
+        "</p>",
+        "<br />");
 
         address[] memory sculptures = IGarden(garden).getSculptures();
         for (uint256 i = 0; i < sculptures.length; i++) {
@@ -77,8 +85,12 @@ unicode"          </pre>",
             string memory title = sculpture.title();
             html = string.concat(html, '<div class="s"');
             string[] memory authors = sculpture.authors();
-            for (uint256 j = 0; j < authors.length; j++) {
-                html = string.concat(html, "<p>", authors[j], "</p>");
+            if (authors.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < authors.length; j++) {
+                    html = string.concat(html, authors[j], "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             if (bytes(title).length > 0) {
                 html = string.concat(html, "<h2><i>", title, "</i></h2>");
@@ -86,12 +98,20 @@ unicode"          </pre>",
                 html = string.concat(html, "<h2><i>", "Untitled", "</i></h2>");
             }
             address[] memory addresses = sculpture.addresses();
-            for (uint256 j = 0; j < addresses.length; j++) {
-                html = string.concat(html, "<p>", LibString.toHexString(addresses[j]), "</p>");
+            if (addresses.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < addresses.length; j++) {
+                    html = string.concat(html, LibString.toHexString(addresses[j]), "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             string[] memory urls = sculpture.urls();
-            for (uint256 j = 0; j < urls.length; j++) {
-                html = string.concat(html, renderUrl(urls[j]), '<br/>');
+            if (urls.length > 0) {
+                html = string.concat(html, "<p>");
+                for (uint256 j = 0; j < urls.length; j++) {
+                    html = string.concat(html, renderUrl(urls[j]), "<br/>");
+                }
+                html = string.concat(html, "</p>");
             }
             string memory text = sculpture.text();
             if (bytes(text).length > 0) {

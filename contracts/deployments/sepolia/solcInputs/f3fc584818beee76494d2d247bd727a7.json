@@ -1,0 +1,39 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/placeholders/Placeholders.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport \"../Sculpture.sol\";\n\nabstract contract PlaceholderSculpture is Sculpture {\n    function title() external pure override returns (string memory) {\n        return \"Untitled (Placeholder)\";\n    }\n\n    function addresses() external view override returns (address[] memory) {\n        address[] memory addresses_ = new address[](1);\n        addresses_[0] = address(0x0);\n        return addresses_;\n    }\n\n    function text() public view override returns (string memory) {}\n\n    function urls() public view override returns (string[] memory urls) {} // empty\n\n}\n\ncontract Placeholder113 is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"113\";\n        return authors_;\n    }\n}\n\ncontract Placeholderpaulseidler is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"Paul Seidler\";\n        return authors_;\n    }\n}\n\ncontract Placeholder0xhaiku is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"0xhaiku\";\n        return authors_;\n    }\n}\n\ncontract Placeholderfigure31 is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"Loucas Braconnier (Figure31)\";\n        return authors_;\n    }\n}\n\ncontract Placeholderrheamyers is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"Rhea Myers\";\n        return authors_;\n    }\n}\n\ncontract Placeholdermaterial is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"Material\";\n        return authors_;\n    }\n}\n\ncontract Placeholdersarahfriend is PlaceholderSculpture {\n    function authors() external view override returns (string[] memory) {\n        string[] memory authors_ = new string[](1);\n        authors_[0] = \"Sarah Friend\";\n        return authors_;\n    }\n}"
+    },
+    "contracts/Sculpture.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity >=0.8.0;\n\ninterface Sculpture {\n\n    function title() external view returns (string memory);\n\n    function authors() external view returns (string[] memory);\n\n    function addresses() external view returns (address[] memory);\n\n    function urls() external view returns (string[] memory);\n\n    function text() external view returns (string memory);\n\n}\n"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
