@@ -56,12 +56,12 @@ contract GardenRenderer {
             'html, body { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; }",
+            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: content-box; }",
             "a { color: inherit; text-decoration: underline; }",
-            ".w { min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; padding: 10em 0; }",
+            ".w { min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
             ".s { width: 100%; max-width: 840px; }",
             ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-            ".t { max-width: 100%; overflow-x: scroll; }",
+            ".t { max-width: 100%; overflow-x: auto; }",
             ".i { margin: 50vh 0 5em; }",
             "</style>"
         );
