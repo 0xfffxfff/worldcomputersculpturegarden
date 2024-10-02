@@ -57,14 +57,12 @@ contract GardenRenderer {
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
             ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; }",
-            // "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
             ".w { min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; padding: 10em 0; }",
             ".s { width: 100%; max-width: 840px; }",
-            ".s:not(.g) a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             ".t { max-width: 100%; overflow-x: scroll; }",
             ".i { margin: 50vh 0 5em; }",
-            // "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
         );
         html = string.concat(

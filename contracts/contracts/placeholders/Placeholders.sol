@@ -58,6 +58,27 @@ contract Placeholder0xhaiku is PlaceholderSculpture {
         authors_[0] = "0xhaiku";
         return authors_;
     }
+
+    function title() external pure override returns (string memory) {
+        return "Flattend Verse Protocol";
+    }
+
+    function addresses() external view override returns (address[] memory) {
+        address[] memory addresses_ = new address[](1);
+        addresses_[0] = address(0xa964cD6fAA26bb425D13f63246Ebd7fF9ccCaBC4);
+        return addresses_;
+    }
+
+    function urls() public pure override returns (string[] memory) {
+        string[] memory urls_ = new string[](1);
+        urls_[0] = "https://0xhaiku.com/protocol";
+        return urls_;
+    }
+
+    function text() public view override returns (string memory) {
+        return
+            "Technological advancements have given us overly abundant communication methods, sometimes distancing us from poetic sensibility. This artwork collaboratively generates an endless poem through a smart contract that allows only specific words defined by the artist to be input. The parent contract creates contracts with an interface accepting only specified inputs (function input(string calldata word)). Each contract has its own unique, limited dictionary, and anyone can contribute. Through blockchain, everyone has become a flat existence represented by an address. This flat chain of poetry connects people of different cultural backgrounds on an equal flat plane, building new relationships through words. Below are the created contracts. Please try linking your words.";
+    }
 }
 
 contract Placeholderfigure31 is PlaceholderSculpture {
