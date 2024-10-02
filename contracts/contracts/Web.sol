@@ -52,8 +52,10 @@ contract GardenRenderer {
             ".c { max-width: 840px; margin: 5em auto; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
-            ".s { margin: 10em 0; max-width: 840px; overflow-x: scroll; }",
+            ".w { min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; padding: 10em 0; }",
+            ".s { max-width: 840px; overflow-x: scroll; }",
             ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            ".i { margin: 50vh 0 5em; }",
             "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
         );
@@ -83,7 +85,7 @@ unicode"          </pre>",
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
             string memory title = sculpture.title();
-            html = string.concat(html, '<div class="s"');
+            html = string.concat(html, '<div class="w"><div class="s">');
             string[] memory authors = sculpture.authors();
             if (authors.length > 0) {
                 html = string.concat(html, "<p>");
@@ -119,13 +121,13 @@ unicode"          </pre>",
             if (bytes(text).length > 0) {
                 html = string.concat(html, "<p>", text, "</p>");
             }
-            html = string.concat(html, "</div>");
+            html = string.concat(html, "</div></div>");
         }
         // uint contributed = GardenContributions(garden).getContributed();
         // for (uint256 i = 0; i < contributed; i++) {
         //     html = string(abi.encodePacked(html, "<li>", GardenContributions(garden).getContribution(i), "</li>"));
         // }
-        html = string.concat(html, "<br><br><p>Generated at block ", LibString.toString(block.number), " (", LibString.toString(block.timestamp), ")</p>");
+        html = string.concat(html, '<div class="i">Generated at block ', LibString.toString(block.number), " (", LibString.toString(block.timestamp), ")</div>");
         html = string.concat(html, "</div></body></html>");
         return html;
     }
