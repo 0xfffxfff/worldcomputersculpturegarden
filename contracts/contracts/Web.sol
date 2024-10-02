@@ -41,6 +41,8 @@ contract GardenRenderer {
     }
 
     function html() public view returns (string memory) {
+        address[] memory sculptures = IGarden(garden).getSculptures();
+
         string memory html = "<html>";
         html = string.concat(html,
             '<head>',
@@ -54,40 +56,64 @@ contract GardenRenderer {
             'html, body { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 840px; margin: 5em auto; padding: 1.5em; }",
-            "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
+            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; }",
+            // "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
             ".w { min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; padding: 10em 0; }",
             ".s { width: 100%; max-width: 840px; }",
-            ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            ".s:not(.g) a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             ".t { max-width: 100%; overflow-x: scroll; }",
             ".i { margin: 50vh 0 5em; }",
-            "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
+            // "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
         );
         html = string.concat(
             html, "<body>",
             '<div class="c">',
+            '<div class="w"><div class="s g">',
             '<pre class="garden">',
-unicode"     ⚘\n",
-unicode"              ⚘         ⚘\n",
-unicode"        ⚘\n",
-unicode"                     ⚘     ⚘\n",
-unicode"      ⚘        ⚘\n",
-unicode"                       ⚘\n",
-unicode"            ⚘\n",
-unicode"          </pre>",
-            "<br><br>",
-            "<h1>", Sculpture(garden).title() ,"</h1>"
+            unicode"       ⚘                    ⚘\n",
+            unicode"             ⚘\n",
+            unicode"⚘                       ⚘         ⚘\n",
+            unicode"        ⚘         ⚘\n",
+            unicode"   ⚘                          ⚘\n",
+            unicode"</pre>",
             '<br /><br />',
-        '<p>',
-        'A contract show organized by ',
-        '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br />with special thanks to ',
-        '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
-        "</p>",
-        "<br />");
+            unicode"<h1>", Sculpture(garden).title(), "</h1>\n",
+            '<br /><br />'
+        );
+        for (uint256 i = 0; i < sculptures.length; i++) {
+            string[] memory authors = Sculpture(sculptures[i]).authors();
+            // Temporary: For now we just use the first author here
+            if (authors.length > 0) {
+                html = string.concat(html, authors[0], "<br/>");
+            }
+        }
+        html = string.concat(html,
+            '<br /><br />',
+            '<pre class="garden">',
+            unicode"      ⚘                      ⚘\n",
+            unicode"              ⚘\n",
+            unicode" ⚘                     ⚘         ⚘\n",
+            unicode"          ⚘      ⚘\n",
+            unicode"     ⚘                     ⚘\n",
+            unicode"</pre>",
+            '<br />',
+            '<p>',
+            'A contract show organized by ',
+            '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br />',
+            'with special thanks to ',
+            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
+            "</p>",
+            '<br /><br />'
+        );
 
-        address[] memory sculptures = IGarden(garden).getSculptures();
+        html = string.concat(
+            html,
+            "<br />",
+            "</div></div>"
+        );
+
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
             string memory title = sculpture.title();

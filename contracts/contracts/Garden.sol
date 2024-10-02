@@ -59,11 +59,20 @@ contract Garden is Sculpture, Ownable {
     }
 
     function authors() external view returns (string[] memory) {
-        string[] memory authors_;
+        uint256 length;
         for (uint256 i = 0; i < sculptures.length; i++) {
             string[] memory sculptureAuthors = Sculpture(sculptures[i]).authors();
             for (uint256 j = 0; j < sculptureAuthors.length; j++) {
-                authors_[authors_.length] = sculptureAuthors[j];
+                length++;
+            }
+        }
+        string[] memory authors_ = new string[](length);
+        uint256 index;
+        for (uint256 i = 0; i < sculptures.length; i++) {
+            string[] memory sculptureAuthors = Sculpture(sculptures[i]).authors();
+            for (uint256 j = 0; j < sculptureAuthors.length; j++) {
+                authors_[index] = sculptureAuthors[j];
+                index++;
             }
         }
         return authors_;
