@@ -43,18 +43,24 @@ contract GardenRenderer {
     function html() public view returns (string memory) {
         string memory html = "<html>";
         html = string.concat(html,
-            "<style>"
+            '<head>',
+            '<meta charset="UTF-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            '<title>', Sculpture(garden).title() ,'</title>',
+            '</head>',
+            "<style>",
             '*, *::before, *::after { box-sizing: border-box; }',
             'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; }',
-            'html { margin: 0; padding: 0; } body { min-height: 100vh }',
+            'html, body { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 840px; margin: 5em auto; }",
+            ".c { max-width: 840px; margin: 5em auto; padding: 1.5em; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
             ".w { min-height: 100vh; display: flex; align-items: center; box-sizing: border-box; padding: 10em 0; }",
-            ".s { max-width: 840px; overflow-x: scroll; }",
+            ".s { width: 100%; max-width: 840px; }",
             ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+            ".t { max-width: 100%; overflow-x: scroll; }",
             ".i { margin: 50vh 0 5em; }",
             "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
@@ -88,17 +94,17 @@ unicode"          </pre>",
             html = string.concat(html, '<div class="w"><div class="s">');
             string[] memory authors = sculpture.authors();
             if (authors.length > 0) {
-                html = string.concat(html, "<p>");
+                html = string.concat(html, "<h2>");
                 for (uint256 j = 0; j < authors.length; j++) {
                     if (bytes(authors[j]).length == 0) continue; // ignore empty
                     html = string.concat(html, authors[j], "<br/>");
                 }
-                html = string.concat(html, "</p>");
+                html = string.concat(html, "</h2>");
             }
             if (bytes(title).length > 0) {
-                html = string.concat(html, "<h2><i>", title, "</i></h2>");
+                html = string.concat(html, "<h3><i>", title, "</i></h3>");
             } else {
-                html = string.concat(html, "<h2><i>", "Untitled", "</i></h2>");
+                html = string.concat(html, "<h3><i>", "Untitled", "</i></h3>");
             }
             address[] memory addresses = sculpture.addresses();
             if (addresses.length > 0) {
@@ -120,8 +126,8 @@ unicode"          </pre>",
             string memory text = sculpture.text();
             bool isSarah = sculpture.authors().length > 0 && keccak256(abi.encodePacked(sculpture.authors()[0])) == keccak256(abi.encodePacked("Sarah Friend"));
             if (bytes(text).length > 0) {
-                if (isSarah) { html = string.concat(html, "<pre>", text, "</pre>"); }
-                else { html = string.concat(html, "<p>", text, "</p>"); }
+                if (isSarah) { html = string.concat(html, '<div class="t"><pre>', text, '</pre></div>'); }
+                else { html = string.concat(html, '<div class="t"><p>', text, '</p></div>'); }
             }
             html = string.concat(html, "</div></div>");
         }
@@ -143,7 +149,7 @@ unicode"          </pre>",
         // Find the position of "://", which indicates the end of the protocol
         for (uint256 i = 0; i < length - 2; i++) {
             if (urlBytes[i] == ":" && urlBytes[i + 1] == "/" && urlBytes[i + 2] == "/") {
-                start = i + 3; // Skip the "://"
+                start = i + 3; // Skip the "://"max
                 break;
             }
         }
