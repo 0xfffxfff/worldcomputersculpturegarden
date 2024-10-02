@@ -23,6 +23,39 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   for (const artist of SCULPTURES.artists) {
     // @ts-ignore
     const address = SCULPTURES.sculptures?.[chainId]?.[artist];
+
+    // EXCEPTION: FIGURE 31
+    if (artist === "figure31") {
+      console.log("Deploying Travel for figure31");
+      const perlin = await deploy("Perlin", {
+        from: deployer,
+        log: true,
+      });
+      const travel = await deploy("Travel", {
+        from: deployer,
+        log: true,
+        libraries: {
+          Perlin: perlin.address,
+        }
+      });
+      console.log(`Travel deployed at ${travel.address}`);
+      sculptureList.push(travel.address);
+      continue;
+    }
+
+    // EXCEPTION: RHEA MYERS
+    if (artist === "rheamyers") {
+      const showCritique = await deploy("ShowCritique", {
+        from: deployer,
+        log: true
+      });
+      const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
+      await showCritiqueInstance.configure(gardenDeployment.address);
+      sculptureList.push(showCritique.address);
+      continue;
+    }
+
+    // REGULAR
     if (address && ethers.isAddress(address)) {
       console.log(`Sculpture available for ${artist} at ${address}`);
       sculptureList.push(address);

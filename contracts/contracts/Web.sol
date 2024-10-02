@@ -49,18 +49,18 @@ contract GardenRenderer {
             'html { margin: 0; padding: 0; } body { min-height: 100vh }',
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 590px; margin: 5em auto; }",
+            ".c { max-width: 840px; margin: 5em auto; }",
             "@media screen and (max-width: 760px) { .c { margin: 2.5em auto; } }",
             "a { color: inherit; text-decoration: underline; }",
-            ".s { margin: 10em 0; }",
+            ".s { margin: 10em 0; max-width: 840px; overflow-x: scroll; }",
             ".s a { text-decoration: none; max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-            "pre { line-height: 1.3; font-size: 1.2rem;}",
+            "pre.garden { line-height: 1.3; font-size: 1.2rem;}",
             "</style>"
         );
         html = string.concat(
             html, "<body>",
             '<div class="c">',
-            "<pre>",
+            '<pre class="garden">',
 unicode"     ⚘\n",
 unicode"              ⚘         ⚘\n",
 unicode"        ⚘\n",
@@ -88,6 +88,7 @@ unicode"          </pre>",
             if (authors.length > 0) {
                 html = string.concat(html, "<p>");
                 for (uint256 j = 0; j < authors.length; j++) {
+                    if (bytes(authors[j]).length == 0) continue; // ignore empty
                     html = string.concat(html, authors[j], "<br/>");
                 }
                 html = string.concat(html, "</p>");
@@ -109,6 +110,7 @@ unicode"          </pre>",
             if (urls.length > 0) {
                 html = string.concat(html, "<p>");
                 for (uint256 j = 0; j < urls.length; j++) {
+                    if (bytes(urls[j]).length == 0) continue; // ignore empty
                     html = string.concat(html, renderUrl(urls[j]), "<br/>");
                 }
                 html = string.concat(html, "</p>");

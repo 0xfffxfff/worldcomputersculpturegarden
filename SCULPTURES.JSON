@@ -10,7 +10,10 @@
     ],
     "sculptures": {
         "11155111": {
-            "paulseidler": "0x6a7139325371a314Fe1374063869F89cB7c09D57"
+            "0xhaiku": "0x27656080f1B90699D4272CD86886893ACC1e7650",
+            "paulseidler": "0x6a7139325371a314Fe1374063869F89cB7c09D57",
+            "material": "0xb5D70C16199146Bbc7085d069095697243511b09",
+            "sarahfriend": "0x37a4F85916E19935acA7b912061E44d7F4611440"
         }
     }
 }

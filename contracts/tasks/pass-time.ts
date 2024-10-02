@@ -8,5 +8,7 @@ export default async function passTime(taskArgs: TaskArguments, hre: HardhatRunt
   await hre.ethers.provider.send("evm_increaseTime", [3 * 24 * 60 * 60]);
 
   // then advance a block
-  await hre.ethers.provider.send("evm_mine", []);
+  for (let i = 0; i < 80; i++) {
+    await hre.ethers.provider.send("evm_mine", []);
+  }
 }
