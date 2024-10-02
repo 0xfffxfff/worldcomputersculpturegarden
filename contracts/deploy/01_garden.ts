@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const web = await deployments.get("Web");
 
-  await deploy("Garden", {
+  const garden = await deploy("Garden", {
     args: [
       [],
       web.address,
@@ -18,6 +18,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     gasLimit: 18_000_000,
     log: true,
   });
+
+  const showCritiqueInstance = await hre.ethers.getContractAt(
+  "ShowCritique",
+  showCritique.address
+  );
+  //IMPORTANT: This *must* be called by the deploying/owning account
+  // after the garden has been deployed.
+  await showCritiqueInstance.configure(garden.address);
 };
 
 export default func;
