@@ -2,15 +2,15 @@ const express = require('express');
 const { ethers } = require('ethers');
 const dotenv = require('dotenv');
 
-const deploymentArtifact = require('../contracts/deployments/localhost/Garden.json');
-// const deploymentArtifact = require('../contracts/deployments/sepolia/Garden.json');
+// const deploymentArtifact = require('../contracts/deployments/localhost/Garden.json');
+const deploymentArtifact = require('../contracts/deployments/sepolia/Garden.json');
 
 dotenv.config();
 
 const CACHE_EXPIRATION_TIME = 12 * 1000; // 12 seconds
 const CACHE_ENABLED = process.env.CACHE_ENABLED === 'false' ? false : true; // Enable/disable cache
-const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:8545'; // Default to localhost
-// const RPC_URL = process.env.RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
+// const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:8545'; // Default to localhost
+const RPC_URL = process.env.RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
 const PORT = process.env.PORT || 3333;
 
 const app = express();
