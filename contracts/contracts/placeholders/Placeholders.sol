@@ -113,4 +113,8 @@ contract Placeholdersarahfriend is PlaceholderSculpture {
         authors_[0] = "Sarah Friend";
         return authors_;
     }
+
+    function text() public view override returns (string memory) {
+        return "This is an example sculpture that is static.";
+    }
 }

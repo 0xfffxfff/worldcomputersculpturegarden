@@ -118,8 +118,10 @@ unicode"          </pre>",
                 html = string.concat(html, "</p>");
             }
             string memory text = sculpture.text();
+            bool isSarah = sculpture.authors().length > 0 && keccak256(abi.encodePacked(sculpture.authors()[0])) == keccak256(abi.encodePacked("Sarah Friend"));
             if (bytes(text).length > 0) {
-                html = string.concat(html, "<p>", text, "</p>");
+                if (isSarah) { html = string.concat(html, "<pre>", text, "</pre>"); }
+                else { html = string.concat(html, "<p>", text, "</p>"); }
             }
             html = string.concat(html, "</div></div>");
         }
