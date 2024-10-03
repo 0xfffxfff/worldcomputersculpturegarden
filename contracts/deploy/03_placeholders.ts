@@ -24,8 +24,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     // @ts-ignore
     const address = SCULPTURES.sculptures?.[chainId]?.[artist];
 
-    // EXCEPTION: FIGURE 31
-    if (artist === "figure31") {
+    if (address && ethers.isAddress(address)) {
+      console.log(`Sculpture available for ${artist} at ${address}`);
+      sculptureList.push(address);
+    } else if (artist === "figure31") {  // EXCEPTION: FIGURE 31
       console.log("Deploying Travel for figure31");
       const perlin = await deploy("Perlin", {
         from: deployer,
@@ -41,10 +43,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       console.log(`Travel deployed at ${travel.address}`);
       sculptureList.push(travel.address);
       continue;
-    }
-
-    // EXCEPTION: RHEA MYERS
-    if (artist === "rheamyers") {
+    } else if (artist === "rheamyers") { // EXCEPTION: RHEA MYERS
       const showCritique = await deploy("ShowCritique", {
         from: deployer,
         log: true
@@ -53,12 +52,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       await showCritiqueInstance.configure(gardenDeployment.address);
       sculptureList.push(showCritique.address);
       continue;
-    }
-
-    // REGULAR
-    if (address && ethers.isAddress(address)) {
-      console.log(`Sculpture available for ${artist} at ${address}`);
-      sculptureList.push(address);
     } else {
       console.log(`No sculpture available for ${artist}`);
       console.log(`Deploying placeholder`);

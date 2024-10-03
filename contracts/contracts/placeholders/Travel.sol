@@ -31,10 +31,6 @@ contract Travel is Sculpture {
         uint256 offset = block.number - uint(int(journey.fromBlock)) - count;
         return string.concat(
             unicode"This contract is a machine that lays time. It expands beyond the boundaries of the machine on which it operates. As time unravels, travellers may use it to journey toward both the future and the past. Once on this road, their presence simultaneously generates and marks the landscape. New land is discovered with every block of time, and with each passing day, fragments of these travellers are left behind for others to bear witness.",
-            "<br/><br/>",
-            unicode"DGLR (T) is a dynamic smart contract artwork on the Ethereum Blockchain, allowing individual addresses to travel through time, represented by Ethereum Blocks. These travellers may move forward or backward in time. As they freely start and end their journeys, each block spent travelling adds a character to an endlessly long string, shaping their individual landscape. With each passing day (approximately 7000 blocks), they leave a footprint on a collective landscape, which spreads and becomes part of all other individual landscapes. The contract’s limited read functions only allow viewers to generate fragments. However, complete landscapes can be generated off-chain using the algorithm provided within the contract.",
-            "<br/><br/>",
-            unicode"This artwork creates parallels between real and virtual time, scaling alongside another perpetually expanding network. It forever pushes beyond the limited computational environment of the Ethereum blockchain—a negative space growing within a positive one. After Michael Heizer, Double Negative.",
             "<br/><br/><br/>",
             landscape(1, offset, count)
         );
