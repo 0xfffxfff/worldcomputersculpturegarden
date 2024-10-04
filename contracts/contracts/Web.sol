@@ -61,7 +61,7 @@ contract GardenRenderer {
             ".w { min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
             ".s { width: 100%; max-width: 840px; }",
             ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-            ".t { max-width: 100%; overflow-x: auto; }",
+            ".t { max-width: 100%; overflow-x: auto; margin: 1em 0; }",
             ".i { margin: 50vh 0 5em; }",
             "</style>"
         );
@@ -148,10 +148,8 @@ contract GardenRenderer {
                 html = string.concat(html, "</p>");
             }
             string memory text = sculpture.text();
-            bool isSarah = sculpture.authors().length > 0 && keccak256(abi.encodePacked(sculpture.authors()[0])) == keccak256(abi.encodePacked("Sarah Friend"));
             if (bytes(text).length > 0) {
-                if (isSarah) { html = string.concat(html, '<div class="t"><pre>', text, '</pre></div>'); }
-                else { html = string.concat(html, '<div class="t"><p>', text, '</p></div>'); }
+                html = string.concat(html, '<div class="t">', text, '</div>');
             }
             html = string.concat(html, "</div></div>");
         }
