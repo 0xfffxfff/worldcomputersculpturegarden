@@ -73,7 +73,7 @@ describe("Garden", function () {
         value: hre.ethers.parseEther("0.149999999999999999"),
       });
 
-      for (let i = 6; i < 15; i++) {
+      for (let i = 6; i < 20; i++) {
         const acc = signers[i];
         await acc.sendTransaction({
           to: await st.getAddress(),
@@ -81,14 +81,40 @@ describe("Garden", function () {
         });
       }
 
-      // console.log(await st.topContributors(10))
-      expect(await st.topContributors(10)).not.to.be.reverted;
+      expect(await st.topContributors(20)).not.to.be.reverted;
+      console.log("Top contributors: ", await st.topContributors(20));
 
       const balanceBefore = await hre.ethers.provider.getBalance(await acc1.getAddress());
       const totalContributions = await st.totalContributions();
       await st.connect(owner).withdraw(await acc1.getAddress());
       const balanceAfter = await hre.ethers.provider.getBalance(await acc1.getAddress());
       expect(balanceAfter).to.equal(balanceBefore + totalContributions);
+
+      for (let i = 0; i < 20; i++) {
+        const acc = signers[i];
+        await acc.sendTransaction({
+          to: await st.getAddress(),
+          value: hre.ethers.parseEther((Math.random()*10).toFixed(18)),
+        });
+      }
+      for (let i = 0; i < 20; i++) {
+        const acc = signers[i];
+        await acc.sendTransaction({
+          to: await st.getAddress(),
+          value: hre.ethers.parseEther((Math.random()*10).toFixed(18)),
+        });
+      }
+      for (let i = 0; i < 20; i++) {
+        const acc = signers[i];
+        await acc.sendTransaction({
+          to: await st.getAddress(),
+          value: hre.ethers.parseEther((Math.random()*10).toFixed(18)),
+        });
+      }
+
+      expect(await st.topContributors(20)).not.to.be.reverted;
+      const [contributors, contributions] = await st.topContributors(20);
+      console.log("Top contributors: ", contributors.map((c, i) => [c, hre.ethers.formatEther(contributions[i])]));
     });
   });
 });

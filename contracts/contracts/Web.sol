@@ -179,13 +179,13 @@ contract GardenRenderer {
         // Resolve ENS
         html = string.concat(html,
             '<script type="module">',
-            'import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
-            'const provider = new ethers.JsonRpcProvider("https://eth.drpc.org");',
+            'import { JsonRpcProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
+            'const provider = new JsonRpcProvider("https://eth.drpc.org");',
 
             'const result = await Promise.all(',
                 'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
                 'const address = el.textContent;',
-                'if (!ethers.isAddress(address)) return address;',
+                'if (!isAddress(address)) return address;',
                 'const name = await provider.lookupAddress(address);',
                 'if (name) el.textContent = name;',
                 'return name || address;',
