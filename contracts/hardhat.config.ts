@@ -8,13 +8,14 @@ envEnc.config();
 import "./tasks";
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.27",
+  solidity: "0.8.28",
   contractSizer: {
     runOnCompile: process.env.REPORT_SIZE === "true",
   },
   networks: {
     sepolia: {
-      url: "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      // url: "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      url: "https://ethereum-sepolia.rpc.subquery.network/public",
       chainId: 11155111,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     }

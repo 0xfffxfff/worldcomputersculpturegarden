@@ -1,0 +1,17 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const { deployments, getUnnamedAccounts } = hre;
+  const { deploy } = deployments;
+  const [deployer] = await getUnnamedAccounts();
+
+  await deploy("SP", {
+    from: deployer,
+    gasLimit: 18_000_000,
+    log: true,
+  });
+};
+
+export default func;
+func.tags = ["SP"];

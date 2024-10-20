@@ -52,14 +52,22 @@ contract Travel is Sculpture {
     mapping(address => uint256) travellerCurrentJourney;
 
     constructor() {
-        _begin(true, address(this));
+        _begin(address(this), true);
+    }
+
+    function begin() public {
+        _begin(msg.sender, true);
+    }
+
+    function begin(address traveller) public {
+        _begin(traveller, true);
     }
 
     function begin(bool direction) public {
-        _begin(direction, msg.sender);
+        _begin(msg.sender, direction);
     }
 
-    function _begin(bool direction, address traveller) internal {
+    function _begin(address traveller, bool direction) internal {
         uint256 currentJourneyIndex = travellerCurrentJourney[traveller];
         Journey memory currentJourney = journeys[currentJourneyIndex];
         require(currentJourney.active == false, "You already have an active journey");
@@ -119,7 +127,7 @@ contract Travel is Sculpture {
         while (true) {
             uint32 _x = journey.forward ? uint32(uint256(int(_fromBlock + int(counter))) % uint256(type(uint32).max)) : uint32(uint256(int(_fromBlock - int(counter))) % uint256(type(uint32).max));
 
-            uint256 height = Perlin.computePerlin(_x, 0, uint32(seed), 64);
+            uint256 height = Perlin.computePerlin(_x, uint32(index), uint32(seed), 64);
             // Estimated Practical range between 16 and 48 (0-64 is the theoretical range)
             // Put a ceiling on the height
             height = height > 43 ? 43 : height;

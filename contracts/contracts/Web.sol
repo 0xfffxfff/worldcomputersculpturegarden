@@ -3,12 +3,12 @@ pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
 import "solady/src/utils/LibString.sol";
+import "./lib/Format.sol";
 import "./Sculpture.sol";
 
 interface IGarden {
-    function getContribution(uint256 index) external view returns (address contributor, uint256 amount);
-    function getContributed() external view returns (uint256);
     function getSculptures() external view returns (address[] memory);
+    function topContributors(uint limit) external view returns (address[] memory, uint[] memory);
 }
 
 interface IWeb {
@@ -40,9 +40,7 @@ contract GardenRenderer {
         garden = _garden;
     }
 
-    function html() public view returns (string memory) {
-        address[] memory sculptures = IGarden(garden).getSculptures();
-
+    function _html(string memory body) internal view returns (string memory) {
         string memory html = "<html>";
         html = string.concat(html,
             '<head>',
@@ -65,8 +63,13 @@ contract GardenRenderer {
             ".i { margin: 50vh 0 5em; }",
             "</style>"
         );
-        html = string.concat(
-            html, "<body>",
+        html = string.concat(html, "<body>", body, "</body></html>");
+        return html;
+    }
+
+    function html() public view returns (string memory html) {
+        address[] memory sculptures = IGarden(garden).getSculptures();
+        html = string.concat(html,
             '<div class="c">',
             '<div class="w"><div class="s g">',
             '<pre class="garden">',
@@ -106,11 +109,14 @@ contract GardenRenderer {
             '<br /><br />'
         );
 
+
         html = string.concat(
             html,
             "<br />",
             "</div></div>"
         );
+
+        // Sculptures
 
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
@@ -153,14 +159,24 @@ contract GardenRenderer {
             }
             html = string.concat(html, "</div></div>");
         }
-        // uint contributed = GardenContributions(garden).getContributed();
-        // for (uint256 i = 0; i < contributed; i++) {
-        //     html = string(abi.encodePacked(html, "<li>", GardenContributions(garden).getContribution(i), "</li>"));
-        // }
+
+        // Top10 Contributions
+        (address[] memory topContributors, uint256[] memory topContributions) = IGarden(garden).topContributors(10);
+        html = string.concat(html, '<div class="w"><div class="s">');
+        html = string.concat(html, "<h2>Top Contributors of this show</h2>");
+        html = string.concat(html, "<ol>");
+        for (uint256 i = 0; i < topContributors.length; i++) {
+            html = string.concat(html, "<li>", LibString.toHexString(topContributors[i]), " - ", Format.formatEther(topContributions[i]), "</li>");
+        }
+        html = string.concat(html, "</ol>");
+        html = string.concat(html, "</div></div>");
+
         html = string.concat(html, '<div class="i">Generated at block ', LibString.toString(block.number), " (", LibString.toString(block.timestamp), ")</div>");
-        html = string.concat(html, "</div></body></html>");
-        return html;
+        html = string.concat(html, "</div>");
+
+        return _html(html);
     }
+
 
     function stripURL(string memory url) internal pure returns (string memory) {
         bytes memory urlBytes = bytes(url);
@@ -202,6 +218,5 @@ contract GardenRenderer {
         string memory strippedUrl = stripURL(url);
         return string.concat('<a href="', url, '" target="_blank" rel="noopener noreferrer">', strippedUrl ,'</a>');
     }
-
 
 }

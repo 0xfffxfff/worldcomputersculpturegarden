@@ -6,6 +6,9 @@ describe("Show Critique", function () {
   async function deployFixture() {
     const [owner, acc1] = await hre.ethers.getSigners();
 
+    const SP = await hre.ethers.getContractFactory("SP");
+    const sp = await SP.deploy();
+
     const StaticExample = await hre.ethers.getContractFactory(
       "ExampleSculptureStatic"
     );
@@ -33,7 +36,7 @@ describe("Show Critique", function () {
       await example3.getAddress(),
       await example4.getAddress(),
       await showCritique.getAddress()
-    ], await web.getAddress());
+    ], await web.getAddress(), await sp.getAddress());
 
     const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
     const renderer = await GardenRenderer.deploy(await garden.getAddress());

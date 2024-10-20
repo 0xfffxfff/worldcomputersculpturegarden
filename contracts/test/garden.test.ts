@@ -6,6 +6,9 @@ describe("Garden", function () {
   async function deployFixture() {
     const [owner, acc1] = await hre.ethers.getSigners();
 
+    const SP = await hre.ethers.getContractFactory("SP");
+    const sp = await SP.deploy();
+
     const StaticExample = await hre.ethers.getContractFactory(
       "ExampleSculptureStatic"
     );
@@ -29,14 +32,14 @@ describe("Garden", function () {
       await example2.getAddress(),
       await example3.getAddress(),
       await example4.getAddress(),
-    ], await web.getAddress());
+    ], await web.getAddress(), await sp.getAddress());
 
     const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
     const renderer = await GardenRenderer.deploy(await garden.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
 
-    return { garden, Garden, web, Web, owner, acc1 };
+    return { garden, Garden, web, Web, sp, SP, owner, acc1 };
   }
 
   describe("Deployment", function () {
