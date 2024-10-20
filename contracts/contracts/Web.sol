@@ -60,7 +60,7 @@ contract GardenRenderer {
             ".s { width: 100%; max-width: 840px; }",
             ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             ".t { max-width: 100%; overflow-x: auto; margin: 1em 0; }",
-            ".i { margin: 50vh 0 5em; }",
+            ".i { margin: 0 0 5em; }",
             "</style>"
         );
         html = string.concat(html, "<body>", body, "</body></html>");
@@ -81,6 +81,7 @@ contract GardenRenderer {
             unicode"</pre>",
             '<br /><br />',
             unicode"<h1>", Sculpture(garden).title(), "</h1>\n",
+            '<h2>', LibString.toHexString(garden), '</h2>',
             '<br /><br />'
         );
         for (uint256 i = 0; i < sculptures.length; i++) {
@@ -163,16 +164,35 @@ contract GardenRenderer {
         // Top10 Contributions
         (address[] memory topContributors, uint256[] memory topContributions) = IGarden(garden).topContributors(10);
         html = string.concat(html, '<div class="w"><div class="s">');
-        html = string.concat(html, "<h2>Top Contributors of this show</h2>");
-        html = string.concat(html, "<ol>");
+        html = string.concat(html, "<p>You may support this show by sending a donation directly to the show contract: ", LibString.toHexString(garden)  ,"</p>");
+        html = string.concat(html, "<h2>Top Contributors</h2>");
+        html = string.concat(html, '<ol class="cl">');
         for (uint256 i = 0; i < topContributors.length; i++) {
-            html = string.concat(html, "<li>", LibString.toHexString(topContributors[i]), " - ", Format.formatEther(topContributions[i]), "</li>");
+            html = string.concat(html, unicode'<li><span class="address">', LibString.toHexString(topContributors[i]), "</span> - ", Format.formatEther(topContributions[i]), " ETH</li>");
         }
         html = string.concat(html, "</ol>");
         html = string.concat(html, "</div></div>");
 
-        html = string.concat(html, '<div class="i">Generated at block ', LibString.toString(block.number), " (", LibString.toString(block.timestamp), ")</div>");
+        html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ " from ", LibString.toHexString(address(this)) ,"</div>");
         html = string.concat(html, "</div>");
+
+        // Resolve ENS
+        html = string.concat(html,
+            '<script type="module">',
+            'import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
+            'const provider = new ethers.JsonRpcProvider("https://eth.drpc.org");',
+
+            'const result = await Promise.all(',
+                'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
+                'const address = el.textContent;',
+                'if (!ethers.isAddress(address)) return address;',
+                'const name = await provider.lookupAddress(address);',
+                'if (name) el.textContent = name;',
+                'return name || address;',
+                '})',
+            ');'
+            '</script>'
+        );
 
         return _html(html);
     }
