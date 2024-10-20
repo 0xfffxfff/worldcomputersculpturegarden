@@ -4,7 +4,7 @@ pragma solidity ^0.8.27;
 import "solady/src/auth/Ownable.sol";
 import "./Sculpture.sol";
 import "./Web.sol";
-import "./s/ST.sol";
+import "./s/impl/ST.sol";
 
 contract Garden is Sculpture, ST {
 
