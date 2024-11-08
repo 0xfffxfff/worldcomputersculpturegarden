@@ -27,22 +27,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (address && ethers.isAddress(address)) {
       console.log(`Sculpture available for ${artist} at ${address}`);
       sculptureList.push(address);
-    } else if (artist === "figure31") {  // EXCEPTION: FIGURE 31
-      console.log("Deploying Travel for figure31");
-      const perlin = await deploy("Perlin", {
-        from: deployer,
-        log: true,
-      });
-      const travel = await deploy("Travel", {
-        from: deployer,
-        log: true,
-        libraries: {
-          Perlin: perlin.address,
-        }
-      });
-      console.log(`Travel deployed at ${travel.address}`);
-      sculptureList.push(travel.address);
-      continue;
     } else if (artist === "rheamyers") { // EXCEPTION: RHEA MYERS
       const showCritique = await deploy("ShowCritique", {
         from: deployer,
