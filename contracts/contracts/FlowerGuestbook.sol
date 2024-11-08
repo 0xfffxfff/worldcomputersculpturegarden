@@ -1,13 +1,13 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
 
 contract FlowerGuestbook is Ownable {
 
-    uint256 public totalFlowers;
-    mapping(address => uint256) public flowers;
-    mapping(uint256 => address) public flowerIndex;
+    uint256 public flowers;
+    mapping(address => uint256) public flowersPlantedBy;
+    mapping(uint256 => address) private flowerBy;
 
     constructor () {
         _initializeOwner(msg.sender);
@@ -17,25 +17,24 @@ contract FlowerGuestbook is Ownable {
         if (msg.value < 0.01 ether) {
             return;
         }
-        uint256 flowerCount = msg.value / 0.01 ether;
-        flowers[msg.sender] += flowerCount;
-        totalFlowers += flowerCount;
-        flowerIndex[totalFlowers - 1] = msg.sender;
+        uint256 newFlowers = msg.value / 0.01 ether;
+        flowersPlantedBy[msg.sender] += newFlowers;
+        flowers += newFlowers;
+        flowerBy[flowers] = msg.sender;
     }
 
-    function ownerOf(uint256 _index) public view returns (address) {
-        require(_index < totalFlowers, "Index out of bounds");
-        address owner = flowerIndex[_index];
-        while (_index < totalFlowers) {
-            _index++;
-            if (flowerIndex[_index] == address(0)) continue;
-            owner = flowerIndex[_index];
-            break;
+    function flower(uint256 flowerId) external view returns (address) {
+        require(0 < flowerId && flowerId <= flowers, "Index out of bounds");
+        while (flowerId <= flowers) {
+            if (flowerBy[flowerId] != address(0)) {
+                break;
+            }
+            flowerId++;
         }
-        return owner;
+        return flowerBy[flowerId];
     }
 
-    function withdraw(address _to) public onlyOwner() {
+    function withdraw(address _to) external onlyOwner() {
         (bool success, ) = _to.call{value: address(this).balance}("");
         require(success, "Failed to withdraw");
     }

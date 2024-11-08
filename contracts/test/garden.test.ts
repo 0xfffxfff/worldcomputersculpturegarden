@@ -1,6 +1,8 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
+import { parseEther } from "ethers";
 import hre from "hardhat";
+import { inputFile } from "hardhat/internal/core/params/argumentTypes";
 
 describe("Garden", function () {
   async function deployFixture() {
@@ -57,6 +59,33 @@ describe("Garden", function () {
       const { web, owner } = await loadFixture(deployFixture);
       const html = await web.html();
       expect(html).to.contain("Example");
+    });
+  });
+
+  describe("FlowerGuestbook", function () {
+    it("Should allow guests to sign", async function () {
+      const { garden, owner, acc1 } = await loadFixture(deployFixture);
+
+      await acc1.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("0.01"),
+      })
+      expect(await garden.flowers()).to.equal(1);
+      expect(await garden.flower(1)).to.equal(await acc1.getAddress());
+      expect(await garden.flowersPlantedBy(await acc1.getAddress())).to.equal(1n);
+
+      await owner.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("150.0"),
+      })
+
+      expect(await garden.flowers()).to.equal(15001);
+      expect(await garden.flower(15001)).to.equal(await owner.getAddress());
+      expect(await garden.flowersPlantedBy(await owner.getAddress())).to.equal(15000);
+      expect(await garden.flower(2,{
+        gasLimit: 60_000_000
+      })).to.equal(await owner.getAddress());
+
     });
   });
 });
