@@ -61,17 +61,12 @@ contract GardenRenderer is IWeb {
     function _html(string memory body) internal view returns (string memory) {
         string memory html = "<html>";
         html = string.concat(html,
-            '<head>',
-            '<meta charset="UTF-8">',
-            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">',
             '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=', unicode"'http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cstyle%3E text %7B fill: %23000; %7D @media (prefers-color-scheme: dark) %7B text %7B fill: %23fff; %7D %7D %3C/style%3E%3Ctext y='.9em' font-size='90'%3E ⚘ %3C/text%3E%3C/svg%3E%0A", '" />',
-            '<title>', Sculpture(garden).title() ,'</title>',
-            '</head>',
+            '<title>', Sculpture(garden).title() ,'</title></head>',
             "<style>",
             '*, *::before, *::after { box-sizing: border-box; }',
-            'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; }',
-            'html, body { margin: 0; padding: 0; } body { min-height: 100vh }',
-            'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
+            'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; } html, body { margin: 0; padding: 0; } body { min-height: 100vh } html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
             ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: content-box; }",
             ".c.essay { max-width: 620px; }",
@@ -121,16 +116,14 @@ contract GardenRenderer is IWeb {
         }
         html = string.concat(html,
             '<br /><br />',
-            '<h2>', LibString.toHexString(garden), '</h2>',
-            '<br />',
+            '<h2>', LibString.toHexString(garden), '</h2><br />',
             '<pre class="garden">',
             unicode"      ⚘                      ⚘\n",
             unicode"              ⚘\n",
             unicode" ⚘                     ⚘         ⚘\n",
             unicode"          ⚘      ⚘\n",
             unicode"     ⚘                     ⚘\n",
-            unicode"</pre>",
-            '<br />',
+            unicode"</pre><br />",
             '<p>',
             'A contract show curated by ',
             '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br/>',
@@ -138,27 +131,21 @@ contract GardenRenderer is IWeb {
             '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
             '<br/><br/>',
             '<a href="/essay">Essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
-            "</p>",
-            '<br /><br />'
+            "</p><br /><br />"
         );
         html = string.concat(
             html,
-            "<br />",
-            "</div>",
-            unicode'<div class="p">↓</div>',
-            "</div>"
+            "<br /></div>",
+            unicode'<div class="p">↓</div></div>'
         );
 
         // Text
 
         html = string.concat(html,
-            '<div class="w"><div class="s">',
-            '<p>',
+            '<div class="w"><div class="s"><p>',
                 Sculpture(garden).text(),
-                '<br/><br/>',
-                '- 0xfff',
-            '</p>',
-            '</div></div>'
+                '<br/><br/> - 0xfff',
+            '</p></div></div>'
         );
 
         // Sculptures
@@ -216,13 +203,25 @@ contract GardenRenderer is IWeb {
                 'You may leave a flower here by sending 0.01 ETH (or multiples thereof)<br/> to the show contract at ',
                     LibString.toHexString(garden),
                 '<br/><br/>',
-                '', LibString.toString(IGarden(garden).guests()),
+                LibString.toString(IGarden(garden).guests() + 5 /* DEV TODO */),
                 ' guests have planted ', LibString.toString(IGarden(garden).flowers()),
                 ' flowers',
-                '</p>',
-                '<br/><br/><br/>',
+                '</p><br/><br/><br/>',
                 '<div id="field2" class="field"></div>',
                 '<script>',
+                    'const flowers = ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */), ';'
+                    'function calculateThreshold(planted) {',
+                        'const min = 30, max = 3000, lower = 0.99, higher = 0.6;',
+                        'if (planted <= min) return lower;',
+                        'if (planted >= max) return higher;',
+                        'const normalized = (planted - min) / (max - min);',
+                        'const logValue = Math.log10(1 + normalized * (10 - 1));',
+                        'return higher + (lower - higher) * (1 - logValue);',
+                    '}',
+                    'function isConditionMet(planted, val) {',
+                        'const threshold = calculateThreshold(planted);',
+                        'return val > threshold || val < -threshold;',
+                    '}',
                     'function gridNoise(x, z, seed) {',
                     '    var n = (1619 * x + 31337 * z + 1013 * seed) & 0x7fffffff;',
                     '    n = BigInt((n >> 13) ^ n);',
@@ -230,35 +229,41 @@ contract GardenRenderer is IWeb {
                     '    n = parseInt(n.toString(2).slice(-31), 2);',
                     '    return 1 - n / 1073741824;',
                     '}',
-                    'const flowers = 100;', // , LibString.toString(IGarden(garden).flowers()), ';'
-                    'const width = 100;',
+                    'const width = 90;',
                     'let lines = [""], counter = 0, planted = 0;',
                     'while (planted < flowers) {',
-                    '    const val = gridNoise(counter % width, Math.floor(counter / width), 0xfff);',
-                    '   console.log(val);',
+                    '    const val = gridNoise(counter % width, Math.floor(counter / width), 0xf);',
                     '    if ('
-                                '((300 < planted && planted < flowers - 300) && (val > 0.88 || val < -0.88))',
-                                '|| ((140 < planted && planted < flowers - 140) && (val > 0.91 || val < -0.91))',
-                                '|| ((80 < planted && planted < flowers - 80) && (val > 0.93 || val < -0.93))',
-                                '|| ((40 < planted && planted < flowers - 40) && (val > 0.955 || val < -0.955))',
-                                '|| (val > 0.99 || val < -0.99)',
+                                'isConditionMet(planted, val)',
+
                         ') {',
-                    unicode'        lines[Math.floor(counter / width)] = `<a href="#${planted+1}" data-flower-id="${planted+1}">⚘</a>` + lines[Math.floor(counter / width)];',
+                    unicode'        lines[Math.floor(counter / width)] += `<a href="#${planted+1}" data-flower-id="${planted+1}">⚘</a>`;',
                                     'planted++;',
-                    '    } else {',
-                    '        lines[Math.floor(counter / width)] = " " + lines[Math.floor(counter / width)];',
-                    '    }',
-                    '    if (counter % width == 79) { lines.push(""); }',
+                    '    } else { lines[Math.floor(counter / width)] += " "; }',
+                    '    if (counter % width == (width-1) && planted < flowers) { lines.push(""); }',
                     '    counter++;'
                     '}',
-                    'lines = lines.toReversed();',
-                    'document.querySelector("#field1").innerHTML = lines.slice(0,7).join("\\n");',
-                    'document.querySelector("#field2").innerHTML = lines.slice(7).join("\\n");',
+                    'lines = lines.reduce((acc, line) => { if (line.trim().length > 0) acc.push(line); return acc; }, []);',
+                    'function arrangePyramid(array) {',
+                    '    let result = [], odd = [], even = [];',
+                    '    for (let i = 0; i < array.length; i++) {',
+                    '        if (i % 2 == 1) {',
+                    '            even.push(array[i]);',
+                    '        } else {',
+                    '            odd.push(array[i]);',
+                    '        }',
+                    '    }',
+                    '    result = odd.concat(even.reverse());',
+                    '    return result;',
+                    '}',
+                    // 'lines = arrangePyramid(lines);',
+                    'document.querySelector("#field1").innerHTML = lines.slice(0,Math.min(7,Math.ceil(lines.length/2))).join("\\n");',
+                    'document.querySelector("#field2").innerHTML = lines.slice(Math.min(7,Math.ceil(lines.length/2))).join("\\n");',
                     'document.querySelectorAll(".field").forEach((el) => el.addEventListener("click", (e) => {',
                     '    const flowerId = e.target.dataset.flowerId;',
                     '    if (flowerId) {',
                     '        e.preventDefault();'
-                    '        console.log("Flower #" + flowerId);',
+                    // '        console.log("Flower #" + flowerId);',
                             // TODO: Tooltip
                     '    }',
                     '}));',
@@ -347,18 +352,18 @@ contract GardenRenderer is IWeb {
         uint256 start = 0;
         uint256 end = length;
 
-        // Handle "data:" URLs first
-        if (length >= 5 && urlBytes[0] == "d" && urlBytes[1] == "a" && urlBytes[2] == "t" && urlBytes[3] == "a" && urlBytes[4] == ":") {
-            // we want a shortened version of the data URL, that replaces everything after the first comma with "..."
-            // e.g. "data:text/plain;base64,..."
-            for (uint256 i = 5; i < length; i++) {
-                if (urlBytes[i] == ",") {
-                    end = i;
-                    break;
-                }
-            }
-        // Otherwise, handle other URLs
-        } else {
+        // // Handle "data:" URLs first
+        // if (length >= 5 && urlBytes[0] == "d" && urlBytes[1] == "a" && urlBytes[2] == "t" && urlBytes[3] == "a" && urlBytes[4] == ":") {
+        //     // we want a shortened version of the data URL, that replaces everything after the first comma with "..."
+        //     // e.g. "data:text/plain;base64,..."
+        //     for (uint256 i = 5; i < length; i++) {
+        //         if (urlBytes[i] == ",") {
+        //             end = i;
+        //             break;
+        //         }
+        //     }
+        // // Otherwise, handle other URLs
+        // } else {
 
             // Find the position of "://", which indicates the end of the protocol
             for (uint256 i = 0; i < length - 2; i++) {
@@ -380,7 +385,7 @@ contract GardenRenderer is IWeb {
             if (end > start && urlBytes[end - 1] == "/") {
                 end -= 1;
             }
-        }
+        // }
 
         // Create a new byte array to store the stripped URL
         bytes memory strippedUrlBytes = new bytes(end - start);
