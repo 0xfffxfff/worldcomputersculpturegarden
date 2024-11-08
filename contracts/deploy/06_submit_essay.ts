@@ -16,14 +16,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   if (text == essayText.essay) {
     console.log(`Essay text already up to date!`);
-    return;
+  } else {
+    console.log(`Setting essay text...`);
+    await essay.setText(essayText.essay, {
+      from: deployer,
+      gasLimit: 30_000_000,
+    });
+    console.log(`Essay text set!`);
   }
 
-  console.log(`Setting essay text...`);
-  await essay.setText(essayText.essay, {
-    from: deployer
-  });
-  console.log(`Essay text set!`);
+  const title = await essay.title();
+  if (title == essayText.title) {
+    console.log(`Essay title already up to date!`);
+  } else {
+    console.log(`Setting essay title...`);
+    await essay.setTitle(essayText.title, {
+      from: deployer,
+      gasLimit: 30_000_000,
+    });
+    console.log(`Essay title set!`);
+  }
 };
 
 export default func;

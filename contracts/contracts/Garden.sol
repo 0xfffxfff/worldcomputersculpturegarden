@@ -82,7 +82,7 @@ contract Garden is Sculpture, FlowerGuestbook {
     }
 
     function authors() external view returns (string[] memory) {
-        uint256 length;
+        uint256 length = 1; // fff
         for (uint256 i = 0; i < sculptures.length; i++) {
             string[] memory sculptureAuthors = Sculpture(sculptures[i]).authors();
             for (uint256 j = 0; j < sculptureAuthors.length; j++) {
@@ -98,16 +98,27 @@ contract Garden is Sculpture, FlowerGuestbook {
                 index++;
             }
         }
+        authors_[index] = "0xfff";
         return authors_;
     }
 
     function addresses() external view returns (address[] memory) {
-        address[] memory addresses_;
+        uint256 length = 1; // Garden itself
+        for (uint256 i = 0; i < sculptures.length; i++) {
+            address[] memory sculptureAddresses = Sculpture(sculptures[i]).addresses();
+            for (uint256 j = 0; j < sculptureAddresses.length; j++) {
+                length++;
+            }
+        }
+        address[] memory addresses_ = new address[](length);
+        uint256 index = 1; // Garden itself
+        addresses_[0] = address(this);
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
             address[] memory sculptureAddresses = sculpture.addresses();
             for (uint256 j = 0; j < sculptureAddresses.length; j++) {
-                addresses_[addresses_.length] = sculpture.addresses()[j];
+                addresses_[index] = sculpture.addresses()[j];
+                index++;
             }
         }
         return addresses_;

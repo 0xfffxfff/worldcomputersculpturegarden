@@ -1,8 +1,7 @@
 export default {
-    "title": "Computation Degree Zero (Placeholder)",
-    "urls": [],
-    "essay":
-`<p>Unlike numbers with counterparts in the natural world, the number zero refers to an empty set that eludes direct observation. Yet arithmetic originates from zero, presupposing its existence. Zero is abstraction in its purest form. The Turing machine extended mathematical abstraction into computation, utilizing the binary states of zero and one within a comprehensive and universal computational paradigm. Meanwhile, painting’s approach to abstraction emerged as a break with representational norms. Both artistic and computational abstraction are processes of reduction that turn compression and constraints into sites of productivity. Mathcastles, a studio run by two anonymous artist-programmers who explore the conceptual possibilities of the Ethereum Virtual Machine, launched a series of projects under the title “Zero Suite” in December 2022. The works in “Zero Suite” use the cryptographic technique of zero-knowledge proof technology as a method of verifying information without disclosing its content, challenging the audience to think about computational and artistic modes of abstraction together.</p>
+  title: "Computation Degree Zero (Placeholder)",
+  urls: [],
+  essay: `<p>Unlike numbers with counterparts in the natural world, the number zero refers to an empty set that eludes direct observation. Yet arithmetic originates from zero, presupposing its existence. Zero is abstraction in its purest form. The Turing machine extended mathematical abstraction into computation, utilizing the binary states of zero and one within a comprehensive and universal computational paradigm. Meanwhile, painting’s approach to abstraction emerged as a break with representational norms. Both artistic and computational abstraction are processes of reduction that turn compression and constraints into sites of productivity. Mathcastles, a studio run by two anonymous artist-programmers who explore the conceptual possibilities of the Ethereum Virtual Machine, launched a series of projects under the title “Zero Suite” in December 2022. The works in “Zero Suite” use the cryptographic technique of zero-knowledge proof technology as a method of verifying information without disclosing its content, challenging the audience to think about computational and artistic modes of abstraction together.</p>
 
 <p>The work remains unknowable, posing an insuperable challenge to the powers of the imagination even as it incites them.</p>
 
@@ -34,5 +33,5 @@ A digital drawing of a flower, rendered in thick strokes of blue, pink, and yell
 <p>There is, the studio’s work seems to imply, a disaccord between this technology’s state of art and the fate of art that has emerged through it. Mathcastles gestures toward an artistic use of computation where art serves as the vanguard of technology rather than being confined to standard forms. The studio’s engagement with the frontier of blockchain-based art enables the artists to raise questions about abstraction—questions that painting, in its traditional scope, has ceased to ask after it had shed the modernist legacy. The modernist quest to reveal the essence of the medium was, paradoxically, always a story about its end. Mathcastles’ work, by contrast, is inviting its audience to imagine the potential for world computer art that is yet to come.</p>
 
 Malte Rauch serves as the head of curation at glitch Gallery in Marfa, Texas, and advises projects in the crypto and digital art space. He previously wrote about Mathcastles’ Terraforms.
-`
-}
+`,
+};

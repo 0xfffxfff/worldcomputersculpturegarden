@@ -68,12 +68,15 @@ contract GardenRenderer is IWeb {
             'html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
             ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: content-box; }",
+            ".c.essay { max-width: 620px; }",
             "a { color: inherit; text-decoration: underline; }",
-            ".w { min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
+            ".w { position: relative; min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
             ".s { width: 100%; max-width: 840px; }",
             ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
             ".t { max-width: 100%; overflow-x: auto; margin: 1em 0; }",
             ".i { margin: 0 0 5em; }",
+            ".f { position: fixed; bottom: 1em; right: 1.3em; }",
+            ".p { position: absolute; bottom: 2em; left: 50%; transform: translateX(-50%); }",
             "</style>"
         );
         html = string.concat(html, "<body>", body, "</body></html>");
@@ -88,7 +91,8 @@ contract GardenRenderer is IWeb {
         address[] memory sculptures = IGarden(garden).getSculptures();
         html = string.concat(html,
             '<div class="c">',
-            '<div class="w"><div class="s g">',
+            '<div class="w">',
+            '<div class="s g">',
             '<pre class="garden">',
             unicode"       ⚘                    ⚘\n",
             unicode"             ⚘\n",
@@ -98,7 +102,6 @@ contract GardenRenderer is IWeb {
             unicode"</pre>",
             '<br /><br />',
             unicode"<h1>", Sculpture(garden).title(), "</h1>\n",
-            '<h2>', LibString.toHexString(garden), '</h2>',
             '<br /><br />'
         );
         for (uint256 i = 0; i < sculptures.length; i++) {
@@ -110,6 +113,8 @@ contract GardenRenderer is IWeb {
         }
         html = string.concat(html,
             '<br /><br />',
+            '<h2>', LibString.toHexString(garden), '</h2>',
+            '<br />',
             '<pre class="garden">',
             unicode"      ⚘                      ⚘\n",
             unicode"              ⚘\n",
@@ -119,20 +124,21 @@ contract GardenRenderer is IWeb {
             unicode"</pre>",
             '<br />',
             '<p>',
-            'A contract show organized by ',
+            'A contract show curated by ',
             '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br/>',
             'with special thanks to ',
-            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a><br/>',
-            'with an <a href="/">essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
+            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
+            '<br/><br/>',
+            '<a href="/essay">Essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
             "</p>",
             '<br /><br />'
         );
-
-
         html = string.concat(
             html,
             "<br />",
-            "</div></div>"
+            "</div>",
+            unicode'<div class="p">↓</div>',
+            "</div>"
         );
 
         // Sculptures
@@ -216,18 +222,30 @@ contract GardenRenderer is IWeb {
         return _html(html);
     }
 
-    function resolveMode() external pure returns (bytes32) {
-        return "5219";
-    }
-
     function essay() public view returns (string memory html) {
         address[] memory sculptures = IGarden(garden).getSculptures();
         html = string.concat(html,
-            '<div class="c">',
+            '<div class="c essay"><div class="w"><div class="s g">',
+                '<p><i>This text was published as part of the contract show: <a href="/" style="display: block">World Computer Sculpture Garden</a></i></p>',
+                '<br/>',
+                unicode'⚘',
+                '<br/><br/><br/>',
+                '<article>',
                 Essay(essayContract).html(),
-            '</div>'
+                '</article>',
+                '<br/><br/>',
+                unicode'⚘',
+                '<br/><br/>',
+                '<p><i>View the exhibition at: <a href="/" style="display: block">World Computer Sculpture Garden</a></i></p>',
+                '<br/>',
+            '</div></div></div>',
+            unicode'<div class="f"><a href="/" style="text-decoration: none;">⚘</a></div>'
         );
         return _html(html);
+    }
+
+    function resolveMode() external pure returns (bytes32) {
+        return "5219";
     }
 
     // ERC-5219

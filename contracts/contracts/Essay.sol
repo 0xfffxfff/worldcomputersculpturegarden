@@ -19,7 +19,7 @@ contract Essay is Sculpture, Ownable {
         return t;
     }
 
-    function authors() external pure returns (string[] memory authors_) {
+    function authors() public pure returns (string[] memory authors_) {
         authors_ = new string[](1);
         authors_[0] = "Malte Rauch";
         return authors_;
@@ -36,10 +36,13 @@ contract Essay is Sculpture, Ownable {
     }
 
     function text() external view returns (string memory) {
+        if (pointer == address(0)) {
+            return "";
+        }
         return string(SSTORE2.read(pointer));
     }
 
-    function setTitles(string memory _title) external onlyOwner {
+    function setTitle(string memory _title) external onlyOwner {
         t = _title;
     }
 
@@ -52,6 +55,9 @@ contract Essay is Sculpture, Ownable {
     }
 
     function html() external view returns (string memory html) {
-        html = string.concat("<h1>", t, "</h1><div>", string(SSTORE2.read(pointer)), "</div>");
+        html = string.concat(
+            "<h1>", t, "</h1>",
+            "<h2>", authors()[0], "</h2>",
+            "<div>", pointer == address(0) ? "" : string(SSTORE2.read(pointer)), "</div>");
     }
 }
