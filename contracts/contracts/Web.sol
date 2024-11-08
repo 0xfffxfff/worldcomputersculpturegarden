@@ -3,15 +3,17 @@ pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
 import "solady/src/utils/LibString.sol";
+import "./lib/Web3url.sol";
 import "./lib/Format.sol";
 import "./Sculpture.sol";
+import "./Essay.sol";
 
 interface IGarden {
     function getSculptures() external view returns (address[] memory);
     function topContributors(uint limit) external view returns (address[] memory, uint[] memory);
 }
 
-interface IWeb {
+interface IWeb is IDecentralizedApp {
     function html() external view returns (string memory);
 }
 
@@ -23,21 +25,32 @@ contract Web is IWeb, Ownable {
         _initializeOwner(msg.sender);
     }
 
+    function setRenderer(address _renderer) public onlyOwner {
+        renderer = _renderer;
+    }
+
     function html() external view returns (string memory) {
         return GardenRenderer(renderer).html();
     }
 
-    function setRenderer(address _renderer) public onlyOwner {
-        renderer = _renderer;
+    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint statusCode, string memory body, KeyValue[] memory headers) {
+        return GardenRenderer(renderer).request(resource, params);
     }
+
+    function resolveMode() external pure returns (bytes32) {
+        return "5219";
+    }
+
 }
 
-contract GardenRenderer {
+contract GardenRenderer is IWeb {
 
     address immutable public garden;
+    address immutable public essayContract;
 
-    constructor(address _garden) {
+    constructor(address _garden, address _essayContract) {
         garden = _garden;
+        essayContract = _essayContract;
     }
 
     function _html(string memory body) internal view returns (string memory) {
@@ -67,7 +80,11 @@ contract GardenRenderer {
         return html;
     }
 
-    function html() public view returns (string memory html) {
+    function html() public view returns (string memory) {
+        return index();
+    }
+
+    function index() public view returns (string memory html) {
         address[] memory sculptures = IGarden(garden).getSculptures();
         html = string.concat(html,
             '<div class="c">',
@@ -103,9 +120,10 @@ contract GardenRenderer {
             '<br />',
             '<p>',
             'A contract show organized by ',
-            '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br />',
+            '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br/>',
             'with special thanks to ',
-            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
+            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a><br/>',
+            'with an <a href="/">essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
             "</p>",
             '<br /><br />'
         );
@@ -161,17 +179,18 @@ contract GardenRenderer {
             html = string.concat(html, "</div></div>");
         }
 
-        // Top10 Contributions
-        (address[] memory topContributors, uint256[] memory topContributions) = IGarden(garden).topContributors(10);
-        html = string.concat(html, '<div class="w"><div class="s">');
-        html = string.concat(html, "<p>You may support this show by sending a donation directly to the show contract: ", LibString.toHexString(garden)  ,"</p>");
-        html = string.concat(html, "<h2>Top Contributors</h2>");
-        html = string.concat(html, '<ol class="cl">');
-        for (uint256 i = 0; i < topContributors.length; i++) {
-            html = string.concat(html, unicode'<li><span class="address">', LibString.toHexString(topContributors[i]), "</span> - ", Format.formatEther(topContributions[i]), " ETH</li>");
-        }
-        html = string.concat(html, "</ol>");
-        html = string.concat(html, "</div></div>");
+        // // Top10 Contributions
+        // (address[] memory topContributors, uint256[] memory topContributions) = IGarden(garden).topContributors(10);
+        // html = string.concat(html, '<div class="w"><div class="s">');
+        // html = string.concat(html, unicode"<p>You may plant a ⚘ by sending 0.01 ETH to ", LibString.toHexString(garden)  ,"</p>");
+        // html = string.concat(html, unicode"<h2>Most ⚘</h2>");
+        // html = string.concat(html, '<ol class="cl">');
+        // for (uint256 i = 0; i < topContributors.length; i++) {
+        //     html = string.concat(html, unicode'<li><span class="address">', LibString.toHexString(topContributors[i]), unicode"</span> — ⚘ × ", LibString.toString(topContributions[i]/(0.01 ether)), "</li>");
+        // }
+        // html = string.concat(html, "</ol>");
+        // html = string.concat(html, "</div></div>");
+
 
         html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ " from ", LibString.toHexString(address(this)) ,"</div>");
         html = string.concat(html, "</div>");
@@ -197,32 +216,83 @@ contract GardenRenderer {
         return _html(html);
     }
 
+    function resolveMode() external pure returns (bytes32) {
+        return "5219";
+    }
 
+    function essay() public view returns (string memory html) {
+        address[] memory sculptures = IGarden(garden).getSculptures();
+        html = string.concat(html,
+            '<div class="c">',
+                Essay(essayContract).html(),
+            '</div>'
+        );
+        return _html(html);
+    }
+
+    // ERC-5219
+    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint statusCode, string memory body, KeyValue[] memory headers) {
+        // Index
+        if(resource.length == 0) {
+            body = index();
+            statusCode = 200;
+            headers = new KeyValue[](1);
+            headers[0].key = "Content-Type";
+            headers[0].value = "text/html; charset=utf-8";
+            return (statusCode, body, headers);
+        } else if (resource.length == 1 && keccak256(abi.encodePacked(resource[0])) == keccak256(abi.encodePacked("essay"))) {
+            body = essay();
+            statusCode = 200;
+            headers = new KeyValue[](1);
+            headers[0].key = "Content-Type";
+            headers[0].value = "text/html; charset=utf-8";
+            return (statusCode, body, headers);
+        }
+
+        statusCode = 404;
+        return (statusCode, body, headers);
+    }
+
+    // Utility
     function stripURL(string memory url) internal pure returns (string memory) {
         bytes memory urlBytes = bytes(url);
         uint256 length = urlBytes.length;
         uint256 start = 0;
         uint256 end = length;
 
-        // Find the position of "://", which indicates the end of the protocol
-        for (uint256 i = 0; i < length - 2; i++) {
-            if (urlBytes[i] == ":" && urlBytes[i + 1] == "/" && urlBytes[i + 2] == "/") {
-                start = i + 3; // Skip the "://"max
-                break;
+        // Handle "data:" URLs first
+        if (length >= 5 && urlBytes[0] == "d" && urlBytes[1] == "a" && urlBytes[2] == "t" && urlBytes[3] == "a" && urlBytes[4] == ":") {
+            // we want a shortened version of the data URL, that replaces everything after the first comma with "..."
+            // e.g. "data:text/plain;base64,..."
+            for (uint256 i = 5; i < length; i++) {
+                if (urlBytes[i] == ",") {
+                    end = i;
+                    break;
+                }
             }
-        }
+        // Otherwise, handle other URLs
+        } else {
 
-        // Find position of "?" or "#" to determine the end of the main URL
-        for (uint256 i = start; i < length; i++) {
-            if (urlBytes[i] == "?" || urlBytes[i] == "#") {
-                end = i;
-                break;
+            // Find the position of "://", which indicates the end of the protocol
+            for (uint256 i = 0; i < length - 2; i++) {
+                if (urlBytes[i] == ":" && urlBytes[i + 1] == "/" && urlBytes[i + 2] == "/") {
+                    start = i + 3; // Skip the "://"max
+                    break;
+                }
             }
-        }
 
-        // Remove trailing slash if present
-        if (end > start && urlBytes[end - 1] == "/") {
-            end -= 1;
+            // Find position of "?" or "#" to determine the end of the main URL
+            for (uint256 i = start; i < length; i++) {
+                if (urlBytes[i] == "?" || urlBytes[i] == "#") {
+                    end = i;
+                    break;
+                }
+            }
+
+            // Remove trailing slash if present
+            if (end > start && urlBytes[end - 1] == "/") {
+                end -= 1;
+            }
         }
 
         // Create a new byte array to store the stripped URL

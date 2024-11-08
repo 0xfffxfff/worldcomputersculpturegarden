@@ -1,12 +1,32 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.27;
 
+////////////////////////////////////////////////////////////////////////
+//                                                                    //
+//     ⚘                    ⚘                              ⚘          //
+//                                        ⚘                           //
+//            ⚘                                                       //
+//                                 ⚘                            ⚘     //
+//                                                                    //
+//         ⚘                                                          //
+//                          hi and welcome                            //
+//                              to the                      ⚘         //
+//                  world computer sculpture garden                   //
+//          ⚘                                                         //
+//                                               ⚘               ⚘    //
+//                           ⚘                                        //
+//       ⚘                                 ⚘            ⚘             //
+//                   ⚘                                                //
+//                                ⚘                       0xfff.eth   //
+//                                                                    //
+////////////////////////////////////////////////////////////////////////
+
 import "solady/src/auth/Ownable.sol";
 import "./Sculpture.sol";
 import "./Web.sol";
-import "./s/impl/ST.sol";
+import "./FlowerGuestbook.sol";
 
-contract Garden is Sculpture, ST {
+contract Garden is Sculpture, FlowerGuestbook {
 
     address[] public sculptures;
 
@@ -16,7 +36,7 @@ contract Garden is Sculpture, ST {
     // Init
     ///////////////////////////////////////////////////////////////////////////
 
-    constructor(address[] memory _sculptures, address _render, address _sp) ST(_sp, msg.sender) {
+    constructor(address[] memory _sculptures, address _render) {
         sculptures = _sculptures;
         render = _render;
     }
@@ -31,6 +51,14 @@ contract Garden is Sculpture, ST {
 
     function html() external view returns (string memory) {
         return IWeb(render).html();
+    }
+
+    function resolveMode() external view returns (bytes32) {
+        return IWeb(render).resolveMode();
+    }
+
+    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint statusCode, string memory body, KeyValue[] memory headers) {
+        return IWeb(render).request(resource, params);
     }
 
     ///////////////////////////////////////////////////////////////////////////

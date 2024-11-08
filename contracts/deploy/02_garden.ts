@@ -7,13 +7,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const [deployer] = await getUnnamedAccounts();
 
   const web = await deployments.get("Web");
-  const sp = await deployments.get("SP");
 
   const garden = await deploy("Garden", {
     args: [
       [],
       web.address,
-      sp.address
+      // sp.address
     ],
     from: deployer,
     gasLimit: 18_000_000,

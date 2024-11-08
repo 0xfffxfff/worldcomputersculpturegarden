@@ -23,6 +23,9 @@ describe("Show Critique", function () {
     const example3 = await ExampleRemoteWork.deploy(await remoteArtwork.getAddress());
     const example4 = await(await hre.ethers.getContractFactory("ExampleSculptureStaticLongUrl")).deploy();
 
+    const Essay = await hre.ethers.getContractFactory("Essay");
+    const essay = await Essay.deploy();
+
     const ShowCritique = await hre.ethers.getContractFactory("ShowCritique");
     const showCritique = await ShowCritique.deploy();
 
@@ -35,15 +38,14 @@ describe("Show Critique", function () {
       await example2.getAddress(),
       await example3.getAddress(),
       await example4.getAddress(),
-      await showCritique.getAddress()
-    ], await web.getAddress(), await sp.getAddress());
+    ], await web.getAddress());
 
     const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
-    const renderer = await GardenRenderer.deploy(await garden.getAddress());
+    const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
 
-    return { garden, Garden, web, Web, owner, acc1, example1, showCritique };
+    return { showCritique, ShowCritique, garden, example1, Garden, web, Web, sp, SP, owner, acc1 };
   }
 
   describe("Deployment", function () {

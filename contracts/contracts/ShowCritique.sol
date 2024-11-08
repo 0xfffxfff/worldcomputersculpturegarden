@@ -108,7 +108,6 @@ contract ShowCritique is Sculpture, Ownable {
     }
 
     function title() external view override returns (string memory) {
-        // This title is dynamic and always shows the current block timestamp
         return string.concat("Critique of This Show");
     }
 
@@ -120,7 +119,6 @@ contract ShowCritique is Sculpture, Ownable {
 
     function addresses() external view override returns (address[] memory) {
         address[] memory addresses_ = new address[](1);
-        // this too, could be dynamic or change over time
         addresses_[0] = address(this);
         return addresses_;
     }
