@@ -14,7 +14,8 @@ export default async (req: Request, context: Context) => {
     if (resource[resource.length - 1] === '' || resource[resource.length - 1] === "index" || resource[resource.length - 1] === "index.html" || resource[resource.length - 1] === "index.htm") {
         resource.pop();
     }
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    // const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const provider = ethers.getDefaultProvider('sepolia');
     const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
     try {
         console.log("Fetching HTML from contract");
