@@ -76,7 +76,7 @@ contract GardenRenderer is IWeb {
             ".t { max-width: 100%; overflow-x: auto; margin: 1em 0; }",
             ".i { margin: 0 0 5em; }",
             ".f { position: fixed; bottom: 1em; right: 1.3em; }",
-            ".p { position: absolute; bottom: 2em; left: 50%; transform: translateX(-50%); }",
+            ".p { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 1.4em; }",
             "</style>"
         );
         html = string.concat(html, "<body>", body, "</body></html>");
