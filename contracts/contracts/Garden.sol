@@ -22,6 +22,7 @@ pragma solidity ^0.8.27;
 ////////////////////////////////////////////////////////////////////////
 
 import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/SSTORE2.sol";
 import "./Sculpture.sol";
 import "./Web.sol";
 import "./FlowerGuestbook.sol";
@@ -124,12 +125,15 @@ contract Garden is Sculpture, FlowerGuestbook {
         return addresses_;
     }
 
-    string public exhibitionText;
+    address private exhibitionText;
     function text() public view returns (string memory) {
-        return exhibitionText;
+        if (exhibitionText == address(0)) {
+            return "";
+        }
+        return string(SSTORE2.read(exhibitionText));
     }
     function setText(string memory _text) public onlyOwner {
-        exhibitionText = _text;
+        exhibitionText = SSTORE2.write(bytes(_text));
     }
 
     string[] public exhibitionUrls;

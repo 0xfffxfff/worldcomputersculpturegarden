@@ -141,6 +141,18 @@ contract GardenRenderer is IWeb {
             "</div>"
         );
 
+        // Text
+
+        html = string.concat(html,
+            '<div class="w"><div class="s">',
+            '<p>',
+                Sculpture(garden).text(),
+                '<br/><br/>',
+                '- 0xfff',
+            '</p>',
+            '</div></div>'
+        );
+
         // Sculptures
 
         for (uint256 i = 0; i < sculptures.length; i++) {
