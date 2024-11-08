@@ -9,14 +9,11 @@ const CACHE_EXPIRATION_TIME = 12;
 const RPC_URL = 'http://localhost:8545';
 
 export default async (req: Request, context: Context) => {
-    console.log(req);
-    // path with leading slash removed:
     const path = context.url.pathname.slice(1);
     const resource = path.split('/');
     if (resource[resource.length - 1] === '' || resource[resource.length - 1] === "index" || resource[resource.length - 1] === "index.html" || resource[resource.length - 1] === "index.htm") {
         resource.pop();
     }
-    console.log("Resource:", resource);
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
     try {

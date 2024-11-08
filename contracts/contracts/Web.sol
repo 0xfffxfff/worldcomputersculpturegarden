@@ -10,7 +10,12 @@ import "./Essay.sol";
 
 interface IGarden {
     function getSculptures() external view returns (address[] memory);
-    function topContributors(uint limit) external view returns (address[] memory, uint[] memory);
+    function flower(uint256 flowerId) external view returns (address);
+    function flowers() external view returns (uint256);
+    function flowersPlanted(address planter) external view returns (uint256);
+    function flowerPlantedAt(uint256 flowerId) external view returns (uint256);
+    function flowerInfo(uint256 flowerId) external view returns (address planter, uint256 timestamp);
+    function guests() external view returns (uint256);
 }
 
 interface IWeb is IDecentralizedApp {
@@ -59,6 +64,7 @@ contract GardenRenderer is IWeb {
             '<head>',
             '<meta charset="UTF-8">',
             '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=', unicode"'http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cstyle%3E text %7B fill: %23000; %7D @media (prefers-color-scheme: dark) %7B text %7B fill: %23fff; %7D %7D %3C/style%3E%3Ctext y='.9em' font-size='90'%3E ⚘ %3C/text%3E%3C/svg%3E%0A", '" />',
             '<title>', Sculpture(garden).title() ,'</title>',
             '</head>',
             "<style>",
@@ -77,6 +83,8 @@ contract GardenRenderer is IWeb {
             ".i { margin: 0 0 5em; }",
             ".f { position: fixed; bottom: 1em; right: 1.3em; }",
             ".p { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 1.4em; }",
+            "#field { white-space: pre; }",
+            "#field a { text-decoration: none; }",
             "</style>"
         );
         html = string.concat(html, "<body>", body, "</body></html>");
@@ -197,39 +205,76 @@ contract GardenRenderer is IWeb {
             html = string.concat(html, "</div></div>");
         }
 
-        // // Top10 Contributions
-        // (address[] memory topContributors, uint256[] memory topContributions) = IGarden(garden).topContributors(10);
-        // html = string.concat(html, '<div class="w"><div class="s">');
-        // html = string.concat(html, unicode"<p>You may plant a ⚘ by sending 0.01 ETH to ", LibString.toHexString(garden)  ,"</p>");
-        // html = string.concat(html, unicode"<h2>Most ⚘</h2>");
-        // html = string.concat(html, '<ol class="cl">');
-        // for (uint256 i = 0; i < topContributors.length; i++) {
-        //     html = string.concat(html, unicode'<li><span class="address">', LibString.toHexString(topContributors[i]), unicode"</span> — ⚘ × ", LibString.toString(topContributions[i]/(0.01 ether)), "</li>");
-        // }
-        // html = string.concat(html, "</ol>");
-        // html = string.concat(html, "</div></div>");
+        // Contributions
+        html = string.concat(html,
+            '<div class="w"><div class="s">',
+                '<p>',
+                'Flower Guestbook',
+                '<br/><br/>',
+                'You may leave a flower here by sending 0.01 ETH (or multiples thereof)<br/> to the show contract at ',
+                    LibString.toHexString(garden),
+                '<br/><br/>',
+                '', LibString.toString(IGarden(garden).guests()),
+                ' guests have planted ', LibString.toString(IGarden(garden).flowers()),
+                ' flowers',
+                '</p>',
+                '<br/>',
+            '<div id="field"></div>',
+            '<script>',
+                'function gridNoise(x, z, seed) {',
+                '    var n = (1619 * x + 31337 * z + 1013 * seed) & 0x7fffffff;',
+                '    n = BigInt((n >> 13) ^ n);',
+                '    n = n * (n * n * 60493n + 19990303n) + 1376312589n;',
+                '    n = parseInt(n.toString(2).slice(-31), 2);',
+                '    return 1 - n / 1073741824;',
+                '}',
+                'const flowers = ', LibString.toString(IGarden(garden).flowers()), ';'
+                'let lines = [""], counter = 0, planted = 0;',
+                'while (planted < flowers) {',
+                '    const val = gridNoise(counter % 80, Math.floor(counter / 80), 0xfff);',
+                '    if (val > 0.96) {',
+                unicode'        lines[Math.floor(counter / 80)] += `<a href="#" data-flower-id="${planted}">⚘</a>`; planted++;',
+                '    } else {',
+                '        lines[Math.floor(counter / 80)] += " ";',
+                '    }',
+                '    if (counter % 80 == 79) { lines.push(""); }',
+                '    counter++;'
+                '}',
+                'console.log(lines.toReversed().join("\\n"));',
+                'document.querySelector("#field").innerHTML = lines.reverse().join("\\n");',
+                'document.querySelector("#field").addEventListener("click", (e) => {',
+                '    const flowerId = e.target.dataset.flowerId;',
+                '    if (flowerId) {',
+                '        e.preventDefault();'
+                '        console.log("Flower #" + flowerId);',
+                        // TODO: Tooltip
+                '    }',
+                '});',
+            '</script>',
+            '</div></div>'
+        );
 
 
         html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ " from ", LibString.toHexString(address(this)) ,"</div>");
         html = string.concat(html, "</div>");
 
         // Resolve ENS
-        html = string.concat(html,
-            '<script type="module">',
-            'import { JsonRpcProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
-            'const provider = new JsonRpcProvider("https://eth.drpc.org");',
+        // html = string.concat(html,
+        //     '<script type="module">',
+        //     'import { JsonRpcProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
+        //     'const provider = new JsonRpcProvider("https://eth.drpc.org");',
 
-            'const result = await Promise.all(',
-                'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
-                'const address = el.textContent;',
-                'if (!isAddress(address)) return address;',
-                'const name = await provider.lookupAddress(address);',
-                'if (name) el.textContent = name;',
-                'return name || address;',
-                '})',
-            ');'
-            '</script>'
-        );
+        //     'const result = await Promise.all(',
+        //         'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
+        //         'const address = el.textContent;',
+        //         'if (!isAddress(address)) return address;',
+        //         'const name = await provider.lookupAddress(address);',
+        //         'if (name) el.textContent = name;',
+        //         'return name || address;',
+        //         '})',
+        //     ');'
+        //     '</script>'
+        // );
 
         return _html(html);
     }
