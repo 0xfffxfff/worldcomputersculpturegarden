@@ -204,11 +204,12 @@ contract GardenRenderer is IWeb {
                     LibString.toHexString(garden),
                 '<br/><br/>',
                 LibString.toString(IGarden(garden).guests() + 5 /* DEV TODO */),
-                ' guests have planted ', LibString.toString(IGarden(garden).flowers()),
+                ' guests have planted ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */),
                 ' flowers',
                 '</p><br/><br/><br/>',
                 '<div id="field2" class="field"></div>',
                 '<script>',
+                    '(() => {',
                     'const flowers = ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */), ';'
                     'function calculateThreshold(planted) {',
                         'const min = 30, max = 3000, lower = 0.99, higher = 0.6;',
@@ -267,6 +268,7 @@ contract GardenRenderer is IWeb {
                             // TODO: Tooltip
                     '    }',
                     '}));',
+                    '})();/*IIFE*/',
                 '</script>',
             '</div></div>'
         );

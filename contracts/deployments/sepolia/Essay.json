@@ -1,0 +1,419 @@
+{
+  "address": "0x7d819DB667f3e5c3029B160b947C35A917913B0f",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadyInitialized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NewOwnerIsZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoHandoverRequest",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Unauthorized",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "pendingOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipHandoverCanceled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "pendingOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipHandoverRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "addresses",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "authors",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "authors_",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cancelOwnershipHandover",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pendingOwner",
+          "type": "address"
+        }
+      ],
+      "name": "completeOwnershipHandover",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "html",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "html",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "result",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pendingOwner",
+          "type": "address"
+        }
+      ],
+      "name": "ownershipHandoverExpiresAt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "result",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "requestOwnershipHandover",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_text",
+          "type": "string"
+        }
+      ],
+      "name": "setText",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_title",
+          "type": "string"
+        }
+      ],
+      "name": "setTitle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string[]",
+          "name": "_urls",
+          "type": "string[]"
+        }
+      ],
+      "name": "setUrls",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "text",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "title",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "urls",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xf37bde6f593ac53b86f64cd6f138df075f4f8cac9a13f672630b6dc9dce7f86f",
+  "receipt": {
+    "to": null,
+    "from": "0x116ADF6db6aBF17828530Ca868Cac4A80af9f9c2",
+    "contractAddress": "0x7d819DB667f3e5c3029B160b947C35A917913B0f",
+    "transactionIndex": 25,
+    "gasUsed": "1379155",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000800000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400001000000000000000000100000000000000000020000000000000000000800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000020000000000004000000000000000000000000800000000000000000000000000000",
+    "blockHash": "0xfaa78ee5f04980923a4811d6b8983ca12f81764e1d8e3b77028c7829e23da870",
+    "transactionHash": "0xf37bde6f593ac53b86f64cd6f138df075f4f8cac9a13f672630b6dc9dce7f86f",
+    "logs": [
+      {
+        "transactionIndex": 25,
+        "blockNumber": 7038481,
+        "transactionHash": "0xf37bde6f593ac53b86f64cd6f138df075f4f8cac9a13f672630b6dc9dce7f86f",
+        "address": "0x7d819DB667f3e5c3029B160b947C35A917913B0f",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x000000000000000000000000116adf6db6abf17828530ca868cac4a80af9f9c2"
+        ],
+        "data": "0x",
+        "logIndex": 40,
+        "blockHash": "0xfaa78ee5f04980923a4811d6b8983ca12f81764e1d8e3b77028c7829e23da870"
+      }
+    ],
+    "blockNumber": 7038481,
+    "cumulativeGasUsed": "3476084",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "6870afaff26cf6b3022232393880b0e5",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.28+commit.7893614a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"AlreadyInitialized\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewOwnerIsZeroAddress\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NoHandoverRequest\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"Unauthorized\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"pendingOwner\",\"type\":\"address\"}],\"name\":\"OwnershipHandoverCanceled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"pendingOwner\",\"type\":\"address\"}],\"name\":\"OwnershipHandoverRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"addresses\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"authors\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"authors_\",\"type\":\"string[]\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cancelOwnershipHandover\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pendingOwner\",\"type\":\"address\"}],\"name\":\"completeOwnershipHandover\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"html\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"html\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"result\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pendingOwner\",\"type\":\"address\"}],\"name\":\"ownershipHandoverExpiresAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"result\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requestOwnershipHandover\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_text\",\"type\":\"string\"}],\"name\":\"setText\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_title\",\"type\":\"string\"}],\"name\":\"setTitle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string[]\",\"name\":\"_urls\",\"type\":\"string[]\"}],\"name\":\"setUrls\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"text\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"title\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"urls\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"\",\"type\":\"string[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"errors\":{\"AlreadyInitialized()\":[{\"details\":\"Cannot double-initialize.\"}],\"NewOwnerIsZeroAddress()\":[{\"details\":\"The `newOwner` cannot be the zero address.\"}],\"NoHandoverRequest()\":[{\"details\":\"The `pendingOwner` does not have a valid handover request.\"}],\"Unauthorized()\":[{\"details\":\"The caller is not authorized to call the function.\"}]},\"events\":{\"OwnershipHandoverCanceled(address)\":{\"details\":\"The ownership handover to `pendingOwner` has been canceled.\"},\"OwnershipHandoverRequested(address)\":{\"details\":\"An ownership handover to `pendingOwner` has been requested.\"},\"OwnershipTransferred(address,address)\":{\"details\":\"The ownership is transferred from `oldOwner` to `newOwner`. This event is intentionally kept the same as OpenZeppelin's Ownable to be compatible with indexers and [EIP-173](https://eips.ethereum.org/EIPS/eip-173), despite it not being as lightweight as a single argument event.\"}},\"kind\":\"dev\",\"methods\":{\"cancelOwnershipHandover()\":{\"details\":\"Cancels the two-step ownership handover to the caller, if any.\"},\"completeOwnershipHandover(address)\":{\"details\":\"Allows the owner to complete the two-step ownership handover to `pendingOwner`. Reverts if there is no existing ownership handover requested by `pendingOwner`.\"},\"owner()\":{\"details\":\"Returns the owner of the contract.\"},\"ownershipHandoverExpiresAt(address)\":{\"details\":\"Returns the expiry timestamp for the two-step ownership handover to `pendingOwner`.\"},\"renounceOwnership()\":{\"details\":\"Allows the owner to renounce their ownership.\"},\"requestOwnershipHandover()\":{\"details\":\"Request a two-step ownership handover to the caller. The request will automatically expire in 48 hours (172800 seconds) by default.\"},\"transferOwnership(address)\":{\"details\":\"Allows the owner to transfer the ownership to `newOwner`.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Essay.sol\":\"Essay\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/Essay.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.27;\\n\\nimport \\\"solady/src/auth/Ownable.sol\\\";\\nimport \\\"solady/src/utils/SSTORE2.sol\\\";\\nimport \\\"./Sculpture.sol\\\";\\n\\ncontract Essay is Sculpture, Ownable {\\n\\n    address private pointer;\\n    string private t;\\n    string[] private u;\\n\\n    constructor () {\\n        _initializeOwner(msg.sender);\\n    }\\n\\n    function title() external view returns (string memory) {\\n        return t;\\n    }\\n\\n    function authors() public pure returns (string[] memory authors_) {\\n        authors_ = new string[](1);\\n        authors_[0] = \\\"Malte Rauch\\\";\\n        return authors_;\\n    }\\n\\n    function addresses() external view returns (address[] memory) {\\n        address[] memory _addresses = new address[](1);\\n        _addresses[0] = address(this);\\n        return _addresses;\\n    }\\n\\n    function urls() external view returns (string[] memory) {\\n        return u;\\n    }\\n\\n    function text() external view returns (string memory) {\\n        if (pointer == address(0)) {\\n            return \\\"\\\";\\n        }\\n        return string(SSTORE2.read(pointer));\\n    }\\n\\n    function setTitle(string memory _title) external onlyOwner {\\n        t = _title;\\n    }\\n\\n    function setUrls(string[] memory _urls) external onlyOwner {\\n        u = _urls;\\n    }\\n\\n    function setText(string memory _text) external onlyOwner {\\n        pointer = SSTORE2.write(bytes(_text));\\n    }\\n\\n    function html() external view returns (string memory html) {\\n        html = string.concat(\\n            \\\"<h1>\\\", t, \\\"</h1>\\\",\\n            \\\"<h2>\\\", authors()[0], \\\"</h2>\\\",\\n            \\\"<div>\\\", pointer == address(0) ? \\\"\\\" : string(SSTORE2.read(pointer)), \\\"</div>\\\");\\n    }\\n}\",\"keccak256\":\"0xafda116ecb4fe003eb69a6c0cd7009b923eb0cf814b3285dbb9260c5349086bc\",\"license\":\"UNLICENSED\"},\"contracts/Sculpture.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity >=0.8.0;\\n\\ninterface Sculpture {\\n\\n    function title() external view returns (string memory);\\n\\n    function authors() external view returns (string[] memory);\\n\\n    function addresses() external view returns (address[] memory);\\n\\n    function urls() external view returns (string[] memory);\\n\\n    function text() external view returns (string memory);\\n\\n}\\n\",\"keccak256\":\"0x42a64bba30b562f327b8313eb924643e9a8e2b39d4f330c9ed2cacdf4d027052\",\"license\":\"UNLICENSED\"},\"solady/src/auth/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.4;\\n\\n/// @notice Simple single owner authorization mixin.\\n/// @author Solady (https://github.com/vectorized/solady/blob/main/src/auth/Ownable.sol)\\n///\\n/// @dev Note:\\n/// This implementation does NOT auto-initialize the owner to `msg.sender`.\\n/// You MUST call the `_initializeOwner` in the constructor / initializer.\\n///\\n/// While the ownable portion follows\\n/// [EIP-173](https://eips.ethereum.org/EIPS/eip-173) for compatibility,\\n/// the nomenclature for the 2-step ownership handover may be unique to this codebase.\\nabstract contract Ownable {\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                       CUSTOM ERRORS                        */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev The caller is not authorized to call the function.\\n    error Unauthorized();\\n\\n    /// @dev The `newOwner` cannot be the zero address.\\n    error NewOwnerIsZeroAddress();\\n\\n    /// @dev The `pendingOwner` does not have a valid handover request.\\n    error NoHandoverRequest();\\n\\n    /// @dev Cannot double-initialize.\\n    error AlreadyInitialized();\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                           EVENTS                           */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev The ownership is transferred from `oldOwner` to `newOwner`.\\n    /// This event is intentionally kept the same as OpenZeppelin's Ownable to be\\n    /// compatible with indexers and [EIP-173](https://eips.ethereum.org/EIPS/eip-173),\\n    /// despite it not being as lightweight as a single argument event.\\n    event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);\\n\\n    /// @dev An ownership handover to `pendingOwner` has been requested.\\n    event OwnershipHandoverRequested(address indexed pendingOwner);\\n\\n    /// @dev The ownership handover to `pendingOwner` has been canceled.\\n    event OwnershipHandoverCanceled(address indexed pendingOwner);\\n\\n    /// @dev `keccak256(bytes(\\\"OwnershipTransferred(address,address)\\\"))`.\\n    uint256 private constant _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE =\\n        0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0;\\n\\n    /// @dev `keccak256(bytes(\\\"OwnershipHandoverRequested(address)\\\"))`.\\n    uint256 private constant _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE =\\n        0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d;\\n\\n    /// @dev `keccak256(bytes(\\\"OwnershipHandoverCanceled(address)\\\"))`.\\n    uint256 private constant _OWNERSHIP_HANDOVER_CANCELED_EVENT_SIGNATURE =\\n        0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92;\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                          STORAGE                           */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev The owner slot is given by:\\n    /// `bytes32(~uint256(uint32(bytes4(keccak256(\\\"_OWNER_SLOT_NOT\\\")))))`.\\n    /// It is intentionally chosen to be a high value\\n    /// to avoid collision with lower slots.\\n    /// The choice of manual storage layout is to enable compatibility\\n    /// with both regular and upgradeable contracts.\\n    bytes32 internal constant _OWNER_SLOT =\\n        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff74873927;\\n\\n    /// The ownership handover slot of `newOwner` is given by:\\n    /// ```\\n    ///     mstore(0x00, or(shl(96, user), _HANDOVER_SLOT_SEED))\\n    ///     let handoverSlot := keccak256(0x00, 0x20)\\n    /// ```\\n    /// It stores the expiry timestamp of the two-step ownership handover.\\n    uint256 private constant _HANDOVER_SLOT_SEED = 0x389a75e1;\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                     INTERNAL FUNCTIONS                     */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Override to return true to make `_initializeOwner` prevent double-initialization.\\n    function _guardInitializeOwner() internal pure virtual returns (bool guard) {}\\n\\n    /// @dev Initializes the owner directly without authorization guard.\\n    /// This function must be called upon initialization,\\n    /// regardless of whether the contract is upgradeable or not.\\n    /// This is to enable generalization to both regular and upgradeable contracts,\\n    /// and to save gas in case the initial owner is not the caller.\\n    /// For performance reasons, this function will not check if there\\n    /// is an existing owner.\\n    function _initializeOwner(address newOwner) internal virtual {\\n        if (_guardInitializeOwner()) {\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                let ownerSlot := _OWNER_SLOT\\n                if sload(ownerSlot) {\\n                    mstore(0x00, 0x0dc149f0) // `AlreadyInitialized()`.\\n                    revert(0x1c, 0x04)\\n                }\\n                // Clean the upper 96 bits.\\n                newOwner := shr(96, shl(96, newOwner))\\n                // Store the new value.\\n                sstore(ownerSlot, or(newOwner, shl(255, iszero(newOwner))))\\n                // Emit the {OwnershipTransferred} event.\\n                log3(0, 0, _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE, 0, newOwner)\\n            }\\n        } else {\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                // Clean the upper 96 bits.\\n                newOwner := shr(96, shl(96, newOwner))\\n                // Store the new value.\\n                sstore(_OWNER_SLOT, newOwner)\\n                // Emit the {OwnershipTransferred} event.\\n                log3(0, 0, _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE, 0, newOwner)\\n            }\\n        }\\n    }\\n\\n    /// @dev Sets the owner directly without authorization guard.\\n    function _setOwner(address newOwner) internal virtual {\\n        if (_guardInitializeOwner()) {\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                let ownerSlot := _OWNER_SLOT\\n                // Clean the upper 96 bits.\\n                newOwner := shr(96, shl(96, newOwner))\\n                // Emit the {OwnershipTransferred} event.\\n                log3(0, 0, _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE, sload(ownerSlot), newOwner)\\n                // Store the new value.\\n                sstore(ownerSlot, or(newOwner, shl(255, iszero(newOwner))))\\n            }\\n        } else {\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                let ownerSlot := _OWNER_SLOT\\n                // Clean the upper 96 bits.\\n                newOwner := shr(96, shl(96, newOwner))\\n                // Emit the {OwnershipTransferred} event.\\n                log3(0, 0, _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE, sload(ownerSlot), newOwner)\\n                // Store the new value.\\n                sstore(ownerSlot, newOwner)\\n            }\\n        }\\n    }\\n\\n    /// @dev Throws if the sender is not the owner.\\n    function _checkOwner() internal view virtual {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            // If the caller is not the stored owner, revert.\\n            if iszero(eq(caller(), sload(_OWNER_SLOT))) {\\n                mstore(0x00, 0x82b42900) // `Unauthorized()`.\\n                revert(0x1c, 0x04)\\n            }\\n        }\\n    }\\n\\n    /// @dev Returns how long a two-step ownership handover is valid for in seconds.\\n    /// Override to return a different value if needed.\\n    /// Made internal to conserve bytecode. Wrap it in a public function if needed.\\n    function _ownershipHandoverValidFor() internal view virtual returns (uint64) {\\n        return 48 * 3600;\\n    }\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                  PUBLIC UPDATE FUNCTIONS                   */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Allows the owner to transfer the ownership to `newOwner`.\\n    function transferOwnership(address newOwner) public payable virtual onlyOwner {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            if iszero(shl(96, newOwner)) {\\n                mstore(0x00, 0x7448fbae) // `NewOwnerIsZeroAddress()`.\\n                revert(0x1c, 0x04)\\n            }\\n        }\\n        _setOwner(newOwner);\\n    }\\n\\n    /// @dev Allows the owner to renounce their ownership.\\n    function renounceOwnership() public payable virtual onlyOwner {\\n        _setOwner(address(0));\\n    }\\n\\n    /// @dev Request a two-step ownership handover to the caller.\\n    /// The request will automatically expire in 48 hours (172800 seconds) by default.\\n    function requestOwnershipHandover() public payable virtual {\\n        unchecked {\\n            uint256 expires = block.timestamp + _ownershipHandoverValidFor();\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                // Compute and set the handover slot to `expires`.\\n                mstore(0x0c, _HANDOVER_SLOT_SEED)\\n                mstore(0x00, caller())\\n                sstore(keccak256(0x0c, 0x20), expires)\\n                // Emit the {OwnershipHandoverRequested} event.\\n                log2(0, 0, _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE, caller())\\n            }\\n        }\\n    }\\n\\n    /// @dev Cancels the two-step ownership handover to the caller, if any.\\n    function cancelOwnershipHandover() public payable virtual {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            // Compute and set the handover slot to 0.\\n            mstore(0x0c, _HANDOVER_SLOT_SEED)\\n            mstore(0x00, caller())\\n            sstore(keccak256(0x0c, 0x20), 0)\\n            // Emit the {OwnershipHandoverCanceled} event.\\n            log2(0, 0, _OWNERSHIP_HANDOVER_CANCELED_EVENT_SIGNATURE, caller())\\n        }\\n    }\\n\\n    /// @dev Allows the owner to complete the two-step ownership handover to `pendingOwner`.\\n    /// Reverts if there is no existing ownership handover requested by `pendingOwner`.\\n    function completeOwnershipHandover(address pendingOwner) public payable virtual onlyOwner {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            // Compute and set the handover slot to 0.\\n            mstore(0x0c, _HANDOVER_SLOT_SEED)\\n            mstore(0x00, pendingOwner)\\n            let handoverSlot := keccak256(0x0c, 0x20)\\n            // If the handover does not exist, or has expired.\\n            if gt(timestamp(), sload(handoverSlot)) {\\n                mstore(0x00, 0x6f5e8818) // `NoHandoverRequest()`.\\n                revert(0x1c, 0x04)\\n            }\\n            // Set the handover slot to 0.\\n            sstore(handoverSlot, 0)\\n        }\\n        _setOwner(pendingOwner);\\n    }\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                   PUBLIC READ FUNCTIONS                    */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Returns the owner of the contract.\\n    function owner() public view virtual returns (address result) {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            result := sload(_OWNER_SLOT)\\n        }\\n    }\\n\\n    /// @dev Returns the expiry timestamp for the two-step ownership handover to `pendingOwner`.\\n    function ownershipHandoverExpiresAt(address pendingOwner)\\n        public\\n        view\\n        virtual\\n        returns (uint256 result)\\n    {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            // Compute the handover slot.\\n            mstore(0x0c, _HANDOVER_SLOT_SEED)\\n            mstore(0x00, pendingOwner)\\n            // Load the handover slot.\\n            result := sload(keccak256(0x0c, 0x20))\\n        }\\n    }\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                         MODIFIERS                          */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Marks a function as only callable by the owner.\\n    modifier onlyOwner() virtual {\\n        _checkOwner();\\n        _;\\n    }\\n}\\n\",\"keccak256\":\"0xc208cdd9de02bbf4b5edad18b88e23a2be7ff56d2287d5649329dc7cda64b9a3\",\"license\":\"MIT\"},\"solady/src/utils/SSTORE2.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.4;\\n\\n/// @notice Read and write to persistent storage at a fraction of the cost.\\n/// @author Solady (https://github.com/vectorized/solady/blob/main/src/utils/SSTORE2.sol)\\n/// @author Saw-mon-and-Natalie (https://github.com/Saw-mon-and-Natalie)\\n/// @author Modified from Solmate (https://github.com/transmissions11/solmate/blob/main/src/utils/SSTORE2.sol)\\n/// @author Modified from 0xSequence (https://github.com/0xSequence/sstore2/blob/master/contracts/SSTORE2.sol)\\n/// @author Modified from SSTORE3 (https://github.com/Philogy/sstore3)\\nlibrary SSTORE2 {\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                         CONSTANTS                          */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev The proxy initialization code.\\n    uint256 private constant _CREATE3_PROXY_INITCODE = 0x67363d3d37363d34f03d5260086018f3;\\n\\n    /// @dev Hash of the `_CREATE3_PROXY_INITCODE`.\\n    /// Equivalent to `keccak256(abi.encodePacked(hex\\\"67363d3d37363d34f03d5260086018f3\\\"))`.\\n    bytes32 internal constant CREATE3_PROXY_INITCODE_HASH =\\n        0x21c35dbe1b344a2488cf3321d6ce542f8e9f305544ff09e4993a62319a497c1f;\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                        CUSTOM ERRORS                       */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Unable to deploy the storage contract.\\n    error DeploymentFailed();\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                         WRITE LOGIC                        */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Writes `data` into the bytecode of a storage contract and returns its address.\\n    function write(bytes memory data) internal returns (address pointer) {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            let n := mload(data) // Let `l` be `n + 1`. +1 as we prefix a STOP opcode.\\n            /**\\n             * ---------------------------------------------------+\\n             * Opcode | Mnemonic       | Stack     | Memory       |\\n             * ---------------------------------------------------|\\n             * 61 l   | PUSH2 l        | l         |              |\\n             * 80     | DUP1           | l l       |              |\\n             * 60 0xa | PUSH1 0xa      | 0xa l l   |              |\\n             * 3D     | RETURNDATASIZE | 0 0xa l l |              |\\n             * 39     | CODECOPY       | l         | [0..l): code |\\n             * 3D     | RETURNDATASIZE | 0 l       | [0..l): code |\\n             * F3     | RETURN         |           | [0..l): code |\\n             * 00     | STOP           |           |              |\\n             * ---------------------------------------------------+\\n             * @dev Prefix the bytecode with a STOP opcode to ensure it cannot be called.\\n             * Also PUSH2 is used since max contract size cap is 24,576 bytes which is less than 2 ** 16.\\n             */\\n            // Do a out-of-gas revert if `n + 1` is more than 2 bytes.\\n            mstore(add(data, gt(n, 0xfffe)), add(0xfe61000180600a3d393df300, shl(0x40, n)))\\n            // Deploy a new contract with the generated creation code.\\n            pointer := create(0, add(data, 0x15), add(n, 0xb))\\n            if iszero(pointer) {\\n                mstore(0x00, 0x30116425) // `DeploymentFailed()`.\\n                revert(0x1c, 0x04)\\n            }\\n            mstore(data, n) // Restore the length of `data`.\\n        }\\n    }\\n\\n    /// @dev Writes `data` into the bytecode of a storage contract with `salt`\\n    /// and returns its normal CREATE2 deterministic address.\\n    function writeCounterfactual(bytes memory data, bytes32 salt)\\n        internal\\n        returns (address pointer)\\n    {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            let n := mload(data)\\n            // Do a out-of-gas revert if `n + 1` is more than 2 bytes.\\n            mstore(add(data, gt(n, 0xfffe)), add(0xfe61000180600a3d393df300, shl(0x40, n)))\\n            // Deploy a new contract with the generated creation code.\\n            pointer := create2(0, add(data, 0x15), add(n, 0xb), salt)\\n            if iszero(pointer) {\\n                mstore(0x00, 0x30116425) // `DeploymentFailed()`.\\n                revert(0x1c, 0x04)\\n            }\\n            mstore(data, n) // Restore the length of `data`.\\n        }\\n    }\\n\\n    /// @dev Writes `data` into the bytecode of a storage contract and returns its address.\\n    /// This uses the so-called \\\"CREATE3\\\" workflow,\\n    /// which means that `pointer` is agnostic to `data, and only depends on `salt`.\\n    function writeDeterministic(bytes memory data, bytes32 salt)\\n        internal\\n        returns (address pointer)\\n    {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            let n := mload(data)\\n            mstore(0x00, _CREATE3_PROXY_INITCODE) // Store the `_PROXY_INITCODE`.\\n            let proxy := create2(0, 0x10, 0x10, salt)\\n            if iszero(proxy) {\\n                mstore(0x00, 0x30116425) // `DeploymentFailed()`.\\n                revert(0x1c, 0x04)\\n            }\\n            mstore(0x14, proxy) // Store the proxy's address.\\n            // 0xd6 = 0xc0 (short RLP prefix) + 0x16 (length of: 0x94 ++ proxy ++ 0x01).\\n            // 0x94 = 0x80 + 0x14 (0x14 = the length of an address, 20 bytes, in hex).\\n            mstore(0x00, 0xd694)\\n            mstore8(0x34, 0x01) // Nonce of the proxy contract (1).\\n            pointer := keccak256(0x1e, 0x17)\\n\\n            // Do a out-of-gas revert if `n + 1` is more than 2 bytes.\\n            mstore(add(data, gt(n, 0xfffe)), add(0xfe61000180600a3d393df300, shl(0x40, n)))\\n            if iszero(\\n                mul( // The arguments of `mul` are evaluated last to first.\\n                    extcodesize(pointer),\\n                    call(gas(), proxy, 0, add(data, 0x15), add(n, 0xb), codesize(), 0x00)\\n                )\\n            ) {\\n                mstore(0x00, 0x30116425) // `DeploymentFailed()`.\\n                revert(0x1c, 0x04)\\n            }\\n            mstore(data, n) // Restore the length of `data`.\\n        }\\n    }\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                    ADDRESS CALCULATIONS                    */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Returns the initialization code hash of the storage contract for `data`.\\n    /// Used for mining vanity addresses with create2crunch.\\n    function initCodeHash(bytes memory data) internal pure returns (bytes32 hash) {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            let n := mload(data)\\n            // Do a out-of-gas revert if `n + 1` is more than 2 bytes.\\n            returndatacopy(returndatasize(), returndatasize(), gt(n, 0xfffe))\\n            mstore(data, add(0x61000180600a3d393df300, shl(0x40, n)))\\n            hash := keccak256(add(data, 0x15), add(n, 0xb))\\n            mstore(data, n) // Restore the length of `data`.\\n        }\\n    }\\n\\n    /// @dev Equivalent to `predictCounterfactualAddress(data, salt, address(this))`\\n    function predictCounterfactualAddress(bytes memory data, bytes32 salt)\\n        internal\\n        view\\n        returns (address pointer)\\n    {\\n        pointer = predictCounterfactualAddress(data, salt, address(this));\\n    }\\n\\n    /// @dev Returns the CREATE2 address of the storage contract for `data`\\n    /// deployed with `salt` by `deployer`.\\n    /// Note: The returned result has dirty upper 96 bits. Please clean if used in assembly.\\n    function predictCounterfactualAddress(bytes memory data, bytes32 salt, address deployer)\\n        internal\\n        pure\\n        returns (address predicted)\\n    {\\n        bytes32 hash = initCodeHash(data);\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            // Compute and store the bytecode hash.\\n            mstore8(0x00, 0xff) // Write the prefix.\\n            mstore(0x35, hash)\\n            mstore(0x01, shl(96, deployer))\\n            mstore(0x15, salt)\\n            predicted := keccak256(0x00, 0x55)\\n            // Restore the part of the free memory pointer that has been overwritten.\\n            mstore(0x35, 0)\\n        }\\n    }\\n\\n    /// @dev Equivalent to `predictDeterministicAddress(salt, address(this))`.\\n    function predictDeterministicAddress(bytes32 salt) internal view returns (address pointer) {\\n        pointer = predictDeterministicAddress(salt, address(this));\\n    }\\n\\n    /// @dev Returns the \\\"CREATE3\\\" deterministic address for `salt` with `deployer`.\\n    function predictDeterministicAddress(bytes32 salt, address deployer)\\n        internal\\n        pure\\n        returns (address pointer)\\n    {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            let m := mload(0x40) // Cache the free memory pointer.\\n            mstore(0x00, deployer) // Store `deployer`.\\n            mstore8(0x0b, 0xff) // Store the prefix.\\n            mstore(0x20, salt) // Store the salt.\\n            mstore(0x40, CREATE3_PROXY_INITCODE_HASH) // Store the bytecode hash.\\n\\n            mstore(0x14, keccak256(0x0b, 0x55)) // Store the proxy's address.\\n            mstore(0x40, m) // Restore the free memory pointer.\\n            // 0xd6 = 0xc0 (short RLP prefix) + 0x16 (length of: 0x94 ++ proxy ++ 0x01).\\n            // 0x94 = 0x80 + 0x14 (0x14 = the length of an address, 20 bytes, in hex).\\n            mstore(0x00, 0xd694)\\n            mstore8(0x34, 0x01) // Nonce of the proxy contract (1).\\n            pointer := keccak256(0x1e, 0x17)\\n        }\\n    }\\n\\n    /*\\u00b4:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0\\u2022.*\\u2022\\u00b4.*:\\u02da.\\u00b0*.\\u02da\\u2022\\u00b4.\\u00b0:\\u00b0\\u2022.\\u00b0+.*\\u2022\\u00b4.*:*/\\n    /*                         READ LOGIC                         */\\n    /*.\\u2022\\u00b0:\\u00b0.\\u00b4+\\u02da.*\\u00b0.\\u02da:*.\\u00b4\\u2022*.+\\u00b0.\\u2022\\u00b0:\\u00b4*.\\u00b4\\u2022*.\\u2022\\u00b0.\\u2022\\u00b0:\\u00b0.\\u00b4:\\u2022\\u02da\\u00b0.*\\u00b0.\\u02da:*.\\u00b4+\\u00b0.\\u2022*/\\n\\n    /// @dev Equivalent to `read(pointer, 0, 2 ** 256 - 1)`.\\n    function read(address pointer) internal view returns (bytes memory data) {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            data := mload(0x40)\\n            let n := and(sub(extcodesize(pointer), 0x01), 0xffffffffff)\\n            extcodecopy(pointer, add(data, 0x1f), 0x00, add(n, 0x21))\\n            mstore(data, n) // Store the length.\\n            mstore(0x40, add(n, add(data, 0x40))) // Allocate memory.\\n        }\\n    }\\n\\n    /// @dev Equivalent to `read(pointer, start, 2 ** 256 - 1)`.\\n    function read(address pointer, uint256 start) internal view returns (bytes memory data) {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            data := mload(0x40)\\n            let n := and(sub(extcodesize(pointer), 0x01), 0xffffffffff)\\n            extcodecopy(pointer, add(data, 0x1f), start, add(n, 0x21))\\n            mstore(data, mul(sub(n, start), lt(start, n))) // Store the length.\\n            mstore(0x40, add(data, add(0x40, mload(data)))) // Allocate memory.\\n        }\\n    }\\n\\n    /// @dev Returns a slice of the data on `pointer` from `start` to `end`.\\n    /// `start` and `end` will be clamped to the range `[0, args.length]`.\\n    /// The `pointer` MUST be deployed via the SSTORE2 write functions.\\n    /// Otherwise, the behavior is undefined.\\n    /// Out-of-gas reverts if `pointer` does not have any code.\\n    function read(address pointer, uint256 start, uint256 end)\\n        internal\\n        view\\n        returns (bytes memory data)\\n    {\\n        /// @solidity memory-safe-assembly\\n        assembly {\\n            data := mload(0x40)\\n            if iszero(lt(end, 0xffff)) { end := 0xffff }\\n            let d := mul(sub(end, start), lt(start, end))\\n            extcodecopy(pointer, add(data, 0x1f), start, add(d, 0x01))\\n            if iszero(and(0xff, mload(add(data, d)))) {\\n                let n := sub(extcodesize(pointer), 0x01)\\n                returndatacopy(returndatasize(), returndatasize(), shr(64, n))\\n                d := mul(gt(n, start), sub(d, mul(gt(end, n), sub(end, n))))\\n            }\\n            mstore(data, d) // Store the length.\\n            mstore(add(add(data, 0x20), d), 0) // Zeroize the slot after the bytes.\\n            mstore(0x40, add(add(data, 0x40), d)) // Allocate memory.\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xbf37e949744f986603abd28c5185fd6cb4253cd4627014725e8adcb2df931d6a\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506100203361002560201b60201c565b61010b565b61003361010660201b60201c565b156100ae577fffffffffffffffffffffffffffffffffffffffffffffffffffffffff7487392780541561006e57630dc149f06000526004601cfd5b8160601b60601c9150811560ff1b821781558160007f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a350610103565b8060601b60601c9050807fffffffffffffffffffffffffffffffffffffffffffffffffffffffff74873927558060007f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a35b50565b600090565b61178b8061011a6000396000f3fe6080604052600436106100f35760003560e01c80636cc895a91161008a578063da0321cd11610059578063da0321cd14610293578063f04e283e146102be578063f2fde38b146102da578063fee81cf4146102f6576100f3565b80636cc895a91461020c578063715018a61461023557806372910be01461023f5780638da5cb5b14610268576100f3565b806333c34ac3116100c657806333c34ac3146101835780634a79d50c146101ae57806354d1f13d146101d95780635d3a1f9d146101e3576100f3565b80631f1bd692146100f8578063256929621461012357806328411ae11461012d5780632c73dc4a14610158575b600080fd5b34801561010457600080fd5b5061010d610333565b60405161011a9190610c40565b60405180910390f35b61012b6103cf565b005b34801561013957600080fd5b50610142610423565b60405161014f9190610d6e565b60405180910390f35b34801561016457600080fd5b5061016d6104ce565b60405161017a9190610d6e565b60405180910390f35b34801561018f57600080fd5b506101986105a7565b6040516101a59190610c40565b60405180910390f35b3480156101ba57600080fd5b506101c3610687565b6040516101d09190610c40565b60405180910390f35b6101e1610719565b005b3480156101ef57600080fd5b5061020a60048036038101906102059190610ed9565b610755565b005b34801561021857600080fd5b50610233600480360381019061022e9190611008565b6107a8565b005b61023d6107ca565b005b34801561024b57600080fd5b5061026660048036038101906102619190610ed9565b6107de565b005b34801561027457600080fd5b5061027d6107f9565b60405161028a9190611092565b60405180910390f35b34801561029f57600080fd5b506102a8610822565b6040516102b5919061116b565b60405180910390f35b6102d860048036038101906102d391906111b9565b6108c8565b005b6102f460048036038101906102ef91906111b9565b610909565b005b34801561030257600080fd5b5061031d600480360381019061031891906111b9565b610933565b60405161032a91906111ff565b60405180910390f35b6060600073ffffffffffffffffffffffffffffffffffffffff1660008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16036103a0576040518060200160405280600081525090506103cc565b6103c960008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1661094e565b90505b90565b60006103d961097f565b67ffffffffffffffff164201905063389a75e1600c5233600052806020600c2055337fdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d600080a250565b6060600167ffffffffffffffff8111156104405761043f610dae565b5b60405190808252806020026020018201604052801561047357816020015b606081526020019060019003908161045e5790505b5090506040518060400160405280600b81526020017f4d616c7465205261756368000000000000000000000000000000000000000000815250816000815181106104c0576104bf61121a565b5b602002602001018190525090565b60606002805480602002602001604051908101604052809291908181526020016000905b8282101561059e57838290600052602060002001805461051190611278565b80601f016020809104026020016040519081016040528092919081815260200182805461053d90611278565b801561058a5780601f1061055f5761010080835404028352916020019161058a565b820191906000526020600020905b81548152906001019060200180831161056d57829003601f168201915b5050505050815260200190600101906104f2565b50505050905090565b606060016105b3610423565b6000815181106105c6576105c561121a565b5b6020026020010151600073ffffffffffffffffffffffffffffffffffffffff1660008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16146106505761064b60008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1661094e565b610661565b604051806020016040528060008152505b60405160200161067393929190611461565b604051602081830303815290604052905090565b60606001805461069690611278565b80601f01602080910402602001604051908101604052809291908181526020018280546106c290611278565b801561070f5780601f106106e45761010080835404028352916020019161070f565b820191906000526020600020905b8154815290600101906020018083116106f257829003601f168201915b5050505050905090565b63389a75e1600c523360005260006020600c2055337ffa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92600080a2565b61075d61098a565b610766816109c2565b6000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b6107b061098a565b80600290805190602001906107c6929190610ad6565b5050565b6107d261098a565b6107dc6000610a09565b565b6107e661098a565b80600190816107f59190611683565b5050565b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffff7487392754905090565b60606000600167ffffffffffffffff81111561084157610840610dae565b5b60405190808252806020026020018201604052801561086f5781602001602082028036833780820191505090505b50905030816000815181106108875761088661121a565b5b602002602001019073ffffffffffffffffffffffffffffffffffffffff16908173ffffffffffffffffffffffffffffffffffffffff16815250508091505090565b6108d061098a565b63389a75e1600c52806000526020600c2080544211156108f857636f5e88186000526004601cfd5b600081555061090681610a09565b50565b61091161098a565b8060601b61092757637448fbae6000526004601cfd5b61093081610a09565b50565b600063389a75e1600c52816000526020600c20549050919050565b6060604051905064ffffffffff6001833b0316602181016000601f8401853c80825260408201810160405250919050565b60006202a300905090565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739275433146109c0576382b429006000526004601cfd5b565b600081518060401b6bfe61000180600a3d393df3000161fffe8211840152600b8101601584016000f0915081610a005763301164256000526004601cfd5b80835250919050565b610a11610ad1565b15610a77577fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739278160601b60601c91508181547f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a3811560ff1b8217815550610ace565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739278160601b60601c91508181547f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a3818155505b50565b600090565b828054828255906000526020600020908101928215610b1e579160200282015b82811115610b1d578251829081610b0d9190611683565b5091602001919060010190610af6565b5b509050610b2b9190610b2f565b5090565b5b80821115610b4f5760008181610b469190610b53565b50600101610b30565b5090565b508054610b5f90611278565b6000825580601f10610b715750610b90565b601f016020900490600052602060002090810190610b8f9190610b93565b5b50565b5b80821115610bac576000816000905550600101610b94565b5090565b600081519050919050565b600082825260208201905092915050565b60005b83811015610bea578082015181840152602081019050610bcf565b60008484015250505050565b6000601f19601f8301169050919050565b6000610c1282610bb0565b610c1c8185610bbb565b9350610c2c818560208601610bcc565b610c3581610bf6565b840191505092915050565b60006020820190508181036000830152610c5a8184610c07565b905092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b600082825260208201905092915050565b6000610caa82610bb0565b610cb48185610c8e565b9350610cc4818560208601610bcc565b610ccd81610bf6565b840191505092915050565b6000610ce48383610c9f565b905092915050565b6000602082019050919050565b6000610d0482610c62565b610d0e8185610c6d565b935083602082028501610d2085610c7e565b8060005b85811015610d5c5784840389528151610d3d8582610cd8565b9450610d4883610cec565b925060208a01995050600181019050610d24565b50829750879550505050505092915050565b60006020820190508181036000830152610d888184610cf9565b905092915050565b6000604051905090565b600080fd5b600080fd5b600080fd5b600080fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b610de682610bf6565b810181811067ffffffffffffffff82111715610e0557610e04610dae565b5b80604052505050565b6000610e18610d90565b9050610e248282610ddd565b919050565b600067ffffffffffffffff821115610e4457610e43610dae565b5b610e4d82610bf6565b9050602081019050919050565b82818337600083830152505050565b6000610e7c610e7784610e29565b610e0e565b905082815260208101848484011115610e9857610e97610da9565b5b610ea3848285610e5a565b509392505050565b600082601f830112610ec057610ebf610da4565b5b8135610ed0848260208601610e69565b91505092915050565b600060208284031215610eef57610eee610d9a565b5b600082013567ffffffffffffffff811115610f0d57610f0c610d9f565b5b610f1984828501610eab565b91505092915050565b600067ffffffffffffffff821115610f3d57610f3c610dae565b5b602082029050602081019050919050565b600080fd5b6000610f66610f6184610f22565b610e0e565b90508083825260208201905060208402830185811115610f8957610f88610f4e565b5b835b81811015610fd057803567ffffffffffffffff811115610fae57610fad610da4565b5b808601610fbb8982610eab565b85526020850194505050602081019050610f8b565b5050509392505050565b600082601f830112610fef57610fee610da4565b5b8135610fff848260208601610f53565b91505092915050565b60006020828403121561101e5761101d610d9a565b5b600082013567ffffffffffffffff81111561103c5761103b610d9f565b5b61104884828501610fda565b91505092915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061107c82611051565b9050919050565b61108c81611071565b82525050565b60006020820190506110a76000830184611083565b92915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b6110e281611071565b82525050565b60006110f483836110d9565b60208301905092915050565b6000602082019050919050565b6000611118826110ad565b61112281856110b8565b935061112d836110c9565b8060005b8381101561115e57815161114588826110e8565b975061115083611100565b925050600181019050611131565b5085935050505092915050565b60006020820190508181036000830152611185818461110d565b905092915050565b61119681611071565b81146111a157600080fd5b50565b6000813590506111b38161118d565b92915050565b6000602082840312156111cf576111ce610d9a565b5b60006111dd848285016111a4565b91505092915050565b6000819050919050565b6111f9816111e6565b82525050565b600060208201905061121460008301846111f0565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b6000600282049050600182168061129057607f821691505b6020821081036112a3576112a2611249565b5b50919050565b7f3c68313e00000000000000000000000000000000000000000000000000000000815250565b600081905092915050565b60008190508160005260206000209050919050565b600081546112fc81611278565b61130681866112cf565b94506001821660008114611321576001811461133657611369565b60ff1983168652811515820286019350611369565b61133f856112da565b60005b8381101561136157815481890152600182019150602081019050611342565b838801955050505b50505092915050565b7f3c2f68313e000000000000000000000000000000000000000000000000000000815250565b7f3c68323e00000000000000000000000000000000000000000000000000000000815250565b60006113c982610bb0565b6113d381856112cf565b93506113e3818560208601610bcc565b80840191505092915050565b7f3c2f68323e000000000000000000000000000000000000000000000000000000815250565b7f3c6469763e000000000000000000000000000000000000000000000000000000815250565b7f3c2f6469763e0000000000000000000000000000000000000000000000000000815250565b600061146c826112a9565b60048201915061147c82866112ef565b915061148782611372565b60058201915061149682611398565b6004820191506114a682856113be565b91506114b1826113ef565b6005820191506114c082611415565b6005820191506114d082846113be565b91506114db8261143b565b600682019150819050949350505050565b60006020601f8301049050919050565b600082821b905092915050565b6000600883026115397fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff826114fc565b61154386836114fc565b95508019841693508086168417925050509392505050565b6000819050919050565b600061158061157b611576846111e6565b61155b565b6111e6565b9050919050565b6000819050919050565b61159a83611565565b6115ae6115a682611587565b848454611509565b825550505050565b600090565b6115c36115b6565b6115ce818484611591565b505050565b5b818110156115f2576115e76000826115bb565b6001810190506115d4565b5050565b601f82111561163757611608816112da565b611611846114ec565b81016020851015611620578190505b61163461162c856114ec565b8301826115d3565b50505b505050565b600082821c905092915050565b600061165a6000198460080261163c565b1980831691505092915050565b60006116738383611649565b9150826002028217905092915050565b61168c82610bb0565b67ffffffffffffffff8111156116a5576116a4610dae565b5b6116af8254611278565b6116ba8282856115f6565b600060209050601f8311600181146116ed57600084156116db578287015190505b6116e58582611667565b86555061174d565b601f1984166116fb866112da565b60005b82811015611723578489015182556001820191506020850194506020810190506116fe565b86831015611740578489015161173c601f891682611649565b8355505b6001600288020188555050505b50505050505056fea2646970667358221220084d55e319c2ca0b846515e2f62fc63c2490b3f7ccbb53d2f16591b9e4b672c364736f6c634300081c0033",
+  "deployedBytecode": "0x6080604052600436106100f35760003560e01c80636cc895a91161008a578063da0321cd11610059578063da0321cd14610293578063f04e283e146102be578063f2fde38b146102da578063fee81cf4146102f6576100f3565b80636cc895a91461020c578063715018a61461023557806372910be01461023f5780638da5cb5b14610268576100f3565b806333c34ac3116100c657806333c34ac3146101835780634a79d50c146101ae57806354d1f13d146101d95780635d3a1f9d146101e3576100f3565b80631f1bd692146100f8578063256929621461012357806328411ae11461012d5780632c73dc4a14610158575b600080fd5b34801561010457600080fd5b5061010d610333565b60405161011a9190610c40565b60405180910390f35b61012b6103cf565b005b34801561013957600080fd5b50610142610423565b60405161014f9190610d6e565b60405180910390f35b34801561016457600080fd5b5061016d6104ce565b60405161017a9190610d6e565b60405180910390f35b34801561018f57600080fd5b506101986105a7565b6040516101a59190610c40565b60405180910390f35b3480156101ba57600080fd5b506101c3610687565b6040516101d09190610c40565b60405180910390f35b6101e1610719565b005b3480156101ef57600080fd5b5061020a60048036038101906102059190610ed9565b610755565b005b34801561021857600080fd5b50610233600480360381019061022e9190611008565b6107a8565b005b61023d6107ca565b005b34801561024b57600080fd5b5061026660048036038101906102619190610ed9565b6107de565b005b34801561027457600080fd5b5061027d6107f9565b60405161028a9190611092565b60405180910390f35b34801561029f57600080fd5b506102a8610822565b6040516102b5919061116b565b60405180910390f35b6102d860048036038101906102d391906111b9565b6108c8565b005b6102f460048036038101906102ef91906111b9565b610909565b005b34801561030257600080fd5b5061031d600480360381019061031891906111b9565b610933565b60405161032a91906111ff565b60405180910390f35b6060600073ffffffffffffffffffffffffffffffffffffffff1660008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16036103a0576040518060200160405280600081525090506103cc565b6103c960008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1661094e565b90505b90565b60006103d961097f565b67ffffffffffffffff164201905063389a75e1600c5233600052806020600c2055337fdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d600080a250565b6060600167ffffffffffffffff8111156104405761043f610dae565b5b60405190808252806020026020018201604052801561047357816020015b606081526020019060019003908161045e5790505b5090506040518060400160405280600b81526020017f4d616c7465205261756368000000000000000000000000000000000000000000815250816000815181106104c0576104bf61121a565b5b602002602001018190525090565b60606002805480602002602001604051908101604052809291908181526020016000905b8282101561059e57838290600052602060002001805461051190611278565b80601f016020809104026020016040519081016040528092919081815260200182805461053d90611278565b801561058a5780601f1061055f5761010080835404028352916020019161058a565b820191906000526020600020905b81548152906001019060200180831161056d57829003601f168201915b5050505050815260200190600101906104f2565b50505050905090565b606060016105b3610423565b6000815181106105c6576105c561121a565b5b6020026020010151600073ffffffffffffffffffffffffffffffffffffffff1660008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16146106505761064b60008054906101000a900473ffffffffffffffffffffffffffffffffffffffff1661094e565b610661565b604051806020016040528060008152505b60405160200161067393929190611461565b604051602081830303815290604052905090565b60606001805461069690611278565b80601f01602080910402602001604051908101604052809291908181526020018280546106c290611278565b801561070f5780601f106106e45761010080835404028352916020019161070f565b820191906000526020600020905b8154815290600101906020018083116106f257829003601f168201915b5050505050905090565b63389a75e1600c523360005260006020600c2055337ffa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92600080a2565b61075d61098a565b610766816109c2565b6000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b6107b061098a565b80600290805190602001906107c6929190610ad6565b5050565b6107d261098a565b6107dc6000610a09565b565b6107e661098a565b80600190816107f59190611683565b5050565b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffff7487392754905090565b60606000600167ffffffffffffffff81111561084157610840610dae565b5b60405190808252806020026020018201604052801561086f5781602001602082028036833780820191505090505b50905030816000815181106108875761088661121a565b5b602002602001019073ffffffffffffffffffffffffffffffffffffffff16908173ffffffffffffffffffffffffffffffffffffffff16815250508091505090565b6108d061098a565b63389a75e1600c52806000526020600c2080544211156108f857636f5e88186000526004601cfd5b600081555061090681610a09565b50565b61091161098a565b8060601b61092757637448fbae6000526004601cfd5b61093081610a09565b50565b600063389a75e1600c52816000526020600c20549050919050565b6060604051905064ffffffffff6001833b0316602181016000601f8401853c80825260408201810160405250919050565b60006202a300905090565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739275433146109c0576382b429006000526004601cfd5b565b600081518060401b6bfe61000180600a3d393df3000161fffe8211840152600b8101601584016000f0915081610a005763301164256000526004601cfd5b80835250919050565b610a11610ad1565b15610a77577fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739278160601b60601c91508181547f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a3811560ff1b8217815550610ace565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffff748739278160601b60601c91508181547f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0600080a3818155505b50565b600090565b828054828255906000526020600020908101928215610b1e579160200282015b82811115610b1d578251829081610b0d9190611683565b5091602001919060010190610af6565b5b509050610b2b9190610b2f565b5090565b5b80821115610b4f5760008181610b469190610b53565b50600101610b30565b5090565b508054610b5f90611278565b6000825580601f10610b715750610b90565b601f016020900490600052602060002090810190610b8f9190610b93565b5b50565b5b80821115610bac576000816000905550600101610b94565b5090565b600081519050919050565b600082825260208201905092915050565b60005b83811015610bea578082015181840152602081019050610bcf565b60008484015250505050565b6000601f19601f8301169050919050565b6000610c1282610bb0565b610c1c8185610bbb565b9350610c2c818560208601610bcc565b610c3581610bf6565b840191505092915050565b60006020820190508181036000830152610c5a8184610c07565b905092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b600082825260208201905092915050565b6000610caa82610bb0565b610cb48185610c8e565b9350610cc4818560208601610bcc565b610ccd81610bf6565b840191505092915050565b6000610ce48383610c9f565b905092915050565b6000602082019050919050565b6000610d0482610c62565b610d0e8185610c6d565b935083602082028501610d2085610c7e565b8060005b85811015610d5c5784840389528151610d3d8582610cd8565b9450610d4883610cec565b925060208a01995050600181019050610d24565b50829750879550505050505092915050565b60006020820190508181036000830152610d888184610cf9565b905092915050565b6000604051905090565b600080fd5b600080fd5b600080fd5b600080fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b610de682610bf6565b810181811067ffffffffffffffff82111715610e0557610e04610dae565b5b80604052505050565b6000610e18610d90565b9050610e248282610ddd565b919050565b600067ffffffffffffffff821115610e4457610e43610dae565b5b610e4d82610bf6565b9050602081019050919050565b82818337600083830152505050565b6000610e7c610e7784610e29565b610e0e565b905082815260208101848484011115610e9857610e97610da9565b5b610ea3848285610e5a565b509392505050565b600082601f830112610ec057610ebf610da4565b5b8135610ed0848260208601610e69565b91505092915050565b600060208284031215610eef57610eee610d9a565b5b600082013567ffffffffffffffff811115610f0d57610f0c610d9f565b5b610f1984828501610eab565b91505092915050565b600067ffffffffffffffff821115610f3d57610f3c610dae565b5b602082029050602081019050919050565b600080fd5b6000610f66610f6184610f22565b610e0e565b90508083825260208201905060208402830185811115610f8957610f88610f4e565b5b835b81811015610fd057803567ffffffffffffffff811115610fae57610fad610da4565b5b808601610fbb8982610eab565b85526020850194505050602081019050610f8b565b5050509392505050565b600082601f830112610fef57610fee610da4565b5b8135610fff848260208601610f53565b91505092915050565b60006020828403121561101e5761101d610d9a565b5b600082013567ffffffffffffffff81111561103c5761103b610d9f565b5b61104884828501610fda565b91505092915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061107c82611051565b9050919050565b61108c81611071565b82525050565b60006020820190506110a76000830184611083565b92915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b6110e281611071565b82525050565b60006110f483836110d9565b60208301905092915050565b6000602082019050919050565b6000611118826110ad565b61112281856110b8565b935061112d836110c9565b8060005b8381101561115e57815161114588826110e8565b975061115083611100565b925050600181019050611131565b5085935050505092915050565b60006020820190508181036000830152611185818461110d565b905092915050565b61119681611071565b81146111a157600080fd5b50565b6000813590506111b38161118d565b92915050565b6000602082840312156111cf576111ce610d9a565b5b60006111dd848285016111a4565b91505092915050565b6000819050919050565b6111f9816111e6565b82525050565b600060208201905061121460008301846111f0565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b6000600282049050600182168061129057607f821691505b6020821081036112a3576112a2611249565b5b50919050565b7f3c68313e00000000000000000000000000000000000000000000000000000000815250565b600081905092915050565b60008190508160005260206000209050919050565b600081546112fc81611278565b61130681866112cf565b94506001821660008114611321576001811461133657611369565b60ff1983168652811515820286019350611369565b61133f856112da565b60005b8381101561136157815481890152600182019150602081019050611342565b838801955050505b50505092915050565b7f3c2f68313e000000000000000000000000000000000000000000000000000000815250565b7f3c68323e00000000000000000000000000000000000000000000000000000000815250565b60006113c982610bb0565b6113d381856112cf565b93506113e3818560208601610bcc565b80840191505092915050565b7f3c2f68323e000000000000000000000000000000000000000000000000000000815250565b7f3c6469763e000000000000000000000000000000000000000000000000000000815250565b7f3c2f6469763e0000000000000000000000000000000000000000000000000000815250565b600061146c826112a9565b60048201915061147c82866112ef565b915061148782611372565b60058201915061149682611398565b6004820191506114a682856113be565b91506114b1826113ef565b6005820191506114c082611415565b6005820191506114d082846113be565b91506114db8261143b565b600682019150819050949350505050565b60006020601f8301049050919050565b600082821b905092915050565b6000600883026115397fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff826114fc565b61154386836114fc565b95508019841693508086168417925050509392505050565b6000819050919050565b600061158061157b611576846111e6565b61155b565b6111e6565b9050919050565b6000819050919050565b61159a83611565565b6115ae6115a682611587565b848454611509565b825550505050565b600090565b6115c36115b6565b6115ce818484611591565b505050565b5b818110156115f2576115e76000826115bb565b6001810190506115d4565b5050565b601f82111561163757611608816112da565b611611846114ec565b81016020851015611620578190505b61163461162c856114ec565b8301826115d3565b50505b505050565b600082821c905092915050565b600061165a6000198460080261163c565b1980831691505092915050565b60006116738383611649565b9150826002028217905092915050565b61168c82610bb0565b67ffffffffffffffff8111156116a5576116a4610dae565b5b6116af8254611278565b6116ba8282856115f6565b600060209050601f8311600181146116ed57600084156116db578287015190505b6116e58582611667565b86555061174d565b601f1984166116fb866112da565b60005b82811015611723578489015182556001820191506020850194506020810190506116fe565b86831015611740578489015161173c601f891682611649565b8355505b6001600288020188555050505b50505050505056fea2646970667358221220084d55e319c2ca0b846515e2f62fc63c2490b3f7ccbb53d2f16591b9e4b672c364736f6c634300081c0033",
+  "devdoc": {
+    "errors": {
+      "AlreadyInitialized()": [
+        {
+          "details": "Cannot double-initialize."
+        }
+      ],
+      "NewOwnerIsZeroAddress()": [
+        {
+          "details": "The `newOwner` cannot be the zero address."
+        }
+      ],
+      "NoHandoverRequest()": [
+        {
+          "details": "The `pendingOwner` does not have a valid handover request."
+        }
+      ],
+      "Unauthorized()": [
+        {
+          "details": "The caller is not authorized to call the function."
+        }
+      ]
+    },
+    "events": {
+      "OwnershipHandoverCanceled(address)": {
+        "details": "The ownership handover to `pendingOwner` has been canceled."
+      },
+      "OwnershipHandoverRequested(address)": {
+        "details": "An ownership handover to `pendingOwner` has been requested."
+      },
+      "OwnershipTransferred(address,address)": {
+        "details": "The ownership is transferred from `oldOwner` to `newOwner`. This event is intentionally kept the same as OpenZeppelin's Ownable to be compatible with indexers and [EIP-173](https://eips.ethereum.org/EIPS/eip-173), despite it not being as lightweight as a single argument event."
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "cancelOwnershipHandover()": {
+        "details": "Cancels the two-step ownership handover to the caller, if any."
+      },
+      "completeOwnershipHandover(address)": {
+        "details": "Allows the owner to complete the two-step ownership handover to `pendingOwner`. Reverts if there is no existing ownership handover requested by `pendingOwner`."
+      },
+      "owner()": {
+        "details": "Returns the owner of the contract."
+      },
+      "ownershipHandoverExpiresAt(address)": {
+        "details": "Returns the expiry timestamp for the two-step ownership handover to `pendingOwner`."
+      },
+      "renounceOwnership()": {
+        "details": "Allows the owner to renounce their ownership."
+      },
+      "requestOwnershipHandover()": {
+        "details": "Request a two-step ownership handover to the caller. The request will automatically expire in 48 hours (172800 seconds) by default."
+      },
+      "transferOwnership(address)": {
+        "details": "Allows the owner to transfer the ownership to `newOwner`."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 10,
+        "contract": "contracts/Essay.sol:Essay",
+        "label": "pointer",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 12,
+        "contract": "contracts/Essay.sol:Essay",
+        "label": "t",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_string_storage"
+      },
+      {
+        "astId": 15,
+        "contract": "contracts/Essay.sol:Essay",
+        "label": "u",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_array(t_string_storage)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_string_storage)dyn_storage": {
+        "base": "t_string_storage",
+        "encoding": "dynamic_array",
+        "label": "string[]",
+        "numberOfBytes": "32"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

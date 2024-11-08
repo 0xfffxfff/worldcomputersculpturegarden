@@ -2,11 +2,11 @@ import { Config, Context } from "@netlify/functions";
 import { ethers } from "ethers";
 import { CacheHeaders } from "cdn-cache-control";
 
-const deploymentArtifact = require('../../../contracts/deployments/localhost/Garden.json');
+const deploymentArtifact = require('../../../contracts/deployments/sepolia/Garden.json');
 
 const CACHE_EXPIRATION_TIME = 12;
-// const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
-const RPC_URL = 'http://localhost:8545';
+const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
+// const RPC_URL = 'http://localhost:8545';
 
 export default async (req: Request, context: Context) => {
     const path = context.url.pathname.slice(1);

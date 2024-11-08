@@ -17,8 +17,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const web = await deployments.get("Web");
   const webContract = await hre.ethers.getContractAt("Web", web.address);
+  console.log("Setting renderer on Web contract...");
   await webContract.setRenderer(renderer.address);
-
+  console.log("Done!");
 };
 
 export default func;
