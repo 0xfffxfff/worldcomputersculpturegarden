@@ -79,9 +79,9 @@ contract ShowCritique is Sculpture, Ownable {
         Sculpture work = Sculpture(workAddress);
         Critique memory critique = critiques[workAddress];
         return string.concat(
-            "<p>",
+            '<p><span class="address">',
             LibString.toHexStringChecksummed(critique.critic),
-            " thinks that <i><span style=\"white-space: nowrap;\">",
+            "</span> thinks that <i><span style=\"white-space: nowrap;\">",
             work.title(),
             "</span></i> <span style=\"white-space: nowrap;\">by ",
             work.authors()[0],

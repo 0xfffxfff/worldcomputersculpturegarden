@@ -220,22 +220,26 @@ library GardenIndex {
         html = string.concat(html, "</div>");
 
         // Script: Resolve ENS
-        // html = string.concat(html,
-        //     '<script type="module">',
-        //     'import { JsonRpcProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
-        //     'const provider = new JsonRpcProvider("https://eth.drpc.org");',
+        html = string.concat(html,
+            '<script type="module">',
+            'import { getDefaultProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
+            'const provider = new getDefaultProvider();',
 
-        //     'const result = await Promise.all(',
-        //         'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
-        //         'const address = el.textContent;',
-        //         'if (!isAddress(address)) return address;',
-        //         'const name = await provider.lookupAddress(address);',
-        //         'if (name) el.textContent = name;',
-        //         'return name || address;',
-        //         '})',
-        //     ');'
-        //     '</script>'
-        // );
+            'async function resolveEns() {',
+            '   const result = await Promise.all(',
+                    'Array.from(document.querySelectorAll(".address")).map(async (el) => {',
+                    'const address = el.textContent;',
+                    'if (!isAddress(address)) return address;',
+                    'const name = await provider.lookupAddress(address);',
+                    'if (name) el.textContent = name;',
+                    'return name || address;',
+                    '})',
+                ');'
+            '}',
+            'resolveEns();',
+            'window.resolveEns = resolveEns;',
+            '</script>'
+        );
 
         return GardenHTML.html(html, Sculpture(garden).title());
     }
