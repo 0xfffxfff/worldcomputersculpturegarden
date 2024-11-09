@@ -44,7 +44,7 @@ library GardenIndex {
         // Header End
         html = string.concat(html,
             '<br /><br />',
-            '<h2 class="a">', LibString.toHexString(garden), '</h2><br />',
+            '<h2 class="a">', LibString.toHexStringChecksummed(garden), '</h2><br />',
             '<pre class="garden">',
             unicode"      ⚘                      ⚘\n",
             unicode"              ⚘\n",
@@ -113,12 +113,12 @@ library GardenIndex {
                 if (addresses.length > 0) {
                     html = string.concat(html, "<p>");
                     for (uint256 j = 0; j < addresses.length; j++) {
-                        html = string.concat(html, '<span class="a">', LibString.toHexString(addresses[j]), "</span><br/>");
+                        html = string.concat(html, '<span class="a">', LibString.toHexStringChecksummed(addresses[j]), "</span><br/>");
                     }
                     html = string.concat(html, "</p>");
                 }
             } catch {
-                html = string.concat(html, "<p><span class='a'>", LibString.toHexString(sculptures[i]) , "</span></p>");
+                html = string.concat(html, "<p><span class='a'>", LibString.toHexStringChecksummed(sculptures[i]) , "</span></p>");
             }
 
             // Urls
@@ -156,7 +156,7 @@ library GardenIndex {
                 'Guestbook',
                 '<br/><br/>',
                 'You may leave a flower here by sending 0.01 ETH (or multiples thereof)<br/> to the show contract at <span class="a">',
-                    LibString.toHexString(garden),
+                    LibString.toHexStringChecksummed(garden),
                 '</span><br/><br/>',
                 LibString.toString(IGarden(garden).guests() + 5 /* DEV TODO */),
                 ' guests have planted ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */),
@@ -216,7 +216,7 @@ library GardenIndex {
         );
 
         // Footer
-        html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ ' from <span class="a">', LibString.toHexString(address(this)) ,"<span></div>");
+        html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ ' from <span class="a">', LibString.toHexStringChecksummed(address(this)) ,"<span></div>");
         html = string.concat(html, "</div>");
 
         // Script: Resolve ENS
