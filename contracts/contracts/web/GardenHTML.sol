@@ -12,7 +12,7 @@ library GardenHTML {
             '*, *::before, *::after { box-sizing: border-box; }',
             'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; } html, body { margin: 0; padding: 0; } body { min-height: 100vh } html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
             'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: content-box; }",
+            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: border-box; }",
             ".c.essay { max-width: 620px; }",
             "a { color: inherit; text-decoration: underline; }",
             ".w { position: relative; min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
