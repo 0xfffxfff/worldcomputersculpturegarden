@@ -7,17 +7,17 @@ pragma solidity >=0.8.0;
 //                                        ⚘                           //
 //            ⚘                                                       //
 //                                 ⚘                            ⚘     //
-//                                                                    //
+//                                                 ⚘                  //
 //         ⚘                                                          //
-//                          hi and welcome                            //
-//                              to the                      ⚘         //
-//                  world computer sculpture garden                   //
+//                 the world computer                                 //
+//                                                           ⚘        //
+//                           is a sculpture garden                    //
 //          ⚘                                                         //
 //                                               ⚘               ⚘    //
 //                           ⚘                                        //
 //       ⚘                                 ⚘            ⚘             //
 //                   ⚘                                                //
-//                                ⚘                       0xfff.eth   //
+//                                ⚘                                   //
 //                                                                    //
 ////////////////////////////////////////////////////////////////////////
 

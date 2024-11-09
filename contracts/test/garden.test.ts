@@ -2,7 +2,6 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import { parseEther } from "ethers";
 import hre from "hardhat";
-import { inputFile } from "hardhat/internal/core/params/argumentTypes";
 
 describe("Garden", function () {
   async function deployFixture() {
@@ -108,6 +107,23 @@ describe("Garden", function () {
         gasLimit: 60_000_000
       })).to.equal(await owner.getAddress());
 
+    });
+
+    it("Should allow withdrawing", async function () {
+      const { garden, owner, acc1 } = await loadFixture(deployFixture);
+
+      await owner.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("1.0"),
+      })
+
+      const balance = await hre.ethers.provider.getBalance(await acc1.getAddress());
+      const gardenBalance = await hre.ethers.provider.getBalance(await garden.getAddress());
+
+      await garden.withdraw(await acc1.getAddress());
+
+      expect(await hre.ethers.provider.getBalance(await acc1.getAddress())).to.equal(balance+gardenBalance);
+      expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(0);
     });
   });
 });
