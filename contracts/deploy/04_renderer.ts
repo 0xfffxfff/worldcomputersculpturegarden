@@ -9,11 +9,28 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const essay = await deployments.get("Essay");
   const garden = await deployments.get("Garden");
 
-  // Deploy GardenHTML library and link
   const gardenHTML = await deploy("GardenHTML", {
     args: [],
     from: deployer,
     log: true
+  });
+
+  const gardenIndex = await deploy("GardenIndex", {
+    args: [],
+    from: deployer,
+    log: true,
+    libraries: {
+      GardenHTML: gardenHTML.address
+    }
+  });
+
+  const gardenEssay = await deploy("GardenEssay", {
+    args: [],
+    from: deployer,
+    log: true,
+    libraries: {
+      GardenHTML: gardenHTML.address
+    }
   });
 
   const renderer = await deploy("GardenRenderer", {
@@ -21,7 +38,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     libraries: {
-      GardenHTML: gardenHTML.address
+      GardenIndex: gardenIndex.address,
+      GardenEssay: gardenEssay.address
     }
   });
 

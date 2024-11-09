@@ -39,7 +39,29 @@ describe("Garden", function () {
       await example4.getAddress(),
     ], await web.getAddress());
 
-    const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
+    const GardenHTML = await hre.ethers.getContractFactory("GardenHTML");
+    const gardenHTML = await GardenHTML.deploy();
+
+    const GardenIndex = await hre.ethers.getContractFactory("GardenIndex", {
+      libraries: {
+        GardenHTML: await gardenHTML.getAddress(),
+      },
+    });
+    const gardenIndex = await GardenIndex.deploy();
+
+    const GardenEssay = await hre.ethers.getContractFactory("GardenEssay", {
+      libraries: {
+        GardenHTML: await gardenHTML.getAddress(),
+      },
+    });
+    const gardenEssay = await GardenEssay.deploy();
+
+    const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer", {
+      libraries: {
+        GardenIndex: await gardenIndex.getAddress(),
+        GardenEssay: await gardenEssay.getAddress(),
+      },
+    });
     const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
@@ -72,7 +94,7 @@ describe("Garden", function () {
       })
       expect(await garden.flowers()).to.equal(1);
       expect(await garden.flower(1)).to.equal(await acc1.getAddress());
-      expect(await garden.flowersPlantedBy(await acc1.getAddress())).to.equal(1n);
+      expect(await garden.flowersPlanted(await acc1.getAddress())).to.equal(1n);
 
       await owner.sendTransaction({
         to: await garden.getAddress(),
@@ -81,7 +103,7 @@ describe("Garden", function () {
 
       expect(await garden.flowers()).to.equal(15001);
       expect(await garden.flower(15001)).to.equal(await owner.getAddress());
-      expect(await garden.flowersPlantedBy(await owner.getAddress())).to.equal(15000);
+      expect(await garden.flowersPlanted(await owner.getAddress())).to.equal(15000);
       expect(await garden.flower(2,{
         gasLimit: 60_000_000
       })).to.equal(await owner.getAddress());

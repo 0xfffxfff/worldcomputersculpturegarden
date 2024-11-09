@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.27;
+pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
 import "solady/src/utils/SSTORE2.sol";

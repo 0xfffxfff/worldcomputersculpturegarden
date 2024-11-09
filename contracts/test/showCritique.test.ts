@@ -40,7 +40,29 @@ describe("Show Critique", function () {
       await example4.getAddress(),
     ], await web.getAddress());
 
-    const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer");
+    const GardenHTML = await hre.ethers.getContractFactory("GardenHTML");
+    const gardenHTML = await GardenHTML.deploy();
+
+    const GardenIndex = await hre.ethers.getContractFactory("GardenIndex", {
+      libraries: {
+        GardenHTML: await gardenHTML.getAddress(),
+      },
+    });
+    const gardenIndex = await GardenIndex.deploy();
+
+    const GardenEssay = await hre.ethers.getContractFactory("GardenEssay", {
+      libraries: {
+        GardenHTML: await gardenHTML.getAddress(),
+      },
+    });
+    const gardenEssay = await GardenEssay.deploy();
+
+    const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer", {
+      libraries: {
+        GardenIndex: await gardenIndex.getAddress(),
+        GardenEssay: await gardenEssay.getAddress(),
+      },
+    });
     const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();

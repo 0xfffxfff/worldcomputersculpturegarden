@@ -24,7 +24,7 @@ library GardenHTML {
             ".p { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 1.4em; }",
             ".field { white-space: pre; margin: 0 auto; max-width: 100%; overflow-x: auto; }",
             ".field a { text-decoration: none; }",
-            ".a { overflow: hidden; display: inline-block; max-width: 100%; text-overflow: ellipsis; }"
+            ".a { overflow: hidden; display: inline-block; max-width: 100%; text-overflow: ellipsis; vertical-align: middle; }"
             "</style>"
         );
         html_ = string.concat(html_, "<body>", body, "</body></html>");
