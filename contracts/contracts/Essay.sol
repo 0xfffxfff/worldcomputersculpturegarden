@@ -21,7 +21,7 @@ contract Essay is Sculpture, Ownable {
 
     function authors() public pure returns (string[] memory authors_) {
         authors_ = new string[](1);
-        authors_[0] = "Malte Rauch";
+        authors_[0] = "maltefr";
         return authors_;
     }
 
