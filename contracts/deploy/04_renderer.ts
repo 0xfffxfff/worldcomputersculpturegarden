@@ -9,10 +9,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const essay = await deployments.get("Essay");
   const garden = await deployments.get("Garden");
 
+  // Deploy GardenHTML library and link
+  const gardenHTML = await deploy("GardenHTML", {
+    args: [],
+    from: deployer,
+    log: true
+  });
+
   const renderer = await deploy("GardenRenderer", {
     args: [garden.address, essay.address],
     from: deployer,
-    log: true
+    log: true,
+    libraries: {
+      GardenHTML: gardenHTML.address
+    }
   });
 
   const web = await deployments.get("Web");

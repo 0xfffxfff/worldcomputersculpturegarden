@@ -3,10 +3,11 @@ pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
 import "solady/src/utils/LibString.sol";
-import "./lib/Web3url.sol";
-import "./lib/Format.sol";
+import "./web/Web3url.sol";
+import "./web/Format.sol";
 import "./Sculpture.sol";
 import "./Essay.sol";
+import "./web/GardenHTML.sol";
 
 interface IGarden {
     function getSculptures() external view returns (address[] memory);
@@ -58,40 +59,14 @@ contract GardenRenderer is IWeb {
         essayContract = _essayContract;
     }
 
-    function _html(string memory body) internal view returns (string memory) {
-        string memory html = "<html>";
-        html = string.concat(html,
-            '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">',
-            '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=', unicode"'http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cstyle%3E text %7B fill: %23000; %7D @media (prefers-color-scheme: dark) %7B text %7B fill: %23fff; %7D %7D %3C/style%3E%3Ctext y='.9em' font-size='90'%3E ⚘ %3C/text%3E%3C/svg%3E%0A", '" />',
-            '<title>', Sculpture(garden).title() ,'</title></head>',
-            "<style>",
-            '*, *::before, *::after { box-sizing: border-box; }',
-            'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; } html, body { margin: 0; padding: 0; } body { min-height: 100vh } html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; }',
-            'h1,h2,h3 { margin: 0; font-size: inherit; font-style: inherit; font-weight: inherit;}',
-            ".c { max-width: 840px; margin: 0 auto; padding: 0 1.5em; box-sizing: content-box; }",
-            ".c.essay { max-width: 620px; }",
-            "a { color: inherit; text-decoration: underline; }",
-            ".w { position: relative; min-height: 100vh; display: flex; align-items: center; padding: 10em 0; }",
-            ".s { width: 100%; max-width: 840px; }",
-            ".s:not(.g) a { max-width: 100%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-            ".t { max-width: 100%; overflow-x: auto; margin: 1em 0; }",
-            ".i { margin: 0 0 5em; }",
-            ".f { position: fixed; bottom: 1em; right: 1.3em; }",
-            ".p { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 1.4em; }",
-            ".field { white-space: pre; margin: 0 auto; }",
-            ".field a { text-decoration: none; }",
-            "</style>"
-        );
-        html = string.concat(html, "<body>", body, "</body></html>");
-        return html;
-    }
-
     function html() public view returns (string memory) {
         return index();
     }
 
     function index() public view returns (string memory html) {
         address[] memory sculptures = IGarden(garden).getSculptures();
+
+        // Header
         html = string.concat(html,
             '<div class="c">',
             '<div class="w">',
@@ -107,13 +82,20 @@ contract GardenRenderer is IWeb {
             unicode"<h1>", Sculpture(garden).title(), "</h1>\n",
             '<br /><br />'
         );
+
+        // Artist names
         for (uint256 i = 0; i < sculptures.length; i++) {
-            string[] memory authors = Sculpture(sculptures[i]).authors();
-            // Temporary: For now we just use the first author here
-            if (authors.length > 0) {
-                html = string.concat(html, authors[0], "<br/>");
+            try Sculpture(sculptures[i]).authors() returns (string[] memory authors) {
+                // Temporary: For now we just use the first author here
+                if (authors.length > 0) {
+                    html = string.concat(html, authors[0], "<br/>");
+                }
+            } catch {
+                html = string.concat(html, "Missing<br/>");
             }
         }
+
+        // Header End
         html = string.concat(html,
             '<br /><br />',
             '<h2>', LibString.toHexString(garden), '</h2><br />',
@@ -133,6 +115,8 @@ contract GardenRenderer is IWeb {
             '<a href="/essay">Essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
             "</p><br /><br />"
         );
+
+        // Scroll Indicator
         html = string.concat(
             html,
             "<br /></div>",
@@ -140,7 +124,6 @@ contract GardenRenderer is IWeb {
         );
 
         // Text
-
         html = string.concat(html,
             '<div class="w"><div class="s"><p>',
                 Sculpture(garden).text(),
@@ -149,46 +132,72 @@ contract GardenRenderer is IWeb {
         );
 
         // Sculptures
-
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
-            string memory title = sculpture.title();
+
             html = string.concat(html, '<div class="w"><div class="s">');
-            string[] memory authors = sculpture.authors();
-            if (authors.length > 0) {
-                html = string.concat(html, "<h2>");
-                for (uint256 j = 0; j < authors.length; j++) {
-                    if (bytes(authors[j]).length == 0) continue; // ignore empty
-                    html = string.concat(html, authors[j], "<br/>");
+
+            // Authors
+            try sculpture.authors() returns (string[] memory authors) {
+                if (authors.length > 0) {
+                    html = string.concat(html, "<h2>");
+                    for (uint256 j = 0; j < authors.length; j++) {
+                        if (bytes(authors[j]).length == 0) continue; // ignore empty
+                        html = string.concat(html, authors[j], "<br/>");
+                    }
+                    html = string.concat(html, "</h2>");
                 }
-                html = string.concat(html, "</h2>");
+            } catch {
+                html = string.concat(html, "<h2><i>Missing</i></h2>");
             }
-            if (bytes(title).length > 0) {
-                html = string.concat(html, "<h3><i>", title, "</i></h3>");
-            } else {
-                html = string.concat(html, "<h3><i>", "Untitled", "</i></h3>");
-            }
-            address[] memory addresses = sculpture.addresses();
-            if (addresses.length > 0) {
-                html = string.concat(html, "<p>");
-                for (uint256 j = 0; j < addresses.length; j++) {
-                    html = string.concat(html, LibString.toHexString(addresses[j]), "<br/>");
+
+            // Title
+            try sculpture.title() returns (string memory title) {
+                if (bytes(title).length > 0) {
+                    html = string.concat(html, "<h3><i>", title, "</i></h3>");
+                } else {
+                    html = string.concat(html, "<h3><i>Untitled</i></h3>");
                 }
-                html = string.concat(html, "</p>");
+            } catch {
+                html = string.concat(html, "<h3><i>Untitled</i></h3>");
             }
-            string[] memory urls = sculpture.urls();
-            if (urls.length > 0) {
-                html = string.concat(html, "<p>");
-                for (uint256 j = 0; j < urls.length; j++) {
-                    if (bytes(urls[j]).length == 0) continue; // ignore empty
-                    html = string.concat(html, renderUrl(urls[j]), "<br/>");
+
+            // Addresses
+            try sculpture.addresses() returns (address[] memory addresses) {
+                if (addresses.length > 0) {
+                    html = string.concat(html, "<p>");
+                    for (uint256 j = 0; j < addresses.length; j++) {
+                        html = string.concat(html, '<span class="a">', LibString.toHexString(addresses[j]), "</span><br/>");
+                    }
+                    html = string.concat(html, "</p>");
                 }
-                html = string.concat(html, "</p>");
+            } catch {
+                html = string.concat(html, "<p><span class='a'>", LibString.toHexString(sculptures[i]) , "</span></p>");
             }
-            string memory text = sculpture.text();
-            if (bytes(text).length > 0) {
-                html = string.concat(html, '<div class="t">', text, '</div>');
+
+            // Urls
+            try sculpture.urls() returns (string[] memory urls) {
+                if (urls.length > 0) {
+                    html = string.concat(html, "<p>");
+                    for (uint256 j = 0; j < urls.length; j++) {
+                        if (bytes(urls[j]).length == 0) continue; // ignore empty
+                        html = string.concat(html, renderUrl(urls[j]), "<br/>");
+                    }
+                    html = string.concat(html, "</p>");
+                }
+            } catch {
+                // ignore reverting urls
             }
+
+            // Text
+            try sculpture.text() returns (string memory text) {
+                if (bytes(text).length > 0) {
+                    html = string.concat(html, '<div class="t">', text, '</div>');
+                }
+            } catch {
+                html = string.concat(html, '<div class="t"><i>Contract Reverted</i></div>');
+            }
+
             html = string.concat(html, "</div></div>");
         }
 
@@ -273,11 +282,11 @@ contract GardenRenderer is IWeb {
             '</div></div>'
         );
 
-
+        // Footer
         html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ " from ", LibString.toHexString(address(this)) ,"</div>");
         html = string.concat(html, "</div>");
 
-        // Resolve ENS
+        // Script: Resolve ENS
         // html = string.concat(html,
         //     '<script type="module">',
         //     'import { JsonRpcProvider, isAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";',
@@ -295,7 +304,7 @@ contract GardenRenderer is IWeb {
         //     '</script>'
         // );
 
-        return _html(html);
+        return GardenHTML.html(html, Sculpture(garden).title());
     }
 
     function essay() public view returns (string memory html) {
@@ -317,7 +326,7 @@ contract GardenRenderer is IWeb {
             '</div></div></div>',
             unicode'<div class="f"><a href="/" style="text-decoration: none;">⚘</a></div>'
         );
-        return _html(html);
+        return GardenHTML.html(html, Sculpture(garden).title());
     }
 
     function resolveMode() external pure returns (bytes32) {

@@ -14,7 +14,9 @@ abstract contract PlaceholderSculpture is Sculpture {
         return addresses_;
     }
 
-    function text() public view override virtual returns (string memory) {}
+    function text() public view override virtual returns (string memory) {
+        revert("Revert Text");
+    }
 
     function urls() public view override virtual returns (string[] memory urls) {} // empty
 }
