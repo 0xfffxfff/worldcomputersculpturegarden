@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { CacheHeaders, ONE_YEAR } from "cdn-cache-control";
 import { getStore } from "@netlify/blobs";
 
-const deploymentArtifact = require('../../../contracts/deployments/localhost/Garden.json');
+const deploymentArtifact = require('../../../contracts/deployments/sepolia/Garden.json');
 
 const CACHE_EXPIRATION_TIME = 12; // Seconds
 // const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
