@@ -32,13 +32,16 @@ describe("Show Critique", function () {
     const Web = await hre.ethers.getContractFactory("Web");
     const web = await Web.deploy();
 
+    const Mod = await hre.ethers.getContractFactory("Mod");
+    const mod = await Mod.deploy();
+
     const Garden = await hre.ethers.getContractFactory("Garden");
     const garden = await Garden.deploy([
       await example1.getAddress(),
       await example2.getAddress(),
       await example3.getAddress(),
       await example4.getAddress(),
-    ], await web.getAddress());
+    ], await web.getAddress(), await mod.getAddress());
 
     const GardenHTML = await hre.ethers.getContractFactory("GardenHTML");
     const gardenHTML = await GardenHTML.deploy();
@@ -63,7 +66,7 @@ describe("Show Critique", function () {
         GardenEssay: await gardenEssay.getAddress(),
       },
     });
-    const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress());
+    const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress(), await mod.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
 
@@ -111,7 +114,7 @@ describe("Show Critique", function () {
       await showCritique.critiqueWork(workIndex, workAddress, 10);
       const text = await showCritique.text();
       const critique = text.split("\n")[0];
-      expect(text).to.contain(`<p>${criticAddress} thinks that <i><span style="white-space: nowrap;">${workTitle}</span></i> <span style="white-space: nowrap;">by ${workAuthor}</span> is <span style="white-space: nowrap;">triumphantly skilful.</span></p>`);
+      expect(text).to.contain(`<p><span class="address">${criticAddress}</span> thinks that <i><span style="white-space: nowrap;">${workTitle}</span></i> <span style="white-space: nowrap;">by ${workAuthor}</span> is <span style="white-space: nowrap;">triumphantly skilful.</span></p>`);
     })
   });
 });

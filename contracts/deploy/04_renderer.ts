@@ -8,6 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const essay = await deployments.get("Essay");
   const garden = await deployments.get("Garden");
+  const mod = await deployments.get("Mod");
 
   const gardenHTML = await deploy("GardenHTML", {
     args: [],
@@ -34,7 +35,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const renderer = await deploy("GardenRenderer", {
-    args: [garden.address, essay.address],
+    args: [garden.address, essay.address, mod.address],
     from: deployer,
     log: true,
     libraries: {

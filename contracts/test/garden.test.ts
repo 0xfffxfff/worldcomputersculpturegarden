@@ -30,13 +30,16 @@ describe("Garden", function () {
     const Web = await hre.ethers.getContractFactory("Web");
     const web = await Web.deploy();
 
+    const Mod = await hre.ethers.getContractFactory("Mod");
+    const mod = await Mod.deploy();
+
     const Garden = await hre.ethers.getContractFactory("Garden");
     const garden = await Garden.deploy([
       await example1.getAddress(),
       await example2.getAddress(),
       await example3.getAddress(),
       await example4.getAddress(),
-    ], await web.getAddress());
+    ], await web.getAddress(), await mod.getAddress());
 
     const GardenHTML = await hre.ethers.getContractFactory("GardenHTML");
     const gardenHTML = await GardenHTML.deploy();
@@ -61,7 +64,7 @@ describe("Garden", function () {
         GardenEssay: await gardenEssay.getAddress(),
       },
     });
-    const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress());
+    const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress(), await mod.getAddress());
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
 
@@ -80,6 +83,14 @@ describe("Garden", function () {
       const { web, owner } = await loadFixture(deployFixture);
       const html = await web.html();
       expect(html).to.contain("Example");
+    });
+  });
+
+  describe("Misc", function () {
+    it("Should return all artist names including curator", async function () {
+      const { garden, owner } = await loadFixture(deployFixture);
+      const names = await garden.authors();
+      expect(names).to.have.length(5);
     });
   });
 

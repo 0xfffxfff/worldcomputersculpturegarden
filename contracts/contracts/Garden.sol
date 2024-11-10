@@ -26,10 +26,13 @@ import "solady/src/utils/SSTORE2.sol";
 import "./Sculpture.sol";
 import "./Web.sol";
 import "./FlowerGuestbook.sol";
+import "./Mod.sol";
 
 contract Garden is Sculpture, FlowerGuestbook {
 
     address[] public sculptures;
+
+    address public immutable data;
 
     address public immutable render;
 
@@ -37,18 +40,15 @@ contract Garden is Sculpture, FlowerGuestbook {
     // Init
     ///////////////////////////////////////////////////////////////////////////
 
-    constructor(address[] memory _sculptures, address _render) {
+    constructor(address[] memory _sculptures, address _render, address _data) {
         sculptures = _sculptures;
         render = _render;
+        data = _data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Web
     ///////////////////////////////////////////////////////////////////////////
-
-    fallback() external payable {
-        revert(IWeb(render).html());
-    }
 
     function html() external view returns (string memory) {
         return IWeb(render).html();
@@ -62,8 +62,12 @@ contract Garden is Sculpture, FlowerGuestbook {
         return IWeb(render).request(resource, params);
     }
 
+    fallback() external payable {
+        revert(LibString.toHexString(abi.encodeWithSignature("html()")));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    // Sculpture Management
+    // Sculptures
     ///////////////////////////////////////////////////////////////////////////
 
     function getSculptures() public view returns (address[] memory) {
@@ -99,7 +103,7 @@ contract Garden is Sculpture, FlowerGuestbook {
                 index++;
             }
         }
-        authors_[index] = "0xfff";
+        authors_[index] = Mod(data).fff();
         return authors_;
     }
 
@@ -125,22 +129,11 @@ contract Garden is Sculpture, FlowerGuestbook {
         return addresses_;
     }
 
-    address private exhibitionText;
     function text() public view returns (string memory) {
-        if (exhibitionText == address(0)) {
-            return "";
-        }
-        return string(SSTORE2.read(exhibitionText));
-    }
-    function setText(string memory _text) public onlyOwner {
-        exhibitionText = SSTORE2.write(bytes(_text));
+        return Mod(data).text();
     }
 
-    string[] public exhibitionUrls;
-    function setExhibitionUrls(string[] memory _urls) public onlyOwner {
-        exhibitionUrls = _urls;
-    }
     function urls() public view returns (string[] memory) {
-        return exhibitionUrls;
+        return Mod(data).urls();
     }
 }

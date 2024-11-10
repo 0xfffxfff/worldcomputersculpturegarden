@@ -6,20 +6,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const [deployer] = await getUnnamedAccounts();
 
-  const web = await deployments.get("Web");
-  const mod = await deployments.get("Mod");
-
-  const garden = await deploy("Garden", {
-    args: [
-      [],
-      web.address,
-      mod.address
-    ],
+  await deploy("Mod", {
+    args: [],
     from: deployer,
-    gasLimit: 18_000_000,
-    log: true,
+    log: true
   });
+
 };
 
 export default func;
-func.tags = ["Garden"];
+func.tags = ["Web"];

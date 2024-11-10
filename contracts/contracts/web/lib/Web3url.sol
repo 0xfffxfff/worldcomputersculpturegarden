@@ -17,5 +17,5 @@ interface IDecentralizedApp {
 
     /// @notice                     returns the resolve mode of the contract
     /// @return resolveMode         The mode of the resolver (e.g. 5219)
-    function resolveMode() external pure returns (bytes32);
+    function resolveMode() external view returns (bytes32);
 }

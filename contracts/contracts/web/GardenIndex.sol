@@ -7,9 +7,10 @@ import "./lib/Format.sol";
 import "../Essay.sol";
 import "../IGarden.sol";
 import "../Sculpture.sol";
+import "../Mod.sol";
 
 library GardenIndex {
-    function html(address garden, address essayContract) public view returns (string memory html) {
+    function html(address garden, address essayContract, address data) public view returns (string memory html) {
         address[] memory sculptures = IGarden(garden).getSculptures();
 
         // Header
@@ -54,11 +55,12 @@ library GardenIndex {
             unicode"</pre><br />",
             '<p>',
             'A contract show curated by ',
-            '<a href="https://0xfff.love" target="_blank" rel="noopener noreferrer">0xfff</a><br/>',
+            '<a href="', Mod(data).fffUrl() ,'" target="_blank" rel="noopener noreferrer">', Mod(data).fff(), '</a><br/>',
             'with special thanks to ',
-            '<a href="https://x.com/sssluke1" target="_blank" rel="noopener noreferrer">sssluke</a> and <a href="https://x.com/0x113d" rel="noopener noreferrer" target="_blank">113</a>',
+            '<a href="', Mod(data).lukeUrl(), '" target="_blank" rel="noopener noreferrer">', Mod(data).luke() ,'</a> and ',
+            '<a href="', Mod(data).oneOneThreeUrl(), '" rel="noopener noreferrer" target="_blank">', Mod(data).oneOneThree(),'</a>',
             '<br/><br/>',
-            '<a href="/essay">Essay</a> by <a href="https://x.com/maltefr_eth" target="_blank" rel="noopener noreferrer">', Essay(essayContract).authors()[0] ,'</a>',
+            '<a href="/essay">Essay</a> by <a href="', Mod(data).malteUrl(), '" target="_blank" rel="noopener noreferrer">', Mod(data).malte() ,'</a>',
             "</p><br /><br />"
         );
 
@@ -71,10 +73,9 @@ library GardenIndex {
 
         // Text
         html = string.concat(html,
-            '<div class="w"><div class="s"><p>',
-                Sculpture(garden).text(),
-                '<br/><br/> - 0xfff',
-            '</p></div></div>'
+            '<div class="w"><div class="s">',
+            Sculpture(garden).text(),
+            '</div></div>'
         );
 
         // Sculptures
@@ -158,14 +159,14 @@ library GardenIndex {
                 'You may leave a flower here by sending 0.01 ETH (or multiples thereof)<br/> to the show contract at <span class="a">',
                     LibString.toHexStringChecksummed(garden),
                 '</span><br/><br/>',
-                LibString.toString(IGarden(garden).guests() + 5 /* DEV TODO */),
-                ' guests have planted ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */),
+                LibString.toString(IGarden(garden).guests()),
+                ' guests have planted ', LibString.toString(IGarden(garden).flowers()),
                 ' flowers',
                 '</p><br/><br/><br/>',
                 '<div id="field2" class="field"></div>',
                 '<script>',
                     '(() => {',
-                    'const flowers = ', LibString.toString(IGarden(garden).flowers() + 200 /* DEV TODO */), ';'
+                    'const flowers = ', LibString.toString(IGarden(garden).flowers()), ';'
                     'function calculateThreshold(planted) {',
                         'const min = 30, max = 3000, lower = 0.99, higher = 0.6;',
                         'if (planted <= min) return lower;',

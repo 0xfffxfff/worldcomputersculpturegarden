@@ -33,8 +33,8 @@ contract Web is IWeb, Ownable {
         return GardenRenderer(renderer).request(resource, params);
     }
 
-    function resolveMode() external pure returns (bytes32) {
-        return "5219";
+    function resolveMode() external view returns (bytes32) {
+        return GardenRenderer(renderer).resolveMode();
     }
 
 }
@@ -43,10 +43,12 @@ contract GardenRenderer is IWeb {
 
     address immutable public garden;
     address immutable public essayContract;
+    address immutable public data;
 
-    constructor(address _garden, address _essayContract) {
+    constructor(address _garden, address _essayContract, address _data) {
         garden = _garden;
         essayContract = _essayContract;
+        data = _data;
     }
 
     function html() public view returns (string memory) {
@@ -54,7 +56,7 @@ contract GardenRenderer is IWeb {
     }
 
     function index() public view returns (string memory html) {
-        return GardenIndex.html(garden, essayContract);
+        return GardenIndex.html(garden, essayContract, data);
     }
 
     function essay() public view returns (string memory html) {

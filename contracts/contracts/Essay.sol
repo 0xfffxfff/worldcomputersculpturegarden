@@ -9,6 +9,7 @@ contract Essay is Sculpture, Ownable {
 
     address private pointer;
     string private t;
+    string private a = "maltefr";
     string[] private u;
 
     constructor () {
@@ -19,9 +20,9 @@ contract Essay is Sculpture, Ownable {
         return t;
     }
 
-    function authors() public pure returns (string[] memory authors_) {
+    function authors() public view returns (string[] memory authors_) {
         authors_ = new string[](1);
-        authors_[0] = "maltefr";
+        authors_[0] = a;
         return authors_;
     }
 
@@ -46,6 +47,10 @@ contract Essay is Sculpture, Ownable {
         t = _title;
     }
 
+    function setAuthor(string memory _author) external onlyOwner {
+        a = _author;
+    }
+
     function setUrls(string[] memory _urls) external onlyOwner {
         u = _urls;
     }
@@ -57,7 +62,9 @@ contract Essay is Sculpture, Ownable {
     function html() external view returns (string memory html) {
         html = string.concat(
             "<h1>", t, "</h1>",
+            "<br/>",
             "<h2>", authors()[0], "</h2>",
+            "<br/>",
             "<div>", pointer == address(0) ? "" : string(SSTORE2.read(pointer)), "</div>");
     }
 }

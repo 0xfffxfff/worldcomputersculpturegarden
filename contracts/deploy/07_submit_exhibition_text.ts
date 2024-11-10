@@ -6,19 +6,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getUnnamedAccounts } = hre;
   const [deployer] = await getUnnamedAccounts();
 
-  const gardenDeployment = await deployments.get("Garden");
-  const garden = await hre.ethers.getContractAt(
-    "Garden",
-    gardenDeployment.address
+  const modDeployment = await deployments.get("Mod");
+  const mod = await hre.ethers.getContractAt(
+    "Mod",
+    modDeployment.address
   );
 
-  const text = await garden.text();
+  const text = await mod.text();
 
   if (text == gardenText) {
     console.log(`Show text already up to date!`);
   } else {
     console.log(`Setting show text...`);
-    await garden.setText(gardenText, {
+    await mod.setText(gardenText, {
       from: deployer,
       gasLimit: 30_000_000,
     });
