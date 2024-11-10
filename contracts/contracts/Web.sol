@@ -2,17 +2,7 @@
 pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
-import "solady/src/utils/LibString.sol";
-import "./web/lib/Web3url.sol";
-import "./Sculpture.sol";
-import "./Essay.sol";
 import "./web/GardenRenderer.sol";
-import "./web/GardenIndex.sol";
-import "./web/GardenEssay.sol";
-
-interface IWeb is IDecentralizedApp {
-    function html() external view returns (string memory);
-}
 
 contract Web is IWeb, Ownable {
     address public garden;

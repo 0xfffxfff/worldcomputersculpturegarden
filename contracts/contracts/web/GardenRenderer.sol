@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
-import "../Web.sol";
+import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/LibString.sol";
+import "../web/lib/Web3url.sol";
+import "../Sculpture.sol";
+import "../Essay.sol";
+import "../web/GardenRenderer.sol";
+import "../web/GardenIndex.sol";
+import "../web/GardenEssay.sol";
+import "../IWeb.sol";
 
 contract GardenRenderer is IWeb {
 
