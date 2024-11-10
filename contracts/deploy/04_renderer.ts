@@ -16,12 +16,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true
   });
 
+  const gardenContributions = await deploy("GardenContributions", {
+    args: [],
+    from: deployer,
+    log: true
+  });
+
   const gardenIndex = await deploy("GardenIndex", {
     args: [],
     from: deployer,
     log: true,
     libraries: {
-      GardenHTML: gardenHTML.address
+      GardenHTML: gardenHTML.address,
+      GardenContributions: gardenContributions.address
     }
   });
 

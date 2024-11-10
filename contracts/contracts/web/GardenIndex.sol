@@ -3,6 +3,7 @@ pragma solidity >=0.8.0;
 
 import "solady/src/utils/LibString.sol";
 import "./GardenHTML.sol";
+import "./GardenContributions.sol";
 import "./lib/Format.sol";
 import "../Essay.sol";
 import "../IGarden.sol";
@@ -149,72 +150,7 @@ library GardenIndex {
         }
 
         // Contributions
-        html = string.concat(html,
-            '<div class="w"><div class="s">',
-                '<div id="field1" class="field"></div>'
-                '<br/><br/><br/>',
-                '<p style="text-align:center;">',
-                'Guestbook',
-                '<br/><br/>',
-                'You may leave a flower here by sending 0.01 ETH (or multiples thereof)<br/> to the show contract at <span class="a">',
-                    LibString.toHexStringChecksummed(garden),
-                '</span><br/><br/>',
-                LibString.toString(IGarden(garden).guests()),
-                ' guests have planted ', LibString.toString(IGarden(garden).flowers()),
-                ' flowers',
-                '</p><br/><br/><br/>',
-                '<div id="field2" class="field"></div>',
-                '<script>',
-                    '(() => {',
-                    'const flowers = ', LibString.toString(IGarden(garden).flowers()), ';'
-                    'function calculateThreshold(planted) {',
-                        'const min = 30, max = 3000, lower = 0.99, higher = 0.6;',
-                        'if (planted <= min) return lower;',
-                        'if (planted >= max) return higher;',
-                        'const normalized = (planted - min) / (max - min);',
-                        'const logValue = Math.log10(1 + normalized * (10 - 1));',
-                        'return higher + (lower - higher) * (1 - logValue);',
-                    '}',
-                    'function isConditionMet(planted, val) {',
-                        'const threshold = calculateThreshold(planted);',
-                        'return val > threshold || val < -threshold;',
-                    '}',
-                    'function gridNoise(x, z, seed) {',
-                    '    var n = (1619 * x + 31337 * z + 1013 * seed) & 0x7fffffff;',
-                    '    n = BigInt((n >> 13) ^ n);',
-                    '    n = n * (n * n * 60493n + 19990303n) + 1376312589n;',
-                    '    n = parseInt(n.toString(2).slice(-31), 2);',
-                    '    return 1 - n / 1073741824;',
-                    '}',
-                    'const width = 90;',
-                    'let lines = [""], counter = 0, planted = 0;',
-                    'while (planted < flowers) {',
-                    '    const val = gridNoise(counter % width, Math.floor(counter / width), 0xf);',
-                    '    if ('
-                                'isConditionMet(planted, val)',
-
-                        ') {',
-                    unicode'        lines[Math.floor(counter / width)] += `<a href="#${planted+1}" data-flower-id="${planted+1}">⚘</a>`;',
-                                    'planted++;',
-                    '    } else { lines[Math.floor(counter / width)] += " "; }',
-                    '    if (counter % width == (width-1) && planted < flowers) { lines.push(""); }',
-                    '    counter++;'
-                    '}',
-                    'lines = lines.reduce((acc, line) => { if (line.trim().length > 0) acc.push(line); return acc; }, []);',
-                    'document.querySelector("#field1").innerHTML = lines.slice(0,Math.min(7,Math.ceil(lines.length/2))).join("\\n");',
-                    'document.querySelector("#field2").innerHTML = lines.slice(Math.min(7,Math.ceil(lines.length/2))).join("\\n");',
-                    'document.querySelectorAll(".field").forEach((el) => el.addEventListener("click", (e) => {',
-                    '    const flowerId = e.target.dataset.flowerId;',
-                    '    if (flowerId) {',
-                    '        e.preventDefault();'
-                    // '        console.log("Flower #" + flowerId);',
-                            // TODO: Tooltip
-                    '    }',
-                    '}));',
-                    '})();/*IIFE*/',
-                '</script>',
-            '</div></div>'
-        );
+        html = string.concat(html, GardenContributions.html(garden));
 
         // Footer
         html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ ' from <span class="a">', LibString.toHexStringChecksummed(address(this)) ,"<span></div>");

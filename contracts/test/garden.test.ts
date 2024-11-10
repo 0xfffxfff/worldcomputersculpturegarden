@@ -44,9 +44,13 @@ describe("Garden", function () {
     const GardenHTML = await hre.ethers.getContractFactory("GardenHTML");
     const gardenHTML = await GardenHTML.deploy();
 
+    const GardenContributions = await hre.ethers.getContractFactory("GardenContributions");
+    const gardenContributions = await GardenContributions.deploy();
+
     const GardenIndex = await hre.ethers.getContractFactory("GardenIndex", {
       libraries: {
         GardenHTML: await gardenHTML.getAddress(),
+        GardenContributions: await gardenContributions.getAddress(),
       },
     });
     const gardenIndex = await GardenIndex.deploy();

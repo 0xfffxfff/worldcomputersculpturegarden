@@ -49,6 +49,22 @@ export default async (req: Request, context: Context) => {
             cache.setJSON(cacheKey, { timestamp: Date.now(), response: "", statusCode: Number(statusCode) });
             throw new Error(`Unexpected status code: ${statusCode}`);
         }
+
+        if (isFlower) {
+            console.log("Resolving planter address");
+            try {
+                const jsonBody = JSON.parse(body);
+                const address = jsonBody.planter;
+                console.log(address);
+                if (!ethers.isAddress(address)) throw new Error("Invalid address");
+                const name = await provider.lookupAddress(address);
+                if (name) jsonBody.planter = name;
+                console.log(`Resolved planter ${address} to name ${jsonBody.planter}`);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         cache.setJSON(cacheKey, { timestamp: Date.now(), response: body, statusCode: Number(statusCode) });
         const netlifyHeaders = new CacheHeaders().ttl(CACHE_EXPIRATION_TIME);
         return new Response(body, { status: statusCode, headers: { 'Content-Type': isFlower ? 'application/json' : 'text/html; charset=utf-8', ...(netlifyHeaders.toObject()) } });
