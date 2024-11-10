@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.0;
+
+import "../Web.sol";
+
+contract GardenRenderer is IWeb {
+
+    address immutable public garden;
+    address immutable public essayContract;
+    address immutable public data;
+
+    constructor(address _garden, address _essayContract, address _data) {
+        garden = _garden;
+        essayContract = _essayContract;
+        data = _data;
+    }
+
+    function html() public view returns (string memory) {
+        return index();
+    }
+
+    function index() public view returns (string memory) {
+        return GardenIndex.html(garden, essayContract, data);
+    }
+
+    function essay() public view returns (string memory) {
+        return GardenEssay.html(garden, essayContract);
+    }
+
+    function resolveMode() external pure returns (bytes32) {
+        return "5219";
+    }
+
+    // ERC-5219
+    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint statusCode, string memory body, KeyValue[] memory headers) {
+        // Index
+        if(resource.length == 0) {
+            body = index();
+            statusCode = 200;
+            headers = new KeyValue[](1);
+            headers[0].key = "Content-Type";
+            headers[0].value = "text/html; charset=utf-8";
+            return (statusCode, body, headers);
+
+        // Essay
+        } else if (resource.length == 1 && keccak256(abi.encodePacked(resource[0])) == keccak256(abi.encodePacked("essay"))) {
+            body = essay();
+            statusCode = 200;
+            headers = new KeyValue[](1);
+            headers[0].key = "Content-Type";
+            headers[0].value = "text/html; charset=utf-8";
+            return (statusCode, body, headers);
+
+        // Flower
+        } else if (resource.length == 2 && keccak256(abi.encodePacked(resource[0])) == keccak256(abi.encodePacked("flower"))) {
+            uint256 flowerId = Format.stringToUint(resource[1]);
+            if (flowerId < 1 || flowerId > IGarden(garden).flowers()) {
+                statusCode = 404;
+                return (statusCode, body, headers);
+            }
+            (address planter, uint256 timestamp) = IGarden(garden).flowerInfo(flowerId);
+            body = string(abi.encodePacked(
+                '{',
+                '"planter": "', LibString.toHexStringChecksummed(planter), '",',
+                '"timestamp": ', LibString.toString(timestamp),
+                '}'
+            ));
+            statusCode = 200;
+            headers = new KeyValue[](1);
+            headers[0].key = "Content-Type";
+            headers[0].value = "application/json";
+            return (statusCode, body, headers);
+        }
+
+        statusCode = 404;
+        return (statusCode, body, headers);
+    }
+}

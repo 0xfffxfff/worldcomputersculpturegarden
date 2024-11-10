@@ -107,11 +107,11 @@ contract ShowCritique is Sculpture, Ownable {
         return opinions;
     }
 
-    function title() external view override returns (string memory) {
+    function title() external pure override returns (string memory) {
         return string.concat("Critique of This Show");
     }
 
-    function authors() external view override returns (string[] memory) {
+    function authors() external pure override returns (string[] memory) {
         string[] memory authors_ = new string[](1);
         authors_[0] = "Rhea Myers et al.";
         return authors_;
@@ -127,5 +127,5 @@ contract ShowCritique is Sculpture, Ownable {
         return formatOpinions();
     }
 
-    function urls() public view override returns (string[] memory) {} // empty
+    function urls() public view override returns (string[] memory) {}
 }

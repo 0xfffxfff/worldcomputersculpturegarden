@@ -84,6 +84,25 @@ describe("Garden", function () {
       const html = await web.html();
       expect(html).to.contain("Example");
     });
+
+    it("Should return flower info after donating", async function () {
+      const { garden, web, owner } = await loadFixture(deployFixture);
+      await owner.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("0.47"),
+      })
+      const responseJson = await web.request(["flower", "1"], []);
+      expect(responseJson.statusCode).to.equal(200);
+
+      const block = await hre.ethers.provider.getBlock("latest");
+      const address = await owner.getAddress();
+      const checksummedAddress = hre.ethers.getAddress(address);
+      expect(JSON.parse(responseJson.body).planter).to.equal(checksummedAddress);
+      expect(JSON.parse(responseJson.body).timestamp).to.equal(block?.timestamp);
+      expect(web.request(["flower", "0"], [])).to.be.reverted;
+      expect(web.request(["flower", "47"], [])).to.not.be.reverted;
+      expect(web.request(["flower", "48"], [])).to.be.reverted;
+    });
   });
 
   describe("Misc", function () {
