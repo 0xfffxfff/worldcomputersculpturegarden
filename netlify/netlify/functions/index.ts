@@ -40,7 +40,7 @@ export default async (req: Request, context: Context) => {
         const provider = ethers.getDefaultProvider('sepolia');
         const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
         console.log("Fetching HTML from contract");
-        const [statusCode, body, headers] = await contract.request(resource, []);
+        let [statusCode, body, headers] = await contract.request(resource, []);
         if (Number(statusCode) === 404) {
             console.log("Page not found");
             cache.setJSON(cacheKey, { timestamp: Date.now(), response: "", statusCode: 404 });
@@ -60,6 +60,7 @@ export default async (req: Request, context: Context) => {
                 const name = await provider.lookupAddress(address);
                 if (name) jsonBody.planter = name;
                 console.log(`Resolved planter ${address} to name ${jsonBody.planter}`);
+                body = JSON.stringify(jsonBody);
             } catch (error) {
                 console.error(error);
             }
