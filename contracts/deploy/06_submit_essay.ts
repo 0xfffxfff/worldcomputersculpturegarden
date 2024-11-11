@@ -14,16 +14,21 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const text = await essay.text();
 
-  if (text == essayText.essay) {
+  if (text == essayText.textPt1 + essayText.textPt2) {
     console.log(`Essay text already up to date!`);
   } else {
     console.log(`Setting essay text...`);
-    await essay.setText(essayText.essay, {
+    const tx1 = await essay.setTextPt1(essayText.textPt1, {
       from: deployer,
       gasLimit: 30_000_000,
-      gasPrice: 5000000000,
+      gasPrice: 15000000000,
     });
-    console.log(`Essay text set!`);
+    const tx2 = await essay.setTextPt2(essayText.textPt2, {
+      from: deployer,
+      gasLimit: 30_000_000,
+      gasPrice: 15000000000,
+    });
+    console.log(`Essay text set!`, tx1.hash, tx2.hash);
   }
 
   const title = await essay.title();
@@ -31,12 +36,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log(`Essay title already up to date!`);
   } else {
     console.log(`Setting essay title...`);
-    await essay.setTitle(essayText.title, {
+    const tx = await essay.setTitle(essayText.title, {
       from: deployer,
       gasLimit: 30_000_000,
-      gasPrice: 5000000000,
+      gasPrice: 100000000000,
     });
-    console.log(`Essay title set!`);
+    console.log(`Essay title set!`, tx.hash);
   }
 };
 

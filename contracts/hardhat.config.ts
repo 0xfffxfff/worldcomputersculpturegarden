@@ -19,10 +19,13 @@ const config: HardhatUserConfig = {
       // }
     },
     sepolia: {
-      // url: "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
-      url: "https://1rpc.io/sepolia", // "https://ethereum-sepolia-rpc.publicnode.com",
+      url: "https://sepolia.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a",
       chainId: 11155111,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+    mainnet: {
+      url: 'https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a',
+      live: true,
     }
   },
 };

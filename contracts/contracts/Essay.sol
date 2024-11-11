@@ -7,7 +7,8 @@ import "./Sculpture.sol";
 
 contract Essay is Sculpture, Ownable {
 
-    address private pointer;
+    address private pointer1;
+    address private pointer2;
     string private t;
     string private a = "maltefr";
     string[] private u;
@@ -37,10 +38,13 @@ contract Essay is Sculpture, Ownable {
     }
 
     function text() external view returns (string memory) {
-        if (pointer == address(0)) {
+        if (pointer1 == address(0)) {
             return "";
         }
-        return string(SSTORE2.read(pointer));
+        return string.concat(
+            string(SSTORE2.read(pointer1)),
+            pointer2 == address(0) ? "" : string(SSTORE2.read(pointer2))
+        );
     }
 
     function setTitle(string memory _title) external onlyOwner {
@@ -55,16 +59,27 @@ contract Essay is Sculpture, Ownable {
         u = _urls;
     }
 
-    function setText(string memory _text) external onlyOwner {
-        pointer = SSTORE2.write(bytes(_text));
+    function setTextPt1(string memory _text) external onlyOwner {
+        pointer1 = SSTORE2.write(bytes(_text));
+    }
+
+    function setTextPt2(string memory _text) external onlyOwner {
+        pointer2 = SSTORE2.write(bytes(_text));
     }
 
     function html() external view returns (string memory html) {
         html = string.concat(
             "<h1>", t, "</h1>",
-            "<br/>",
-            "<h2>", authors()[0], "</h2>",
-            "<br/>",
-            "<div>", pointer == address(0) ? "" : string(SSTORE2.read(pointer)), "</div>");
+            "<br/><br/><br/>",
+            "<h2><i>Written by ", authors()[0], "</i></h2>",
+            "<br/><br/>",
+            "<div>",
+                pointer1 == address(0)
+                    ? ""
+                    : string.concat(
+                        string(SSTORE2.read(pointer1)),
+                        pointer2 == address(0) ? "" : string(SSTORE2.read(pointer2))
+                    ),
+            "</div>");
     }
 }

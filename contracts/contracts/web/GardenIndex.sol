@@ -61,7 +61,7 @@ library GardenIndex {
             '<a href="', Mod(data).lukeUrl(), '" target="_blank" rel="noopener noreferrer">', Mod(data).luke() ,'</a> and ',
             '<a href="', Mod(data).oneOneThreeUrl(), '" rel="noopener noreferrer" target="_blank">', Mod(data).oneOneThree(),'</a>',
             '<br/><br/>',
-            '<a href="/essay">Essay</a> by <a href="', Mod(data).malteUrl(), '" target="_blank" rel="noopener noreferrer">', Mod(data).malte() ,'</a>',
+            '<a href="/essay">', Sculpture(essayContract).title() ,'</a> by <a href="', Mod(data).malteUrl(), '" target="_blank" rel="noopener noreferrer">', Mod(data).malte() ,'</a>',
             "</p><br /><br />"
         );
 
