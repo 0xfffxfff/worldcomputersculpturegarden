@@ -46,7 +46,7 @@ library GardenIndex {
         // Header End
         html = string.concat(html,
             '<br /><br />',
-            '<h2 class="a">', LibString.toHexStringChecksummed(garden), '</h2><br />',
+            '<h2 class="a">', LibString.toHexStringChecksummed(garden), '</h2><br /><br />',
             '<pre class="garden">',
             unicode"      ⚘                      ⚘\n",
             unicode"              ⚘\n",
