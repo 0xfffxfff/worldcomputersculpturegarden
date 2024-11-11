@@ -156,6 +156,8 @@ library GardenIndex {
         html = string.concat(html, '<div class="i">Generated in block ', LibString.toString(block.number), /*" (", LibString.toString(block.timestamp), ")",*/ ' from <span class="a">', LibString.toHexStringChecksummed(address(this)) ,"<span></div>");
         html = string.concat(html, "</div>");
 
-        return GardenHTML.html(html, Sculpture(garden).title());
+        string memory description = string.concat('Contract Show: World Computer Sculpture Garden at ', LibString.toHexStringChecksummed(garden), '. Curated by ', Mod(data).fff(), '.');
+
+        return GardenHTML.html(html, Sculpture(garden).title(), description);
     }
 }

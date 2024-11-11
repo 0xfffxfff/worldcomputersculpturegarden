@@ -11,7 +11,7 @@ library GardenEssay {
     function html(address garden, address essayContract) public view returns (string memory html) {
         html = string.concat(html,
             '<div class="c essay"><div class="w"><div class="s g">',
-                '<p><i>This text was published as part of the contract show: <a href="/" style="display: block">World Computer Sculpture Garden</a></i></p>',
+                '<p><i>This text was published as part of the contract show: <a href="/" style="display: block">', Sculpture(garden).title() ,'</a></i></p>',
                 '<br/><br/><br/>',
                 unicode'⚘',
                 '<br/><br/><br/><br/>',
@@ -23,11 +23,17 @@ library GardenEssay {
                 '<br/><br/><br/>',
                 '<p>', LibString.toHexStringChecksummed(garden),' </p>',
                 '<br/><br/>',
-                '<p><i>This text was published as part of the show <a href="/" style="display: block">World Computer Sculpture Garden</a></i></p>',
+                '<p><i>This text was published as part of the show <a href="/" style="display: block">', Sculpture(garden).title() ,'</a></i></p>',
                 '<br/>',
             '</div></div></div>',
             unicode'<div class="f"><a href="/" style="text-decoration: none;">⚘</a></div>'
         );
-        return GardenHTML.html(html, Sculpture(garden).title());
+
+        string memory description = string.concat(
+            'The essay "', Essay(essayContract).title(),
+            '" written by ', Essay(essayContract).authors()[0] ,
+            ' was published as part of the contract show: ', Sculpture(garden).title());
+
+        return GardenHTML.html(html, Sculpture(garden).title(), description);
     }
 }

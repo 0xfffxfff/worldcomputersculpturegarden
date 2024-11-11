@@ -8,7 +8,7 @@ contract Mod is Ownable {
 
     constructor () Ownable(msg.sender) {}
 
-    // Show Text
+    // text
     address private exhibitionText;
 
     function setText(string memory _text) public onlyOwner {
@@ -22,7 +22,7 @@ contract Mod is Ownable {
         return string(SSTORE2.read(exhibitionText));
     }
 
-    // Show URLs
+    // urls
     string[] private exhibitionUrls;
 
     function setExhibitionUrls(string[] memory _urls) public onlyOwner {
@@ -59,7 +59,7 @@ contract Mod is Ownable {
         oneOneThreeUrl = _oneOneThreeUrl;
     }
 
-    // Luke
+    // sssluke
     string public luke = "sssluke";
 
     function setLuke(string memory _luke) public onlyOwner {
@@ -72,7 +72,7 @@ contract Mod is Ownable {
         lukeUrl = _lukeUrl;
     }
 
-    // Malte
+    // maltefr
     string public malte = "maltefr";
 
     function setMalte(string memory _malte) public onlyOwner {

@@ -2,12 +2,14 @@
 pragma solidity >=0.8.0;
 
 library GardenHTML {
-    function html(string memory body, string memory title) external pure returns (string memory) {
+    function html(string memory body, string memory title, string memory description) external pure returns (string memory) {
         string memory html_ = "<html>";
         html_ = string.concat(html_,
             '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">',
             '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=', unicode"'http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cstyle%3E text %7B fill: %23000; %7D @media (prefers-color-scheme: dark) %7B text %7B fill: %23fff; %7D %7D %3C/style%3E%3Ctext y='.9em' font-size='90'%3E ⚘ %3C/text%3E%3C/svg%3E%0A", '" />',
-            '<title>', title ,'</title></head>',
+            '<title>', title ,'</title>',
+            '<meta name="description" content="', description, '">',
+            '</head>',
             "<style>",
             '*, *::before, *::after { box-sizing: border-box; }',
             'html { -moz-text-size-adjust: none; -webkit-text-size-adjust: none; text-size-adjust: none; } html, body { margin: 0; padding: 0; } body { min-height: 100vh } html,body,pre { font-family: "Courier New", "Courier", monospace; font-size: 15px; line-height: 1.3; }',
