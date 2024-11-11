@@ -68,9 +68,9 @@ contract Essay is Sculpture, Ownable {
     function html() external view returns (string memory html) {
         html = string.concat(
             "<h1>", t, "</h1>",
-            "<br/><br/><br/>",
+            "<br><br><br>",
             "<h2><i>Written by ", authors()[0], "</i></h2>",
-            "<br/><br/>",
+            "<br><br>",
             "<div>",
                 pointer1 == address(0)
                     ? ""
