@@ -26,7 +26,7 @@ library GardenHTML {
             '.field { white-space: pre; margin: 0 auto; max-width: 100%; overflow: none; }',
             '@media (screen) and (max-width: 900px) { .field { overflow-x: auto } }',
             '.field a { text-decoration: none; }',
-            '.a { overflow: hidden; display: inline-block; max-width: 100%; text-overflow: ellipsis; vertical-align: middle; ',
+            '.a { overflow: hidden; display: inline-block; max-width: 100%; text-overflow: ellipsis; vertical-align: middle; }',
             '</style>',
             '</head>'
         );
