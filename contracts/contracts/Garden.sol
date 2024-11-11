@@ -10,9 +10,9 @@ pragma solidity >=0.8.0;
 //                                 ⚘                            ⚘     //
 //                                                 ⚘                  //
 //         ⚘                                                          //
-//                 the world computer                                 //
+//                   the world computer                               //
 //                                                           ⚘        //
-//                           is a sculpture garden                    //
+//                            is a sculpture garden                   //
 //          ⚘                                                         //
 //                                               ⚘               ⚘    //
 //                           ⚘                                        //
