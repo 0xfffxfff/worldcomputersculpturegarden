@@ -10,6 +10,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const garden = await deployments.get("Garden");
   const mod = await deployments.get("Mod");
 
+  const ENSResolver = await deploy("ENSResolver", {
+    args: [],
+    from: deployer,
+    log: true
+  });
+
   const gardenHTML = await deploy("GardenHTML", {
     args: [],
     from: deployer,
@@ -47,7 +53,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     libraries: {
       GardenIndex: gardenIndex.address,
-      GardenEssay: gardenEssay.address
+      GardenEssay: gardenEssay.address,
+      ENSResolver: ENSResolver.address
     }
   });
 

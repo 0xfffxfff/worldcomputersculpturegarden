@@ -28,9 +28,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       console.log(`Sculpture available for ${artist} at ${address}`);
       sculptureList.push(address);
     } else if (artist === "rheamyers") { // EXCEPTION: RHEA MYERS
+      const ENSResolver = await deployments.get("ENSResolver");
       const showCritique = await deploy("ShowCritique", {
         from: deployer,
-        log: true
+        log: true,
+        libraries: {
+          ENSResolver: ENSResolver.address,
+        },
       });
       const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
       await showCritiqueInstance.configure(gardenDeployment.address);

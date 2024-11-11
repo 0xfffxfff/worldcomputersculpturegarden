@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import "solady/src/auth/Ownable.sol";
-import "./web/GardenRenderer.sol";
+import "./IWeb.sol";
 
 contract Web is IWeb, Ownable {
     address public garden;
@@ -17,14 +17,14 @@ contract Web is IWeb, Ownable {
     }
 
     function html() external view returns (string memory) {
-        return GardenRenderer(renderer).html();
+        return IWeb(renderer).html();
     }
 
     function request(string[] memory resource, KeyValue[] memory params) external view returns (uint statusCode, string memory body, KeyValue[] memory headers) {
-        return GardenRenderer(renderer).request(resource, params);
+        return IWeb(renderer).request(resource, params);
     }
 
     function resolveMode() external view returns (bytes32) {
-        return GardenRenderer(renderer).resolveMode();
+        return IWeb(renderer).resolveMode();
     }
 }

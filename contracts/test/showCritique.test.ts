@@ -26,7 +26,14 @@ describe("Show Critique", function () {
     const Essay = await hre.ethers.getContractFactory("Essay");
     const essay = await Essay.deploy();
 
-    const ShowCritique = await hre.ethers.getContractFactory("ShowCritique");
+    const ENSResolver = await hre.ethers.getContractFactory("ENSResolver");
+    const ensResolver = await ENSResolver.deploy();
+
+    const ShowCritique = await hre.ethers.getContractFactory("ShowCritique", {
+      libraries: {
+        ENSResolver: await ensResolver.getAddress(),
+      },
+    });
     const showCritique = await ShowCritique.deploy();
 
     const Web = await hre.ethers.getContractFactory("Web");
@@ -68,6 +75,7 @@ describe("Show Critique", function () {
       libraries: {
         GardenIndex: await gardenIndex.getAddress(),
         GardenEssay: await gardenEssay.getAddress(),
+        ENSResolver: await ensResolver.getAddress(),
       },
     });
     const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress(), await mod.getAddress());

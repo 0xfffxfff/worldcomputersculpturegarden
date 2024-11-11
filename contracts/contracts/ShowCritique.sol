@@ -8,6 +8,7 @@ import "solady/src/auth/Ownable.sol";
 import "solady/src/utils/LibString.sol";
 import "./Sculpture.sol";
 import "./Garden.sol";
+import "./ENSResolver.sol";
 
 contract ShowCritique is Sculpture, Ownable {
 
@@ -78,9 +79,15 @@ contract ShowCritique is Sculpture, Ownable {
     function formatOpinion (address workAddress) internal view returns (string memory) {
         Sculpture work = Sculpture(workAddress);
         Critique memory critique = critiques[workAddress];
+        string memory critic;
+        try ENSResolver.resolveAddress(critique.critic) returns (string memory name) {
+            critic = name;
+        } catch {
+            critic = LibString.toHexStringChecksummed(critique.critic);
+        }
         return string.concat(
             '<p><span class="address">',
-            LibString.toHexStringChecksummed(critique.critic),
+            critic,
             "</span> thinks that <i><span style=\"white-space: nowrap;\">",
             work.title(),
             "</span></i> <span style=\"white-space: nowrap;\">by ",

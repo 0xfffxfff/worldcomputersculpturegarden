@@ -113,7 +113,6 @@ library GardenContributions {
                     '    const tooltip = document.getElementById("tooltip" + flowerId);',
                     '    if (!tooltip) return console.log("Tooltip not found");',
                     unicode'    tooltip.innerHTML = `Flower #${flowerId}<br/> <span class="address">${data.planter}</span><br/> ${formatTime(data.timestamp)}`;',
-                    '    window.resolveEns();',
                     '}',
                     'function formatTime(t) {',
                     '    const date = new Date(t * 1000);',

@@ -16,7 +16,8 @@ export default async function critique(taskArgs: TaskArguments, hre: HardhatRunt
   for (let i = 0; i < sculptures.length; i++) {
     const crit = Math.floor(Math.random() * 16);
     console.log("Critiquing", i, sculptures[i], "with", crit);
-    await critique.critiqueWork(i, sculptures[i], crit);
+    const tx = await critique.critiqueWork(i, sculptures[i], crit);
+    console.log("Critiqued", i, sculptures[i], "with", crit, "tx", tx.data);
   }
 
   console.log("Done critiquing");

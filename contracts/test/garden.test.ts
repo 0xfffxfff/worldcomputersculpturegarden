@@ -1,6 +1,6 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
-import { parseEther } from "ethers";
+import { EnsResolver, parseEther } from "ethers";
 import hre from "hardhat";
 
 describe("Garden", function () {
@@ -62,10 +62,14 @@ describe("Garden", function () {
     });
     const gardenEssay = await GardenEssay.deploy();
 
+    const ENSResolver = await hre.ethers.getContractFactory("ENSResolver");
+    const ensResolver = await ENSResolver.deploy();
+
     const GardenRenderer = await hre.ethers.getContractFactory("GardenRenderer", {
       libraries: {
         GardenIndex: await gardenIndex.getAddress(),
         GardenEssay: await gardenEssay.getAddress(),
+        ENSResolver: await ensResolver.getAddress(),
       },
     });
     const renderer = await GardenRenderer.deploy(await garden.getAddress(), await essay.getAddress(), await mod.getAddress());

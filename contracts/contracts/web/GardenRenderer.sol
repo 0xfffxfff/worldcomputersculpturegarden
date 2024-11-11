@@ -10,6 +10,7 @@ import "../web/GardenRenderer.sol";
 import "../web/GardenIndex.sol";
 import "../web/GardenEssay.sol";
 import "../IWeb.sol";
+import "../ENSResolver.sol";
 
 contract GardenRenderer is IWeb {
 
@@ -67,9 +68,15 @@ contract GardenRenderer is IWeb {
                 return (statusCode, body, headers);
             }
             (address planter, uint256 timestamp) = IGarden(garden).flowerInfo(flowerId);
+            string memory resolvedPlanter;
+            try ENSResolver.resolveAddress(planter) returns (string memory resolved) {
+                resolvedPlanter = resolved;
+            } catch {
+                resolvedPlanter = LibString.toHexStringChecksummed(planter);
+            }
             body = string(abi.encodePacked(
                 '{',
-                '"planter": "', LibString.toHexStringChecksummed(planter), '",',
+                '"planter": "', resolvedPlanter, '",',
                 '"timestamp": ', LibString.toString(timestamp),
                 '}'
             ));

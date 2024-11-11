@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@chainlink/env-enc": "^1.0.5",
+    "@ensdomains/ens-contracts": "^1.2.2",
     "solady": "^0.0.237"
   }
 }
