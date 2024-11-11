@@ -4,7 +4,7 @@
 // Copyright 2024 Myers Studio Ltd.
 pragma solidity >=0.8.0;
 
-import "solady/src/auth/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "solady/src/utils/LibString.sol";
 import "./Sculpture.sol";
 import "./Garden.sol";
@@ -41,9 +41,7 @@ contract ShowCritique is Sculpture, Ownable {
     mapping(address => Critique) private critiques;
     address payable private gardenAddress;
 
-    constructor () {
-        _initializeOwner(msg.sender);
-    }
+    constructor () Ownable(msg.sender) {}
 
     function configure (address payable newGardenAddress) external onlyOwner {
         gardenAddress = newGardenAddress;

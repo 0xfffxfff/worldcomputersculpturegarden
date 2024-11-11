@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "solady/src/auth/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FlowerGuestbook is Ownable {
 
@@ -11,9 +11,7 @@ contract FlowerGuestbook is Ownable {
     mapping(uint256 => address) private flowerBy;
     mapping(uint256 => uint256) private flowerTimestamp;
 
-    constructor () {
-        _initializeOwner(msg.sender);
-    }
+    constructor () Ownable(msg.sender) {}
 
     receive() external payable {
         if (msg.value < 0.01 ether) {

@@ -5,10 +5,10 @@ import "solady/src/utils/LibString.sol";
 import "./GardenHTML.sol";
 import "./GardenContributions.sol";
 import "./lib/Format.sol";
-import "../Essay.sol";
-import "../IGarden.sol";
-import "../Sculpture.sol";
-import "../Mod.sol";
+import "./Essay.sol";
+import "./IGarden.sol";
+import "./Sculpture.sol";
+import "./Mod.sol";
 
 library GardenIndex {
     function html(address garden, address essayContract, address data) public view returns (string memory html) {
@@ -34,9 +34,9 @@ library GardenIndex {
         // Artist names
         for (uint256 i = 0; i < sculptures.length; i++) {
             try Sculpture(sculptures[i]).authors() returns (string[] memory authors) {
-                // Temporary: For now we just use the first author here
-                if (authors.length > 0) {
-                    html = string.concat(html, authors[0], "<br/>");
+                for (uint256 j = 0; j < authors.length; j++) {
+                    if (bytes(authors[j]).length == 0) continue; // ignore empty
+                    html = string.concat(html, authors[j], "<br/>");
                 }
             } catch {
                 html = string.concat(html, "Missing<br/>");

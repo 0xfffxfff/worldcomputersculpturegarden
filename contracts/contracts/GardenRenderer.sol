@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "solady/src/auth/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "solady/src/utils/LibString.sol";
-import "../web/lib/Web3url.sol";
-import "../Sculpture.sol";
-import "../Essay.sol";
-import "../web/GardenRenderer.sol";
-import "../web/GardenIndex.sol";
-import "../web/GardenEssay.sol";
-import "../IWeb.sol";
-import "../ENSResolver.sol";
+import "./lib/Web3url.sol";
+import "./Sculpture.sol";
+import "./Essay.sol";
+import "./GardenRenderer.sol";
+import "./GardenIndex.sol";
+import "./GardenEssay.sol";
+import "./IWeb.sol";
+import "./ENSResolver.sol";
 
 contract GardenRenderer is IWeb {
 

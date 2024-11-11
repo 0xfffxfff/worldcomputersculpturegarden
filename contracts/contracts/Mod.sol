@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "solady/src/auth/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "solady/src/utils/SSTORE2.sol";
 
 contract Mod is Ownable {
 
-    constructor() {
-        _initializeOwner(msg.sender);
-    }
+    constructor () Ownable(msg.sender) {}
 
     // Show Text
     address private exhibitionText;

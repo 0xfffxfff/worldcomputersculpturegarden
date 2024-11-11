@@ -3,9 +3,9 @@ pragma solidity >=0.8.0;
 
 import "solady/src/utils/LibString.sol";
 import "./GardenHTML.sol";
-import "../IGarden.sol";
-import "../Essay.sol";
-import "../Sculpture.sol";
+import "./IGarden.sol";
+import "./Essay.sol";
+import "./Sculpture.sol";
 
 library GardenEssay {
     function html(address garden, address essayContract) public view returns (string memory html) {

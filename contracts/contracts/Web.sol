@@ -1,16 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "solady/src/auth/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IWeb.sol";
 
 contract Web is IWeb, Ownable {
     address public garden;
     address public renderer;
 
-    constructor() {
-        _initializeOwner(msg.sender);
-    }
+    constructor () Ownable(msg.sender) {}
 
     function setRenderer(address _renderer) public onlyOwner {
         renderer = _renderer;

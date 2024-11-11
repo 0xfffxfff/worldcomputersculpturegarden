@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import "solady/src/utils/LibString.sol";
-import "../IGarden.sol";
+import "./IGarden.sol";
 
 library GardenContributions {
     function html(address garden) external view returns (string memory html) {
