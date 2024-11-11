@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 // Author: @yigitduman
 // Source: https://github.com/ygtdmn/drakeflipping/blob/main/src/DrakeflippingRenderer.sol
 pragma solidity >=0.8.0;
