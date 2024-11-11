@@ -16,7 +16,7 @@ library ENSResolver {
      */
     function resolveAddress(address addr) external view returns (string memory) {
         ENS ens = ENS(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
-        IReverseRegistrar reverseRegistrar = IReverseRegistrar(/*sepolia*/0xA0a1AbcDAe1a2a4A2EF8e9113Ff0e02DD81DC0C6);
+        IReverseRegistrar reverseRegistrar = IReverseRegistrar(0xa58E81fe9b61B5c3fE2AFD33CF304c454AbFc7Cb);
         bytes32 node = reverseRegistrar.node(addr);
         address resolverAddress = ens.resolver(node);
 
