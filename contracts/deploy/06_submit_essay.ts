@@ -21,12 +21,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const tx1 = await essay.setTextPt1(essayText.textPt1, {
       from: deployer,
       gasLimit: 30_000_000,
-      gasPrice: 10_000_000_000,
+      gasPrice: 15_000_000_000,
     });
     const tx2 = await essay.setTextPt2(essayText.textPt2, {
       from: deployer,
       gasLimit: 30_000_000,
-      gasPrice: 10_000_000_000,
+      gasPrice: 15_000_000_000,
     });
     console.log(`Essay text set!`, tx1.hash, tx2.hash);
   }

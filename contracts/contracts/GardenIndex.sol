@@ -76,6 +76,9 @@ library GardenIndex {
         html = string.concat(html,
             '<div class="w"><div class="s">',
             Sculpture(garden).text(),
+            '<br>',
+            '<p>The website you are viewing was generated from the show contract itself at block ', LibString.toString(block.number) ,'. ',
+            'Over time, as people engage with the artworks and artists activate their pieces, the information rendered here will change. Block by block. Year by year.</p>',
             '</div></div>'
         );
 
