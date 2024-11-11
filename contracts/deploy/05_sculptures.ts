@@ -53,7 +53,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   const sculptures = await garden.getSculptures();
-  if (sculptures.every((sculpture) => sculptureList.includes(sculpture))) {
+  if (sculptureList.every((sculpture) => sculptures.includes(sculpture))) {
     console.log("Sculptures already set on Garden");
   } else {
     console.log("Setting sculptures on Garden");
