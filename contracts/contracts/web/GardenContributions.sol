@@ -7,6 +7,7 @@ import "../IGarden.sol";
 library GardenContributions {
     function html(address garden) external view returns (string memory html) {
         uint256 guests = IGarden(garden).guests();
+        uint256 flowers = IGarden(garden).flowers();
         html = string.concat(html,
             '<div class="w"><div class="s">',
                 '<div id="field1" class="field"></div>'
@@ -18,9 +19,9 @@ library GardenContributions {
                     LibString.toHexStringChecksummed(garden),
                 '</span><br/><br/>',
                 LibString.toString(guests),
-                guests == 1 ? ' guest' : ' guests',
-                ' have planted ', LibString.toString(IGarden(garden).flowers()),
-                ' flowers',
+                guests == 1 ? ' guest has' : ' guests have',
+                ' planted ', LibString.toString(flowers),
+                ' flower' , flowers == 1 ? '' : 's',
                 '</p><br/><br/><br/>',
                 '<div id="field2" class="field"></div>',
                 '<style>'

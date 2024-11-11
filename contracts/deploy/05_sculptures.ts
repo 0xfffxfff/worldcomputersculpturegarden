@@ -1,5 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { DeployFunction } from "hardhat-deploy/types";
+import { Address, DeployFunction } from "hardhat-deploy/types";
 
 import SCULPTURES from "../../SCULPTURES.json";
 import { ethers } from "hardhat";
@@ -15,7 +15,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     gardenDeployment.address
   );
 
-  const sculptureList = [];
+  const sculptureList: Address[] = [];
 
   const chainId = await hre.getChainId();
 
@@ -52,8 +52,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     }
   }
 
-  console.log("Setting sculptures on Garden: ", sculptureList.join(", "));
-  await garden.setSculptures(sculptureList);
+  const sculptures = await garden.getSculptures();
+  if (sculptures.every((sculpture) => sculptureList.includes(sculpture))) {
+    console.log("Sculptures already set on Garden");
+  } else {
+    console.log("Setting sculptures on Garden");
+    await garden.setSculptures(sculptureList);
+  }
 };
 
 export default func;
