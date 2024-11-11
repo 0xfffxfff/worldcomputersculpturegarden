@@ -6,9 +6,6 @@ describe("Show Critique", function () {
   async function deployFixture() {
     const [owner, acc1] = await hre.ethers.getSigners();
 
-    const SP = await hre.ethers.getContractFactory("SP");
-    const sp = await SP.deploy();
-
     const StaticExample = await hre.ethers.getContractFactory(
       "ExampleSculptureStatic"
     );
@@ -82,7 +79,7 @@ describe("Show Critique", function () {
 
     await (await web.setRenderer(await renderer.getAddress())).wait();
 
-    return { showCritique, ShowCritique, garden, example1, Garden, web, Web, sp, SP, owner, acc1 };
+    return { showCritique, ShowCritique, garden, example1, Garden, web, Web, owner, acc1 };
   }
 
   describe("Deployment", function () {
@@ -109,7 +106,7 @@ describe("Show Critique", function () {
         showCritique.connect(acc1).configure(await garden.getAddress())
       ).to.be.revertedWithCustomError(
         showCritique,
-        "Unauthorized"
+        `OwnableUnauthorizedAccount`
       );
     });
 
