@@ -12,6 +12,11 @@ const config: HardhatUserConfig = {
   contractSizer: {
     runOnCompile: process.env.REPORT_SIZE === "true",
   },
+  verify: {
+    etherscan: {
+      apiKey: "WTVZMWIIUDFK44YBQ3KJS2DJ4QA87XC2GQ"
+    },
+  },
   networks: {
     hardhat: {
       // forking: {
