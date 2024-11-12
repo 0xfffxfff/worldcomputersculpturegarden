@@ -58,10 +58,16 @@ contract ShowCritique is Sculpture, Ownable {
         }
     }
 
-    function critiqueWork (uint256 workIndex, address workAddress, uint8 critique) external {
+    function critiqueWork (uint256 workIndex, uint8 critique) external {
         Garden garden = Garden(gardenAddress);
+        address[] memory sculptures = garden.getSculptures();
         require(
-            garden.getSculptures()[workIndex] == workAddress,
+            workIndex < sculptures.length,
+            "invalid work (was the garden changed?)"
+        );
+        address workAddress = sculptures[workIndex];
+        require(
+            workAddress != address(0),
             "invalid work (was the garden changed?)"
         );
         require(

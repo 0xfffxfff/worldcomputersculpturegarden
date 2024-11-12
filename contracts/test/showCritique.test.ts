@@ -120,10 +120,32 @@ describe("Show Critique", function () {
       expect(workAddress).to.equal(await example1.getAddress());
       const workTitle = await example1.title();
       const workAuthor = (await example1.authors())[workIndex];
-      await showCritique.critiqueWork(workIndex, workAddress, 10);
+      await showCritique.critiqueWork(workIndex, 10);
       const text = await showCritique.text();
       const critique = text.split("\n")[0];
       expect(text).to.contain(`<p><span class="address">${criticAddress}</span> thinks that <i><span style="white-space: nowrap;">${workTitle}</span></i> <span style="white-space: nowrap;">by ${workAuthor}</span> is <span style="white-space: nowrap;">triumphantly skilful.</span></p>`);
-    })
+    });
+
+    it("Should fail to ciritque with invalid work index", async function () {
+      const { owner, garden, showCritique } = await loadFixture(deployFixture);
+      await showCritique.configure(await garden.getAddress());
+      const workIndex = 100;
+      await expect(
+        showCritique.critiqueWork(workIndex, 10)
+      ).to.be.revertedWith(
+        `invalid work (was the garden changed?)`
+      );
+    });
+
+    it("Should fail to critique with invalid opinion", async function () {
+      const { owner, garden, showCritique } = await loadFixture(deployFixture);
+      await showCritique.configure(await garden.getAddress());
+      const workIndex = 0;
+      await expect(
+        showCritique.critiqueWork(workIndex, 16)
+      ).to.be.revertedWith(
+        "invalid critical opinion (indices start at zero)"
+      );
+    });
   });
 });
