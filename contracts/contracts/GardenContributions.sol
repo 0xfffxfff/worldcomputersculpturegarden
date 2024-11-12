@@ -10,7 +10,7 @@ library GardenContributions {
         uint256 guests = IGarden(garden).guests();
         uint256 flowers = IGarden(garden).flowers();
         html = string.concat(html,
-            '<div class="w"><div class="s">',
+            '<div class="w" id="guestbook"><div class="s">',
                 '<div id="field1" class="field"></div>'
                 '<br><br><br>',
                 '<p style="text-align:center;">',
@@ -68,7 +68,7 @@ library GardenContributions {
                         'const val = gridNoise(counter % width, Math.floor(counter / width), 0xf);',
                         'const threshold = calculateThreshold(planted);',
                         'if (val > threshold || val < -threshold) {',
-                            unicode'lines[Math.floor(counter / width)] += `<a href="#${planted+1}" id="flower-${planted+1}" style="position:relative;" data-flower-id="${planted+1}">⚘</a>`;',
+                            unicode'lines[Math.floor(counter / width)] += `<a href="#flower${planted+1}" id="flower${planted+1}" style="position:relative;" data-flower-id="${planted+1}">⚘</a>`;',
                             'planted++;',
                         '} else { lines[Math.floor(counter / width)] += " "; }',
                         'if (counter % width == (width-1) && planted < flowers) { lines.push(""); }',
