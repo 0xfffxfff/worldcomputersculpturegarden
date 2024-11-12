@@ -34,6 +34,6 @@ library GardenEssay {
             '" written by ', Essay(essayContract).authors()[0] ,
             ' was published as part of the contract show: ', Sculpture(garden).title());
 
-        return GardenHTML.html(html, Sculpture(garden).title(), description);
+        return GardenHTML.html(html, Essay(essayContract).title(), description);
     }
 }

@@ -22,7 +22,7 @@ const config: HardhatUserConfig = {
     gasPrice: 30,
     tokenPrice: "3000",
   },
-  defaultNetwork: "localhost",
+  // defaultNetwork: "localhost",
   networks: {
     hardhat: {
       // forking: {
