@@ -3,6 +3,9 @@ import { expect } from "chai";
 import { EnsResolver, parseEther } from "ethers";
 import hre from "hardhat";
 
+import ESSAY from "../../ESSAY";
+import SHOWTEXT from "../../SHOWTEXT";
+
 describe("Garden", function () {
   async function deployFixture() {
     const [owner, acc1] = await hre.ethers.getSigners();
@@ -159,6 +162,18 @@ describe("Garden", function () {
 
       expect(await hre.ethers.provider.getBalance(await acc1.getAddress())).to.equal(balance+gardenBalance);
       expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(0);
+    });
+  });
+
+  describe("Showtext & Essay", function () {
+    it("Should allow setting the showtext on mod", async function () {
+      const { garden, owner } = await loadFixture(deployFixture);
+      const Mod = await hre.ethers.getContractFactory("Mod");
+      const mod = await Mod.deploy();
+      await mod.setText(SHOWTEXT, {
+        from: owner
+      });
+      expect(await mod.text()).to.equal(SHOWTEXT);
     });
   });
 });

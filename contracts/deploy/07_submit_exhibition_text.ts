@@ -21,7 +21,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await mod.setText(gardenText, {
       from: deployer,
       gasLimit: 30_000_000,
-      gasPrice: 50_000_000_000,
+      gasPrice: 40_000_000_000,
     });
     console.log(`Show text set!`);
   }

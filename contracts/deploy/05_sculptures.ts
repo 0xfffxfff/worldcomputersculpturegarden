@@ -27,32 +27,36 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (address && ethers.isAddress(address)) {
       console.log(`Sculpture available for ${artist} at ${address}`);
       sculptureList.push(address);
-    } else if (artist === "rheamyers" && hre.network.config.chainId !== 1) { // EXCEPTION: RHEA MYERS
-      const ENSResolver = await deployments.get("ENSResolver");
-      const showCritique = await deploy("ShowCritique", {
-        from: deployer,
-        log: true,
-        libraries: {
-          ENSResolver: ENSResolver.address,
-        },
-      });
-      const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
-      await showCritiqueInstance.configure(gardenDeployment.address);
-      sculptureList.push(showCritique.address);
-      continue;
-    } else if (hre.network.config.chainId !== 1) {
-      console.log(`No sculpture available for ${artist}`);
-      console.log(`Deploying placeholder`);
-      const placeholder = await deploy(`Placeholder${artist}`, {
-        from: deployer,
-        log: true,
-      });
-      console.log(`Placeholder deployed at ${placeholder.address}`);
-      sculptureList.push(placeholder.address);
     }
+    // else if (artist === "rheamyers" && hre.network.config.chainId !== 1) { // EXCEPTION: RHEA MYERS
+    //   const ENSResolver = await deployments.get("ENSResolver");
+    //   const showCritique = await deploy("ShowCritique", {
+    //     from: deployer,
+    //     log: true,
+    //     libraries: {
+    //       ENSResolver: ENSResolver.address,
+    //     },
+    //   });
+    //   const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
+    //   await showCritiqueInstance.configure(gardenDeployment.address);
+    //   sculptureList.push(showCritique.address);
+    //   continue;
+    // }
+    // else if (hre.network.config.chainId !== 1) {
+    //   console.log(`No sculpture available for ${artist}`);
+    //   console.log(`Deploying placeholder`);
+    //   const placeholder = await deploy(`Placeholder${artist}`, {
+    //     from: deployer,
+    //     log: true,
+    //   });
+    //   console.log(`Placeholder deployed at ${placeholder.address}`);
+    //   sculptureList.push(placeholder.address);
+    // }
   }
 
   const sculptures = await garden.getSculptures();
+  console.log("Sculptures on Garden", sculptures);
+  console.log("Sculptures to set", sculptureList);
   if (sculptureList.every((sculpture) => sculptures.includes(sculpture))) {
     console.log("Sculptures already set on Garden");
   } else {

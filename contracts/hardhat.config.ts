@@ -34,6 +34,8 @@ const config: HardhatUserConfig = {
     },
     mainnet: {
       url: 'https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a',
+      chainId: 1,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       live: true,
     }
   },
