@@ -3,7 +3,7 @@ export default {
   urls: [],
   // textPt1: '',
   // textPt2: '',
-  textPt1: `<style>.essay-text { line-height: 1.5; } .essay-text p { margin-bottom: 2.5em } .essay-text h2 { margin-left: 1.5em } .ftntref { margin-right: 0.1em; text-decoration: none; } hr { height: 1px; border: 0; background: #000; } .ftnts a { text-decoration: none; } </style>
+  textPt1: `<style>.essay-text { line-height: 1.5; } .essay-text p { margin-bottom: 2.5em } .essay-text h2 { margin-left: 1.5em } .ftntref { margin-right: 0.1em; text-decoration: none; } hr { height: 1px; border: 0; background: #000; } .ftnts a { text-decoration: none; overflow-wrap: break-word; } </style>
 <div class="essay-text">
 <p>The artists in "World Computer Sculpture Garden" explore computation and networks with an understanding that the contemporary art world has yet to grasp the significance of these phenomena. Perhaps their work constitutes the beginnings of a movement—though not an "-ism" or school. </p>
 <p>Over the past years, the work produced by these artists has been labeled in various ways: "on-chain art," "runtime art," "blockchain-native art." I prefer to describe it as “protocol art,” because these artists are primarily concerned with foundational structures or sets of rules that precede and define a computing environment. </p>
@@ -65,15 +65,11 @@ export default {
 <a href="#ftnt12" id="ftnt12ref">[12]</a></sup> The most radical gesture of “World Computer Sculpture Garden” is to awaken from this historicist nightmare. To leave the 20th century. All explorations of distributed computation as a unique site for artistic meaning-making point in this direction.  </p>
 `,
   textPt2: `<br>
-<pre>
-       ⚘
-                ⚘                 ⚘
-⚘
-                       ⚘                       ⚘
-          ⚘
-                                      ⚘
-     ⚘
-                      ⚘
+<pre class="garden">      ⚘                      ⚘
+              ⚘
+ ⚘                     ⚘         ⚘
+          ⚘      ⚘
+     ⚘                     ⚘
 </pre>
 <br><br>
 <p>I would like to thank 0xfff for organizing this exhibition and providing me the opportunity to consolidate thoughts developed over the past two years in writing and conversation. His kindness and rigor have greatly shaped what we describe here as "protocol art." He also gave me the space and support I needed to complete this text during a particularly stressful time.</p>
@@ -82,8 +78,8 @@ export default {
 <br>
 <hr>
 <br><br>
-<div>
-    <div id="footnotes" class="ftnts">
+<div id="footnotes" class="ftnts">
+    <div>
     <p class="c10"><a href="#ftnt1ref" id="ftnt1" class="ftntref">[1]</a><span>&nbsp;Alexander Raubo, “Towards a New Net Art”, </span><span><a class="c12" href="https://www.google.com/url?q=https://quarterly.remilia.org/towards-a-new-net-art/&amp;sa=D&amp;source=editors&amp;ust=1731318758790666&amp;usg=AOvVaw3zZstAQnH8Laz_3YP2OGhK">Remilia Quarterly Issue 1</a></span><span>&nbsp;(SS 2024). &nbsp;</span></p>
     </div><div>
     <p class="c10"><a href="#ftnt2ref" id="ftnt2" class="ftntref">[2]</a><span>&nbsp;Paul Seidler has pointed to this: “There are two strains of ‘nft art’ emerging - one is an extension of post-internet art as the production of unique images using the ledger as means of distribution. The other strain is creating experiments with the material (code) and structure of the chain itself.” </span><span><a class="c12" href="https://www.google.com/url?q=https://x.com/brachlandberlin/status/1783864724976730586&amp;sa=D&amp;source=editors&amp;ust=1731318758791239&amp;usg=AOvVaw2dWe8NH06EfebyG-CZYK0h">https://x.com/brachlandberlin/status/1783864724976730586</a></span><span>&nbsp;(slightly adjusted spelling)</span></p>

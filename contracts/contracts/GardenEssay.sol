@@ -21,7 +21,7 @@ library GardenEssay {
                 '<br><br><br><br>',
                 unicode'⚘',
                 '<br><br><br>',
-                '<p>', LibString.toHexStringChecksummed(garden),' </p>',
+                '<p><span class="a">', LibString.toHexStringChecksummed(garden),'</span></p>',
                 '<br><br>',
                 '<p><i>This text was published as part of the show <a href="/" style="display: block">', Sculpture(garden).title() ,'</a></i></p>',
                 '<br>',
