@@ -9,19 +9,23 @@
         "paulseidler"
     ],
     "sculptures": {
+        "31337": {
+            "figure31": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f"
+        },
         "11155111": {
             "0xhaiku": "0xbcF698AAac1b144064f899e03EcAeE2EE42963dF",
             "paulseidler": "0x6a7139325371a314Fe1374063869F89cB7c09D57",
             "material": "0xFc8e3655B130b355572697715098cf3C87D3B263",
             "sarahfriend": "0x764bb6f13eCd121bE21E4a072792A527BDC967c0",
             "113": "0xd16dBb416cA311669202FE3065612D36B470005D",
-            "figure31": "0x6fe3C5020B14f704A31D6Ec2DB2C9C390F46ad88",
+            "figure31": "0x0422342E316eE9e468494ff2B41117be2682e24A",
             "rheamyers": "0x30051B765528C53F6e9aed53e2e872deB1e8f2d6"
         },
         "1": {
             "0xhaiku": "0x151fC4C33778791BAe14d7Ba2702Efb052F066ae",
-            "figure31": "0xb78212285CcC039733Ea3453F38e591eD91F1D63",
+            "figure31": "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01",
             "sarahfriend": "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16",
+            "material": "0xb78212285CcC039733Ea3453F38e591eD91F1D63",
             "rheamyers": "0x6582Adc209769bb9974e42cA61F4Db802D25997E",
             "paulseidler": "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8"
         }
