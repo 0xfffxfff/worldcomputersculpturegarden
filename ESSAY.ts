@@ -63,7 +63,8 @@ export default {
 <p>History is “a nightmare from which I am trying to awake,“ says Stephan Daedalus.
 <sup>
 <a href="#ftnt12" id="ftnt12ref">[12]</a></sup> The most radical gesture of “World Computer Sculpture Garden” is to awaken from this historicist nightmare. To leave the 20th century. All explorations of distributed computation as a unique site for artistic meaning-making point in this direction.  </p>
-<br>
+`,
+  textPt2: `<br>
 <pre>
        ⚘
                 ⚘                 ⚘
@@ -108,6 +109,5 @@ export default {
     <p class="c10"><a href="#ftnt12ref" id="ftnt12" class="ftntref">[12]</a><span>&nbsp;James Joyce, </span><span>Ulysses</span><span>&nbsp;</span><span class="c2">(New York: Vintage Books, 1986), 28. </span></p>
     </div>
 </div>
-</div>`,
-  textPt2: ``
+</div>`
 };

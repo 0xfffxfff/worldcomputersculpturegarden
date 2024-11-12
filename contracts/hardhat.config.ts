@@ -18,7 +18,9 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false
+    enabled: (process.env.REPORT_GAS) ? true : false,
+    gasPrice: 30,
+    tokenPrice: "3000",
   },
   defaultNetwork: "localhost",
   networks: {
