@@ -2,6 +2,8 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import { EnsResolver, parseEther } from "ethers";
 import hre from "hardhat";
+import SHOWTEXT from "../../SHOWTEXT";
+import ESSAY from "../../ESSAY";
 
 describe("Garden", function () {
   async function deployFixture() {
@@ -161,4 +163,32 @@ describe("Garden", function () {
       expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(0);
     });
   });
+
+  describe("Showtext & Essay", function () {
+    it("Should allow setting the showtext on mod", async function () {
+      const { garden, owner } = await loadFixture(deployFixture);
+      const Mod = await hre.ethers.getContractFactory("Mod");
+      const mod = await Mod.deploy();
+      await mod.setText(SHOWTEXT, {
+        from: owner
+      });
+      expect(await mod.text()).to.equal(SHOWTEXT);
+    });
+
+    it("Should allow setting the essay text", async function () {
+      const { garden, owner } = await loadFixture(deployFixture);
+      const Essay = await hre.ethers.getContractFactory("Essay");
+      const essay = await Essay.deploy();
+      await essay.setTextPt1(ESSAY.textPt1, {
+        from: owner
+      });
+      await essay.setTextPt2(ESSAY.textPt2, {
+        from: owner
+      });
+      await essay.setTitle(ESSAY.title, {
+        from: owner
+      });
+    });
+  });
+
 });
