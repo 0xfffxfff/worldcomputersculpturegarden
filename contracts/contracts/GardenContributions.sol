@@ -99,7 +99,7 @@ library GardenContributions {
                         'tooltip.id = "tooltip" + flowerId;',
                         'tooltip.innerHTML = `Loading Flower #${flowerId} ...`;',
                         'tooltip.style.position = "absolute";',
-                        'const flower = document.getElementById("flower-" + flowerId);',
+                        'const flower = document.getElementById("flower" + flowerId);',
                         'const clientRect = flower.getBoundingClientRect();',
                         'const offsetTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;',
                         'tooltip.style.top = clientRect.top + (offsetTop) + flower.clientHeight + "px";',
