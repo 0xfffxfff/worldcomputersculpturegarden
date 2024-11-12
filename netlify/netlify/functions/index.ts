@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { CacheHeaders, ONE_YEAR } from "cdn-cache-control";
 import { getStore } from "@netlify/blobs";
 
-const deploymentArtifact = require('../../../contracts/deployments/sepolia/Garden.json');
+const deploymentArtifact = require('../../../contracts/deployments/mainnet/Garden.json');
 
 const CACHE_EXPIRATION_TIME = 12; // Seconds
 // const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
@@ -37,7 +37,7 @@ export default async (req: Request, context: Context) => {
 
     try {
         // const provider = new ethers.JsonRpcProvider(RPC_URL);
-        const provider = ethers.getDefaultProvider('sepolia');
+        const provider = ethers.getDefaultProvider('mainnet');
         const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
         console.log("Fetching HTML from contract");
         let [statusCode, body, headers] = await contract.request(resource, []);
