@@ -17,6 +17,9 @@ const config: HardhatUserConfig = {
       apiKey: "WTVZMWIIUDFK44YBQ3KJS2DJ4QA87XC2GQ"
     },
   },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false
+  },
   networks: {
     hardhat: {
       // forking: {
