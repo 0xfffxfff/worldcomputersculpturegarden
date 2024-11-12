@@ -17,7 +17,7 @@ library GardenIndex {
         // Header
         html = string.concat(html,
             '<div class="c">',
-            '<div class="w">',
+            '<div class="w" id="hi">',
             '<div class="s g">',
             '<pre class="garden">',
             unicode"       ⚘                    ⚘\n",
@@ -74,7 +74,7 @@ library GardenIndex {
 
         // Text
         html = string.concat(html,
-            '<div class="w"><div class="s">',
+            '<div class="w" id="intro"><div class="s">',
             Sculpture(garden).text(),
             '<br>',
             '<p>The website you are viewing was generated from the show contract itself at block ', LibString.toString(block.number) ,'. ',
@@ -86,7 +86,7 @@ library GardenIndex {
         for (uint256 i = 0; i < sculptures.length; i++) {
             Sculpture sculpture = Sculpture(sculptures[i]);
 
-            html = string.concat(html, '<div class="w"><div class="s">');
+            html = string.concat(html, '<div class="w" id="', LibString.toString(i+1) ,'"><div class="s">');
 
             // Authors
             try sculpture.authors() returns (string[] memory authors) {
