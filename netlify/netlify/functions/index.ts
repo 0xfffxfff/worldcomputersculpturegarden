@@ -42,10 +42,10 @@ export default async (req: Request, context: Context) => {
 
     try {
         const providers = [
-            ...(RPC_URLS.map((rpcUrl) => new ethers.JsonRpcProvider(rpcUrl))),
+            ...(RPC_URLS.map((rpcUrl) => new ethers.JsonRpcProvider(rpcUrl, 1))),
             ethers.getDefaultProvider('mainnet')
         ];
-        const provider = new ethers.FallbackProvider(providers, 1);
+        const provider = new ethers.FallbackProvider(providers, 1, { quorum: 1 });
         const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
 
         console.log("Fetching HTML from contract");
