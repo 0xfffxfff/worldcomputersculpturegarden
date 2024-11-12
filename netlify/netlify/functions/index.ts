@@ -9,6 +9,11 @@ const CACHE_EXPIRATION_TIME = 12; // Seconds
 // const RPC_URL = Netlify.env.get("RPC_URL") || 'https://ethereum-sepolia-rpc.publicnode.com';
 // const RPC_URL = 'http://localhost:8545';
 
+const RPC_URLS = [
+    'https://mainnet.infura.io/v3/812d37a6ecc04336b3ac75b102fe7a9e',
+    // 'https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a',
+]
+
 export default async (req: Request, context: Context) => {
     const cache = getStore("cache");
     const path = context.url.pathname.slice(1);
@@ -36,9 +41,13 @@ export default async (req: Request, context: Context) => {
     }
 
     try {
-        // const provider = new ethers.JsonRpcProvider(RPC_URL);
-        const provider = ethers.getDefaultProvider('mainnet');
+        const providers = [
+            ...(RPC_URLS.map((rpcUrl) => new ethers.JsonRpcProvider(rpcUrl))),
+            ethers.getDefaultProvider('mainnet')
+        ];
+        const provider = new ethers.FallbackProvider(providers, 1);
         const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
+
         console.log("Fetching HTML from contract");
         let [statusCode, body, headers] = await contract.request(resource, []);
         if (Number(statusCode) === 404) {
@@ -48,22 +57,6 @@ export default async (req: Request, context: Context) => {
         } else if (Number(statusCode) !== 200) {
             cache.setJSON(cacheKey, { timestamp: Date.now(), response: "", statusCode: Number(statusCode) });
             throw new Error(`Unexpected status code: ${statusCode}`);
-        }
-
-        if (isFlower) {
-            console.log("Resolving planter address");
-            try {
-                const jsonBody = JSON.parse(body);
-                const address = jsonBody.planter;
-                console.log(address);
-                if (!ethers.isAddress(address)) throw new Error("Invalid address");
-                const name = await provider.lookupAddress(address);
-                if (name) jsonBody.planter = name;
-                console.log(`Resolved planter ${address} to name ${jsonBody.planter}`);
-                body = JSON.stringify(jsonBody);
-            } catch (error) {
-                console.error(error);
-            }
         }
 
         cache.setJSON(cacheKey, { timestamp: Date.now(), response: body, statusCode: Number(statusCode) });
