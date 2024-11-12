@@ -28,20 +28,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       console.log(`Sculpture available for ${artist} at ${address}`);
       sculptureList.push(address);
     }
-    // else if (artist === "rheamyers" && hre.network.config.chainId !== 1) { // EXCEPTION: RHEA MYERS
-    //   const ENSResolver = await deployments.get("ENSResolver");
-    //   const showCritique = await deploy("ShowCritique", {
-    //     from: deployer,
-    //     log: true,
-    //     libraries: {
-    //       ENSResolver: ENSResolver.address,
-    //     },
-    //   });
-    //   const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
-    //   await showCritiqueInstance.configure(gardenDeployment.address);
-    //   sculptureList.push(showCritique.address);
-    //   continue;
-    // }
+    else if (artist === "rheamyers") { // EXCEPTION: RHEA MYERS
+      const ENSResolver = await deployments.get("ENSResolver");
+      const showCritique = await deploy("ShowCritique", {
+        from: deployer,
+        log: true,
+        libraries: {
+          ENSResolver: ENSResolver.address,
+        },
+      });
+      const showCritiqueInstance = await hre.ethers.getContractAt("ShowCritique", showCritique.address);
+      await showCritiqueInstance.configure(gardenDeployment.address);
+      sculptureList.push(showCritique.address);
+      continue;
+    }
     // else if (hre.network.config.chainId !== 1) {
     //   console.log(`No sculpture available for ${artist}`);
     //   console.log(`Deploying placeholder`);
