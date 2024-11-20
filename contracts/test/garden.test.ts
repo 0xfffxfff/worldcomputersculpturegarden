@@ -194,4 +194,33 @@ describe("Garden", function () {
     });
   });
 
+  describe("ExternalWithdraw", async function () {
+    it("Should allow withdrawing using the ExternalWithdraw contract", async function () {
+      const { garden, owner, acc1 } = await loadFixture(deployFixture);
+      const ExternalWithdraw = await hre.ethers.getContractFactory("ExternalWithdraw");
+      const externalWithdraw = await ExternalWithdraw.deploy(await garden.getAddress());
+      await owner.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("1.0"),
+      })
+      expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(parseEther("1.0"));
+      await garden.transferOwnership(await externalWithdraw.getAddress());
+      await expect(garden.setSculptures([])).to.be.reverted;
+      await expect(garden.withdraw(owner.address)).to.be.reverted;
+      await externalWithdraw.withdraw(owner.address);
+      expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(0);
+
+      // Once more
+      await owner.sendTransaction({
+        to: await garden.getAddress(),
+        value: parseEther("1.23456789"),
+      })
+      expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(parseEther("1.23456789"));
+      const acc1BalancePre = await hre.ethers.provider.getBalance(acc1.address);
+      await externalWithdraw.withdraw(acc1.address);
+      expect(await hre.ethers.provider.getBalance(await garden.getAddress())).to.equal(0);
+      expect(await hre.ethers.provider.getBalance(acc1.address)).to.equal(acc1BalancePre + parseEther("1.23456789"));
+    });
+  });
+
 });
