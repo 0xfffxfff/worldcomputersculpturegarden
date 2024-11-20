@@ -41,15 +41,19 @@ export default async (req: Request, context: Context) => {
     }
 
     try {
-        const providers = [
-            ...(RPC_URLS.map((rpcUrl) => new ethers.JsonRpcProvider(rpcUrl, 1))),
-            ethers.getDefaultProvider('mainnet')
-        ];
-        const provider = new ethers.FallbackProvider(providers, 1, { quorum: 1 });
-        const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
+        let statusCode, body, headers;
+        console.log(`Fetching HTML from contract for ${path}`);
+        try {
+            const provider =  new ethers.JsonRpcProvider(RPC_URLS[Math.floor(Math.random()*RPC_URLS.length)], 1);
+            const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
+            [statusCode, body, headers] = await contract.request(resource, []);
+        } catch (error) {
+            console.error("Error fetching HTML from contract using own RPCs, falling back to mainnet default provider", error);
+            const provider = ethers.getDefaultProvider('mainnet')
+            const contract = new ethers.Contract(deploymentArtifact.address, deploymentArtifact.abi, provider);
+            [statusCode, body, headers] = await contract.request(resource, []);
+        }
 
-        console.log("Fetching HTML from contract");
-        let [statusCode, body, headers] = await contract.request(resource, []);
         if (Number(statusCode) === 404) {
             console.log("Page not found");
             cache.setJSON(cacheKey, { timestamp: Date.now(), response: "", statusCode: 404 });
