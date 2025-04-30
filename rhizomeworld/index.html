@@ -130,7 +130,7 @@
           "function title() view returns (string memory)",
           "function authors() view returns (string[] memory)"
         ];
-        
+
         // Contract interaction setup
         let provider, gardenContract, sculptureContracts = [];
         let isDebugMode = location.search.includes('debug=true');
@@ -139,7 +139,7 @@
         let currentFlowerCount = parseInt(localStorage.getItem('flowerCount') || '283', 10);
         let displayedFlowers = 0;
         let isInitialized = false;
-        
+
         // Elements
         const gardenField = document.getElementById('garden-field');
         const debugPanel = document.getElementById('debug-panel');
@@ -147,13 +147,13 @@
         const currentBlockEl = document.getElementById('current-block');
         const windEffectEl = document.getElementById('wind-effect');
         const loadingEl = document.querySelector('.loading');
-        
+
         // Show debug panel if needed
         if (isDebugMode) {
           debugPanel.style.display = 'block';
           flowerCountEl.textContent = currentFlowerCount;
         }
-        
+
         // Grid and visualization settings
         const config = {
           // Dynamically calculate grid size based on window dimensions
@@ -166,32 +166,32 @@
           windDuration: 10000,    // Ms each wind effect lasts
           flowerFadeInTime: 15000 // Ms for new flowers to fade in
         };
-        
+
         // Calculate optimal grid size based on screen dimensions
         function calculateGridSize() {
           // Get window dimensions
           const windowWidth = window.innerWidth;
           const windowHeight = window.innerHeight;
-          
+
           // Calculate how many characters can fit
           // Assuming each character is roughly 1em wide and 1.2em tall
           const fontSizeInPx = 15;
           const charWidth = fontSizeInPx;
           const charHeight = fontSizeInPx * 1.2;
-          
+
           // Calculate grid dimensions
           config.gridWidth = Math.floor(windowWidth / charWidth) - 2; // Leave a small margin
           config.gridHeight = Math.floor(windowHeight / charHeight) - 2;
-          
+
           console.log(`Grid size set to ${config.gridWidth} x ${config.gridHeight} based on screen size`);
         }
-        
+
         // Initialize application
         async function init() {
           try {
             // Calculate grid size based on screen dimensions
             calculateGridSize();
-            
+
             // Handle window resize
             window.addEventListener('resize', () => {
               calculateGridSize();
@@ -201,32 +201,32 @@
                 generateGarden();
               }, 500);
             });
-            
+
             // Connect to Ethereum
             provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/JFKk0rH8qT8yvFnJhbY0MwAX43-YrWAv");
             gardenContract = new ethers.Contract(GARDEN_CONTRACT_ADDRESS, GARDEN_ABI, provider);
-            
+
             // Get flower count and artwork information
             await fetchFlowerCount();
             await fetchArtworkInfo();
-            
+
             // Generate the initial garden
             generateGarden();
-            
+
             // Setup block listeners for updates
             provider.on('block', onNewBlock);
-            
+
             // Start wind effects
             scheduleWindEffect();
-            
+
             // Hide loading screen
             loadingEl.style.display = 'none';
             isInitialized = true;
-            
+
             console.log('Garden visualization initialized');
           } catch (error) {
             console.error('Initialization error:', error);
-            
+
             // Show static fallback garden without announcing the error
             setTimeout(() => {
               displayStaticGarden();
@@ -234,16 +234,16 @@
             }, 1000);
           }
         }
-        
+
         // Fetch the current flower count from the contract
         async function fetchFlowerCount() {
           try {
             const count = await gardenContract.flowers();
             currentFlowerCount = parseInt(count.toString(), 10);
-            
+
             // Store the flower count in localStorage for future sessions
             localStorage.setItem('flowerCount', currentFlowerCount.toString());
-            
+
             if (isDebugMode) {
               flowerCountEl.textContent = currentFlowerCount;
             }
@@ -253,22 +253,22 @@
             return currentFlowerCount; // Return current count (from localStorage or default)
           }
         }
-        
+
         // Fetch information about the artworks
         async function fetchArtworkInfo() {
           try {
             // Get sculpture addresses
             const sculptureAddresses = await gardenContract.sculptures();
-            
+
             // For each sculpture, create a contract instance and get info
             for (const address of sculptureAddresses) {
               const sculptureContract = new ethers.Contract(address, SCULPTURE_ABI, provider);
               sculptureContracts.push(sculptureContract);
-              
+
               try {
                 const title = await sculptureContract.title();
                 const authors = await sculptureContract.authors();
-                
+
                 artworkInfo.push({
                   title,
                   authors,
@@ -278,39 +278,39 @@
                 console.warn(`Failed to get info for sculpture at ${address}:`, err);
               }
             }
-            
+
             console.log('Artwork info:', artworkInfo);
           } catch (error) {
             console.error('Error fetching artwork info:', error);
           }
         }
-        
+
         // Generate the garden visualization
         function generateGarden() {
           gardenField.innerHTML = '';
           const grid = createEmptyGrid(config.gridWidth, config.gridHeight);
-          
+
           // Place flowers based on noise algorithm
           const flowersToDisplay = Math.min(currentFlowerCount, 10000); // Limit for performance
           const flowerPositions = placeFlowersUsingNoise(grid, flowersToDisplay);
-          
+
           // Create flower elements
           flowerPositions.forEach((pos, i) => {
             const flowerEl = createFlowerElement(pos.x, pos.y);
             gardenField.appendChild(flowerEl);
-            
+
             // Make initial flowers visible immediately
             flowerEl.classList.add('visible');
           });
-          
+
           // Place artwork info text
           if (artworkInfo.length > 0) {
             placeInfoText();
           }
-          
+
           displayedFlowers = flowersToDisplay;
         }
-        
+
         // Create an empty grid
         function createEmptyGrid(width, height) {
           const grid = [];
@@ -323,35 +323,35 @@
           }
           return grid;
         }
-        
+
         // Place flowers using deterministic noise algorithm (based on GardenContributions.sol)
         function placeFlowersUsingNoise(grid, count) {
           // The issue might be with the threshold calculation - let's adjust it
           // to allow more flowers to be placed
-          
+
           // Grid size is now set by calculateGridSize() based on screen dimensions
           // No need to adjust it here
-          
+
           const positions = [];
           let placed = 0;
           let attempts = 0;
-          
+
           // Try to place all flowers
           while (placed < count && attempts < count * 20) {
             attempts++;
-            
+
             // Get random position
             const x = Math.floor(Math.random() * config.gridWidth);
             const y = Math.floor(Math.random() * config.gridHeight);
-            
+
             // For this grid cell, calculate a noise value
             const noiseVal = gridNoise(x, y, 0xf);
-            
+
             // We'll make the threshold more lenient as we place more flowers
             // This ensures we get a nice pattern but still place enough flowers
             const baseThreshold = 0.7; // Lower threshold = more flowers
             const threshold = Math.max(0.3, baseThreshold - (placed / count) * 0.5);
-            
+
             if (Math.abs(noiseVal) > threshold && grid[y][x] === ' ') {
               // Place flower in grid
               grid[y][x] = '⚘';
@@ -359,10 +359,10 @@
               placed++;
             }
           }
-          
+
           return positions;
         }
-        
+
         // Create a flower element at specific coordinates
         function createFlowerElement(x, y) {
           const flower = document.createElement('div');
@@ -374,10 +374,10 @@
           flower.dataset.y = y;
           flower.dataset.baseX = x * 1.0;
           flower.dataset.baseY = y * 1.2;
-          
+
           return flower;
         }
-        
+
         // Place text elements with artwork information
         function placeInfoText() {
           artworkInfo.forEach((artwork, index) => {
@@ -385,46 +385,46 @@
             const titleEl = document.createElement('div');
             titleEl.className = 'info-text';
             titleEl.textContent = artwork.title;
-            
+
             // Random position, avoiding edges
             const x = 10 + Math.floor(Math.random() * (config.gridWidth - 40));
             const y = 5 + Math.floor(Math.random() * (config.gridHeight - 10));
-            
+
             titleEl.style.left = `${x * 1.0}em`;
             titleEl.style.top = `${y * 1.2}em`;
-            
+
             gardenField.appendChild(titleEl);
-            
+
             // Place authors with slight offset
             artwork.authors.forEach((author, authorIndex) => {
               const authorEl = document.createElement('div');
               authorEl.className = 'info-text';
               authorEl.textContent = author;
-              
+
               // Position below the title with spacing
               authorEl.style.left = `${(x + (authorIndex % 3 - 1) * 5) * 1.0}em`;
               authorEl.style.top = `${(y + 1.5 + authorIndex * 0.8) * 1.2}em`;
-              
+
               gardenField.appendChild(authorEl);
             });
-            
+
             // Make text elements visible immediately
             titleEl.classList.add('visible');
-            
+
             artwork.authors.forEach((_, i) => {
               const authorEl = gardenField.querySelectorAll('.info-text')[index * (artwork.authors.length + 1) + i + 1];
               authorEl.classList.add('visible');
             });
           });
         }
-        
+
         // Update garden when new flowers are detected
         async function updateGarden(newFlowerCount) {
           if (newFlowerCount <= displayedFlowers) return;
-          
+
           const additionalFlowers = newFlowerCount - displayedFlowers;
           const grid = createEmptyGrid(config.gridWidth, config.gridHeight);
-          
+
           // Mark existing flowers in grid
           const existingFlowers = document.querySelectorAll('.flower.visible');
           existingFlowers.forEach(flower => {
@@ -434,40 +434,40 @@
               grid[y][x] = '⚘';
             }
           });
-          
+
           // Add new flowers
           const newPositions = placeFlowersUsingNoise(grid, additionalFlowers);
-          
+
           // Create and add new flower elements
           newPositions.forEach(pos => {
             const flowerEl = createFlowerElement(pos.x, pos.y);
             gardenField.appendChild(flowerEl);
-            
+
             // Fade in the new flower
             setTimeout(() => {
               flowerEl.classList.add('visible');
             }, Math.random() * 1000);
           });
-          
+
           displayedFlowers = newFlowerCount;
-          
+
           // Update debug info
           if (isDebugMode) {
             flowerCountEl.textContent = newFlowerCount;
           }
         }
-        
+
         // Handle new blocks from the blockchain
         async function onNewBlock(blockNumber) {
           if (!isInitialized) return;
-          
+
           if (isDebugMode) {
             currentBlockEl.textContent = blockNumber;
           }
-          
+
           // Fetch updated flower count
           const newFlowerCount = await fetchFlowerCount();
-          
+
           // Add new flowers if needed
           if (newFlowerCount > currentFlowerCount) {
             console.log(`New flowers detected: ${newFlowerCount - currentFlowerCount}`);
@@ -475,16 +475,16 @@
             updateGarden(newFlowerCount);
           }
         }
-        
+
         // Apply wind effect to flowers
         function applyWindEffect(direction, strength) {
           if (isDebugMode) {
             windEffectEl.textContent = direction;
           }
-          
+
           // Get all visible flowers
           const flowers = document.querySelectorAll('.flower.visible');
-          
+
           // Define transform based on direction
           let transform = '';
           switch (direction) {
@@ -515,109 +515,120 @@
             default:
               transform = '';
           }
-          
+
           // Apply transform to each flower
           flowers.forEach(flower => {
             flower.style.transform = transform;
           });
-          
+
           // Also apply gentle movement to text elements
           const infoTexts = document.querySelectorAll('.info-text.visible');
           infoTexts.forEach(text => {
             text.style.transform = transform;
           });
         }
-        
+
         // Reset wind effect (return to normal position)
         function resetWindEffect() {
           if (isDebugMode) {
             windEffectEl.textContent = 'None';
           }
-          
+
           const flowers = document.querySelectorAll('.flower.visible');
           flowers.forEach(flower => {
             flower.style.transform = '';
           });
-          
+
           const infoTexts = document.querySelectorAll('.info-text.visible');
           infoTexts.forEach(text => {
             text.style.transform = '';
           });
         }
-        
+
         // Schedule random wind effects
         function scheduleWindEffect() {
           setInterval(() => {
             // Apply random wind direction
             const directions = [
-              'left', 'right', 'up', 'down', 
-              'diagonal-up-right', 'diagonal-up-left', 
+              'left', 'right', 'up', 'down',
+              'diagonal-up-right', 'diagonal-up-left',
               'diagonal-down-right', 'diagonal-down-left'
             ];
             const direction = directions[Math.floor(Math.random() * directions.length)];
             const strength = (Math.random() * 0.7 + 0.3) * config.windStrength;
-            
+
             applyWindEffect(direction, strength);
-            
+
             // Reset after wind duration
             setTimeout(() => {
               resetWindEffect();
             }, config.windDuration);
           }, config.windInterval);
         }
-        
+
         // Create a static garden as fallback for network issues
         function displayStaticGarden() {
           // Use the currentFlowerCount which is already initialized from localStorage or default
           // No need to set a static count - we're using what we have
-          
+
           // Add static artwork info
           artworkInfo = [
             {
               title: "World Computer Sculpture Garden",
-              authors: ["The Garden"],
+              authors: ["0xfff"],
               address: "0x0000000000000000000000000000000000000000"
-            }
+            },
+            {
+              title: "Echoes",
+              authors: ["0xhaiku"],
+              address: "0x17a79a4900F3Dd0E0b35D5B0c19Bc2E1189174Dc"
+            },
+            { title: "Extimacy", authors: ["113"], address: "0xB44018DF3284Daf608a8f6b7F8049F30FE14ec92" },
+            { title: "Dear God, Layer of Roads (Travelers)", authors: ["Loucas Braconnier (Figure31)"], address: "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01" },
+            { title: "Yesbot", authors: ["Sarah Friend"], address: "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16" },
+            { title: "Modulation Studies", authors: ["Material Protocol Arts"], address: "0xb78212285CcC039733Ea3453F38e591eD91F1D63" },
+            { title: "Critique of This Show", authors: ["Rhea Myers et al."], address: "0x6582Adc209769bb9974e42cA61F4Db802D25997E" },
+            { title: "Real Abstraction (A Line Made by Proofs)", authors: ["Paul Seidler"], address: "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8" },
           ];
-          
+
           generateGarden();
           scheduleWindEffect();
           isInitialized = true;
         }
-        
+
         // Grid noise function from GardenContributions.sol
         function gridNoise(x, y, seed) {
           // Converting the noise algorithm to JavaScript
           let n = (1619 * x + 31337 * y + 1013 * seed) & 0x7fffffff;
           n = ((n >> 13) ^ n);
-          
+
           // Use BigInt for large number calculations
           let bigN = BigInt(n);
           bigN = bigN * (bigN * BigInt(60493) + BigInt(19990303)) + BigInt(1376312589);
-          
+
           // Convert to binary and slice the last 31 bits
           const binaryStr = bigN.toString(2);
           const last31Bits = binaryStr.slice(-31);
-          
+
           // Convert back to decimal and normalize to the range [-1, 1]
           n = parseInt(last31Bits, 2);
           return 1 - n / 1073741824;
         }
-        
+
         // Calculate threshold based on GardenContributions.sol algorithm
         function calculateThreshold(planted) {
           const min = 30, max = 10000;
           const lower = 0.99, higher = 0.8;
-          
+
           if (planted <= min) return lower;
           if (planted >= max) return higher;
-          
+
           const normalized = (planted - min) / (max - min);
           const logValue = Math.log10(1 + normalized * (10 - 1));
-          
+
           return higher + (lower - higher) * (1 - logValue);
         }
-        
+
         // Start the application
         init();
       });
