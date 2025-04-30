@@ -44,8 +44,8 @@
         width: 100vw;
         height: 100vh;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-start;
+        align-items: flex-start;
         overflow: hidden;
       }
       .garden-field {
@@ -179,9 +179,10 @@
           const charWidth = fontSizeInPx;
           const charHeight = fontSizeInPx * 1.2;
 
-          // Calculate grid dimensions
-          config.gridWidth = Math.floor(windowWidth / charWidth) - 2; // Leave a small margin
-          config.gridHeight = Math.floor(windowHeight / charHeight) - 2;
+          // Calculate grid dimensions matching exactly to window size
+          // Use ceiling to ensure we fill the space completely
+          config.gridWidth = Math.ceil(windowWidth / charWidth) - 1;
+          config.gridHeight = Math.ceil(windowHeight / charHeight) - 1;
 
           console.log(`Grid size set to ${config.gridWidth} x ${config.gridHeight} based on screen size`);
         }
@@ -335,14 +336,52 @@
           const positions = [];
           let placed = 0;
           let attempts = 0;
-
-          // Try to place all flowers
+          
+          // Ensure even distribution - divide screen into sections and ensure flowers in each
+          const numSections = 4; // Divide screen into quarters
+          const sectionHeight = config.gridHeight / numSections;
+          const flowersPerSection = Math.ceil(count / numSections);
+          
+          // Track how many flowers we've placed in each section
+          const sectionCounts = new Array(numSections).fill(0);
+          
+          // Try to place all flowers with better distribution
           while (placed < count && attempts < count * 20) {
             attempts++;
 
-            // Get random position
+            // Choose a section that needs more flowers
+            // Focus on underfilled sections, especially the bottom ones
+            let sectionIndex;
+            if (attempts < count * 10) {
+              // During first half of attempts, prioritize empty sections
+              // Give bottom sections higher priority
+              const weights = sectionCounts.map((count, index) => {
+                // More weight to sections with fewer flowers and sections near the bottom
+                return (flowersPerSection - count) * (index + 1);
+              });
+              
+              const totalWeight = weights.reduce((sum, weight) => sum + Math.max(0, weight), 0);
+              let random = Math.random() * totalWeight;
+              
+              for (sectionIndex = 0; sectionIndex < numSections; sectionIndex++) {
+                if (weights[sectionIndex] <= 0) continue;
+                random -= weights[sectionIndex];
+                if (random <= 0) break;
+              }
+              if (sectionIndex >= numSections) {
+                sectionIndex = numSections - 1; // Default to bottom section
+              }
+            } else {
+              // For later attempts, just place anywhere
+              sectionIndex = Math.floor(Math.random() * numSections);
+            }
+            
+            // Get position within that section
+            const sectionStartY = Math.floor(sectionIndex * sectionHeight);
+            const sectionEndY = Math.floor(Math.min(config.gridHeight, (sectionIndex + 1) * sectionHeight));
+            
             const x = Math.floor(Math.random() * config.gridWidth);
-            const y = Math.floor(Math.random() * config.gridHeight);
+            const y = sectionStartY + Math.floor(Math.random() * (sectionEndY - sectionStartY));
 
             // For this grid cell, calculate a noise value
             const noiseVal = gridNoise(x, y, 0xf);
@@ -357,6 +396,7 @@
               grid[y][x] = '⚘';
               positions.push({ x, y });
               placed++;
+              sectionCounts[sectionIndex]++;
             }
           }
 
