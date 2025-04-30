@@ -156,6 +156,8 @@
         
         // Grid and visualization settings
         const config = {
+          // Dynamically calculate grid size based on window dimensions
+          // Default values that will be adjusted in the init function
           gridWidth: 120,         // Characters per line
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
@@ -165,9 +167,41 @@
           flowerFadeInTime: 15000 // Ms for new flowers to fade in
         };
         
+        // Calculate optimal grid size based on screen dimensions
+        function calculateGridSize() {
+          // Get window dimensions
+          const windowWidth = window.innerWidth;
+          const windowHeight = window.innerHeight;
+          
+          // Calculate how many characters can fit
+          // Assuming each character is roughly 1em wide and 1.2em tall
+          const fontSizeInPx = 15;
+          const charWidth = fontSizeInPx;
+          const charHeight = fontSizeInPx * 1.2;
+          
+          // Calculate grid dimensions
+          config.gridWidth = Math.floor(windowWidth / charWidth) - 2; // Leave a small margin
+          config.gridHeight = Math.floor(windowHeight / charHeight) - 2;
+          
+          console.log(`Grid size set to ${config.gridWidth} x ${config.gridHeight} based on screen size`);
+        }
+        
         // Initialize application
         async function init() {
           try {
+            // Calculate grid size based on screen dimensions
+            calculateGridSize();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+              calculateGridSize();
+              // Regenerate garden on resize with a debounce
+              clearTimeout(window.resizeTimer);
+              window.resizeTimer = setTimeout(() => {
+                generateGarden();
+              }, 500);
+            });
+            
             // Connect to Ethereum
             provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/JFKk0rH8qT8yvFnJhbY0MwAX43-YrWAv");
             gardenContract = new ethers.Contract(GARDEN_CONTRACT_ADDRESS, GARDEN_ABI, provider);
@@ -295,9 +329,8 @@
           // The issue might be with the threshold calculation - let's adjust it
           // to allow more flowers to be placed
           
-          // Adjust grid size based on flower count to ensure we can fit all flowers
-          config.gridWidth = Math.max(120, Math.ceil(Math.sqrt(count * 3)));
-          config.gridHeight = Math.max(40, Math.ceil(Math.sqrt(count * 3)));
+          // Grid size is now set by calculateGridSize() based on screen dimensions
+          // No need to adjust it here
           
           const positions = [];
           let placed = 0;
