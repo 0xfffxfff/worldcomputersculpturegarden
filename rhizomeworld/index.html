@@ -28,7 +28,7 @@
       }
       body {
         min-height: 100vh;
-        background-color: #fafafa;
+        background-color: #fff;
       }
       html,
       body,
@@ -71,11 +71,16 @@
         font-size: 15px;
         pointer-events: none;
         transition: opacity 4s ease-in-out, transform 5s ease-in-out;
-        text-align: center;
+        text-align: left;
         white-space: nowrap;
+        background-color: rgba(255, 255, 255, 0.9); /* White background with slight transparency */
+        padding: 0 4px; /* Horizontal padding for better readability */
+        border-radius: 2px; /* Slightly rounded corners */
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.8); /* White glow effect */
+        z-index: 10; /* Ensure text appears above flowers */
       }
       .info-text.visible {
-        opacity: 0.8;
+        opacity: 1;
       }
       .debug-panel {
         position: fixed;
@@ -325,14 +330,21 @@
           return grid;
         }
 
+        // Create a seeded pseudo-random number generator
+        function createSeededRandom(seed) {
+          return function() {
+            seed = (seed * 16807) % 2147483647;
+            return (seed - 1) / 2147483646;
+          };
+        }
+        
         // Place flowers using deterministic noise algorithm (based on GardenContributions.sol)
         function placeFlowersUsingNoise(grid, count) {
-          // The issue might be with the threshold calculation - let's adjust it
-          // to allow more flowers to be placed
-
-          // Grid size is now set by calculateGridSize() based on screen dimensions
-          // No need to adjust it here
-
+          // Use a fixed seed for deterministic placement
+          // This will ensure we get the same pattern every time
+          const fixedSeed = 12345; // Fixed seed for consistent patterns
+          const random = createSeededRandom(fixedSeed);
+          
           const positions = [];
           let placed = 0;
           let attempts = 0;
@@ -361,27 +373,27 @@
               });
               
               const totalWeight = weights.reduce((sum, weight) => sum + Math.max(0, weight), 0);
-              let random = Math.random() * totalWeight;
+              let randomValue = random() * totalWeight;
               
               for (sectionIndex = 0; sectionIndex < numSections; sectionIndex++) {
                 if (weights[sectionIndex] <= 0) continue;
-                random -= weights[sectionIndex];
-                if (random <= 0) break;
+                randomValue -= weights[sectionIndex];
+                if (randomValue <= 0) break;
               }
               if (sectionIndex >= numSections) {
                 sectionIndex = numSections - 1; // Default to bottom section
               }
             } else {
               // For later attempts, just place anywhere
-              sectionIndex = Math.floor(Math.random() * numSections);
+              sectionIndex = Math.floor(random() * numSections);
             }
             
             // Get position within that section
             const sectionStartY = Math.floor(sectionIndex * sectionHeight);
             const sectionEndY = Math.floor(Math.min(config.gridHeight, (sectionIndex + 1) * sectionHeight));
             
-            const x = Math.floor(Math.random() * config.gridWidth);
-            const y = sectionStartY + Math.floor(Math.random() * (sectionEndY - sectionStartY));
+            const x = Math.floor(random() * config.gridWidth);
+            const y = sectionStartY + Math.floor(random() * (sectionEndY - sectionStartY));
 
             // For this grid cell, calculate a noise value
             const noiseVal = gridNoise(x, y, 0xf);
@@ -420,31 +432,90 @@
 
         // Place text elements with artwork information
         function placeInfoText() {
+          // Use same seeded random generator for consistent text placement
+          const random = createSeededRandom(789012); // Different seed from flower placement
+          
+          // Create an array of grid positions that match where flowers could be placed
+          // We'll place text at these grid positions to ensure alignment
+          const gridPositions = [];
+          
+          // Generate grid positions (essentially the same as the flower placement logic)
+          for (let y = 0; y < config.gridHeight; y++) {
+            for (let x = 0; x < config.gridWidth; x++) {
+              gridPositions.push({ x, y });
+            }
+          }
+          
+          // Shuffle the positions using our deterministic random
+          for (let i = gridPositions.length - 1; i > 0; i--) {
+            const j = Math.floor(random() * (i + 1));
+            [gridPositions[i], gridPositions[j]] = [gridPositions[j], gridPositions[i]];
+          }
+          
+          // Keep track of used positions to avoid overlap
+          const usedPositions = new Set();
+          
+          // Function to find an available position for text
+          function findAvailablePosition(length, startIdx) {
+            // Find a position that has enough space for the text
+            for (let i = startIdx; i < gridPositions.length; i++) {
+              const pos = gridPositions[i];
+              
+              // Check if this position and needed length is available
+              let available = true;
+              for (let j = 0; j < length; j++) {
+                const checkPos = `${pos.x + j},${pos.y}`;
+                if (usedPositions.has(checkPos) || (pos.x + j) >= config.gridWidth) {
+                  available = false;
+                  break;
+                }
+              }
+              
+              // If we found an available spot, mark it as used
+              if (available) {
+                for (let j = 0; j < length; j++) {
+                  usedPositions.add(`${pos.x + j},${pos.y}`);
+                }
+                return pos;
+              }
+            }
+            
+            // If no position is found, return a fallback
+            return { x: 5, y: 5 + artworkInfo.indexOf(artwork) * 2 };
+          }
+          
+          // Start index for art placements
+          let posIndex = 100; // Skip some of the first positions to make room for flowers
+          
           artworkInfo.forEach((artwork, index) => {
-            // Place title
+            // Place title in grid
+            const titleLength = artwork.title.length;
+            const titlePos = findAvailablePosition(titleLength, posIndex);
+            posIndex += 50; // Move forward to space out the artworks
+            
             const titleEl = document.createElement('div');
             titleEl.className = 'info-text';
             titleEl.textContent = artwork.title;
-
-            // Random position, avoiding edges
-            const x = 10 + Math.floor(Math.random() * (config.gridWidth - 40));
-            const y = 5 + Math.floor(Math.random() * (config.gridHeight - 10));
-
-            titleEl.style.left = `${x * 1.0}em`;
-            titleEl.style.top = `${y * 1.2}em`;
-
+            titleEl.style.left = `${titlePos.x * 1.0}em`;
+            titleEl.style.top = `${titlePos.y * 1.2}em`;
+            
             gardenField.appendChild(titleEl);
-
-            // Place authors with slight offset
+            
+            // Place authors in grid, below the title
             artwork.authors.forEach((author, authorIndex) => {
+              const authorLength = author.length;
+              // Position below the title
+              const authorPos = findAvailablePosition(
+                authorLength, 
+                posIndex + authorIndex * 20
+              );
+              
               const authorEl = document.createElement('div');
               authorEl.className = 'info-text';
               authorEl.textContent = author;
-
-              // Position below the title with spacing
-              authorEl.style.left = `${(x + (authorIndex % 3 - 1) * 5) * 1.0}em`;
-              authorEl.style.top = `${(y + 1.5 + authorIndex * 0.8) * 1.2}em`;
-
+              authorEl.style.left = `${authorPos.x * 1.0}em`;
+              authorEl.style.top = `${authorPos.y * 1.2}em`;
+              
               gardenField.appendChild(authorEl);
             });
 
@@ -585,17 +656,29 @@
           });
         }
 
-        // Schedule random wind effects
+        // Schedule wind effects with deterministic pattern
         function scheduleWindEffect() {
+          // Use a seeded random generator for wind pattern
+          // This creates a deterministic sequence that repeats
+          const windRandom = createSeededRandom(54321);
+          let windCounter = 0;
+          
           setInterval(() => {
-            // Apply random wind direction
+            // Wind directions in a deterministic sequence
             const directions = [
               'left', 'right', 'up', 'down',
               'diagonal-up-right', 'diagonal-up-left',
               'diagonal-down-right', 'diagonal-down-left'
             ];
-            const direction = directions[Math.floor(Math.random() * directions.length)];
-            const strength = (Math.random() * 0.7 + 0.3) * config.windStrength;
+            
+            // Use modulo arithmetic to create a repeating pattern
+            // But still with some variety based on the seeded random
+            windCounter = (windCounter + 1) % 100;
+            const dirIndex = Math.floor(windRandom() * directions.length);
+            const direction = directions[dirIndex];
+            
+            // Deterministic but varied strength
+            const strength = (0.3 + (0.7 * windRandom())) * config.windStrength;
 
             applyWindEffect(direction, strength);
 
