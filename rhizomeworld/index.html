@@ -29,6 +29,12 @@
       body {
         min-height: 100vh;
         background-color: #fff;
+        color: #000;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      body.inverted {
+        background-color: #000;
+        color: #fff;
       }
       html,
       body,
@@ -81,16 +87,21 @@
         opacity: 0;
         font-size: 15px;
         pointer-events: none;
-        transition: opacity 4s ease-in-out;
+        transition: opacity 4s ease-in-out, background-color 0.3s, color 0.3s;
         text-align: left;
         white-space: nowrap;
         background-color: #fff; /* White background with slight transparency */
+        color: #000;
         padding: 0 4px; /* Horizontal padding for better readability */
         line-height: 1.2;
         box-sizing: border-box;
         z-index: 10; /* Ensure text appears above flowers */
         display: flex;
         flex-direction: column;
+      }
+      .inverted .info-text {
+        background-color: #000;
+        color: #fff;
       }
       .info-text.visible {
         opacity: 1;
@@ -107,10 +118,17 @@
         right: 10px;
         background: #fff;
         border: 1px solid #000;
+        color: #000;
         padding: 10px;
         font-size: 12px;
         display: none;
         z-index: 100;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      }
+      .inverted .debug-panel {
+        background: #000;
+        border: 1px solid #fff;
+        color: #fff;
       }
       .loading {
         position: fixed;
@@ -122,7 +140,13 @@
         justify-content: center;
         align-items: center;
         background-color: #fff;
+        color: #000;
         z-index: 1000;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      .inverted .loading {
+        background-color: #000;
+        color: #fff;
       }
       .loading-text {
         font-size: 15px;
@@ -138,17 +162,24 @@
         z-index: 10;
         display: none; /* Hide the wind marker for now */
       }
-      
+
       .last-flower-panel {
         position: fixed;
         bottom: 10px;
         right: 10px;
         background: #fff;
         border: 1px solid #000;
+        color: #000;
         padding: 10px;
         font-size: 12px;
         z-index: 200; /* Increase z-index to ensure visibility */
         display: block !important; /* Force display */
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      }
+      .inverted .last-flower-panel {
+        background: #000;
+        border: 1px solid #fff;
+        color: #fff;
       }
     </style>
   </head>
@@ -162,8 +193,9 @@
       <div>Block: <span id="current-block">-</span></div>
       <div>Wind Effect: <span id="wind-effect">None</span></div>
       <div>Wandering Text: <span id="wandering-state">On</span></div>
+      <div>Inverted Mode: <span id="inverted-state">Off</span></div>
     </div>
-    
+
     <div class="last-flower-panel" id="last-flower-panel">
       <div>Last flower planted <span id="last-flower-time">-</span> by <span id="last-flower-planter">-</span></div>
     </div>
@@ -224,9 +256,9 @@
             type: 'function',
             stateMutability: 'view',
             inputs: [
-              { 
-                name: 'resource', 
-                type: 'string[]' 
+              {
+                name: 'resource',
+                type: 'string[]'
               },
               {
                 name: 'params',
@@ -324,7 +356,7 @@
         let currentFlowerCount = parseInt(localStorage.getItem('flowerCount') || '283', 10);
         let displayedFlowers = 0;
         let isInitialized = false;
-        
+
         // Try to fetch last flower information for the latest flower
         setTimeout(() => fetchLastFlowerInfo(currentFlowerCount), 1000);
 
@@ -361,7 +393,8 @@
           windSpeed: 33, // ms
           flowerFadeInTime: 15000, // Ms for new flowers to fade in
           wanderingTextEnabled: true, // Enable/disable wandering text feature
-          wanderingTextInterval: 12000 // Ms between text movements
+          wanderingTextInterval: 12000, // Ms between text movements
+          invertedMode: false // Default to light mode
         };
 
         // Calculate optimal grid size based on screen dimensions
@@ -406,6 +439,12 @@
               if (event.key === 't') {
                 const isEnabled = toggleWanderingText();
                 console.log(`Wandering text ${isEnabled ? 'enabled' : 'disabled'}`);
+              }
+
+              // 'i' to toggle inverted mode
+              if (event.key === 'i' || event.key === 'I') {
+                const isInverted = toggleInvertedMode();
+                console.log(`Inverted mode ${isInverted ? 'enabled' : 'disabled'}`);
               }
 
               // 'f' to add a flower
@@ -545,7 +584,7 @@
 
             // Generate the initial garden
             generateGarden();
-            
+
             // Fetch the initial flower information
             if (currentFlowerCount > 0) {
               console.log(`Fetching initial flower info for flower #${currentFlowerCount}`);
@@ -576,7 +615,7 @@
             // Just hide loading screen and mark as initialized
             loadingEl.style.display = 'none';
             isInitialized = true;
-            
+
             // Start a timer to periodically update the "time ago" display
             // This ensures the display stays accurate even when no new blocks arrive
             startTimeAgoUpdater();
@@ -764,9 +803,9 @@
           // Find the title and author elements as separate elements
           const titleEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-title"]`);
           const authorEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-author"]`);
-          
+
           let needsRegeneration = false;
-          
+
           // Update title if found
           if (titleEl) {
             console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
@@ -774,7 +813,7 @@
           } else {
             needsRegeneration = true;
           }
-          
+
           // Update author if found
           if (authorEl) {
             const authorText = artwork.authors.join(', ');
@@ -783,7 +822,7 @@
           } else {
             needsRegeneration = true;
           }
-          
+
           // If we can't find either element, regenerate the garden to ensure proper display
           if (needsRegeneration) {
             console.warn(`Could not find elements for artwork at ${artwork.address}`);
@@ -1007,7 +1046,7 @@
               const pos = gridPositions[i];
 
               // First check if the position is within the padding boundary
-              if (pos.x < PADDING || pos.x + length > config.gridWidth - PADDING || 
+              if (pos.x < PADDING || pos.x + length > config.gridWidth - PADDING ||
                   pos.y < PADDING || pos.y > config.gridHeight - PADDING) {
                 continue; // Skip positions too close to the edge
               }
@@ -1040,30 +1079,30 @@
 
           artworkInfo.forEach((artwork, index) => {
             // Create separate positions for title and author
-            
+
             // Get author text
             const authorText = artwork.authors.join(', ');
-            
+
             // Place author element
             const authorPos = findAvailablePosition(authorText.length, posIndex);
             posIndex += 50; // Space between author and title
-            
+
             const authorEl = document.createElement('div');
             authorEl.className = 'info-text artwork-author';
             authorEl.style.left = `${authorPos.x * 1.0}em`;
             authorEl.style.top = `${authorPos.y * 1.2}em`;
             authorEl.textContent = authorText;
-            
+
             // Add data attributes for author element
             if (artwork.address) {
               authorEl.dataset.artworkAddress = artwork.address;
               authorEl.dataset.elementType = 'artwork-author';
             }
-            
+
             // Add to garden field
             gardenField.appendChild(authorEl);
             authorEl.classList.add('visible');
-            
+
             // Store position data for wandering
             const authorPosX = parseInt(authorEl.style.left.replace('em', ''));
             const authorPosY = parseInt(authorEl.style.top.replace('em', '')) / 1.2;
@@ -1071,28 +1110,28 @@
             authorEl.dataset.baseY = authorPosY;
             authorEl.dataset.currentX = authorPosX;
             authorEl.dataset.currentY = authorPosY;
-            
+
             // Find position for title
             const titlePos = findAvailablePosition(artwork.title.length, posIndex);
             posIndex += 50; // Space for next artwork
-            
+
             // Create title element
             const titleEl = document.createElement('div');
             titleEl.className = 'info-text artwork-title';
             titleEl.style.left = `${titlePos.x * 1.0}em`;
             titleEl.style.top = `${titlePos.y * 1.2}em`;
             titleEl.textContent = artwork.title;
-            
+
             // Add data attributes for title element
             if (artwork.address) {
               titleEl.dataset.artworkAddress = artwork.address;
               titleEl.dataset.elementType = 'artwork-title';
             }
-            
+
             // Add to garden field
             gardenField.appendChild(titleEl);
             titleEl.classList.add('visible');
-            
+
             // Store position data for wandering
             const titlePosX = parseInt(titleEl.style.left.replace('em', ''));
             const titlePosY = parseInt(titleEl.style.top.replace('em', '')) / 1.2;
@@ -1146,7 +1185,7 @@
             // So we just need to add the 'visible' class
             setTimeout(() => {
               flowerEl.classList.add('visible');
-              
+
               // Create a circular wave emanating from the new flower
               createCircularWave(pos.x, pos.y);
             }, 10); // Small timeout to ensure transition works properly
@@ -1215,10 +1254,10 @@
           // Add new flowers if needed
           if (newFlowerCount > oldFlowerCount) {
             console.log(`New flowers detected: ${newFlowerCount - oldFlowerCount}`);
-            
+
             // Update the garden with new flowers
             updateGarden(newFlowerCount);
-            
+
             // Fetch information about the last flower - make sure this happens
             console.log(`Triggering flower info fetch for flower #${newFlowerCount}`);
             // Use a small delay to ensure contract state is updated
@@ -1365,7 +1404,7 @@
           // Calculate wave distance based on direction
           let waveDistance;
           let waveSpeed = waveFrameInterval; // Default frame interval
-          
+
           if (waveDirection === 'diagonal') {
             // For diagonal, calculate the exact diagonal distance across the grid
             // Using Pythagorean theorem for the diagonal distance from one corner to the other
@@ -1373,7 +1412,7 @@
               Math.pow(config.gridWidth, 2) +
               Math.pow(config.gridHeight, 2)
             )) + 20; // Add extra distance to ensure it goes all the way
-            
+
             // Make diagonal waves faster to compensate for longer distance
             waveSpeed = Math.floor(waveFrameInterval * 0.6); // 60% of the original interval = faster
           } else if (waveDirection === 'horizontal') {
@@ -1465,7 +1504,7 @@
                     if (!flower.dataset.animating) {
                       // Mark as animating to prevent overlapping animations
                       flower.dataset.animating = "true";
-                      
+
                       // Calculate distance from wave front for intensity scaling
                       let distanceFromStart;
                       if (waveDirection === 'horizontal') {
@@ -1476,16 +1515,16 @@
                         // For diagonal, use Manhattan distance from starting point
                         distanceFromStart = Math.abs(waveStartX - x) + Math.abs(waveStartY - y);
                       }
-                      
+
                       // Normalize distance to range [0,1] based on grid dimensions
                       const maxPossibleDistance = config.gridWidth + config.gridHeight;
                       const normalizedDistance = Math.min(1, distanceFromStart / maxPossibleDistance);
-                      
+
                       // Calculate diminishing factor (starts at 1.0, goes down to 0.3)
                       // This ensures we never drop below 30% of the original strength
                       const minStrengthFactor = 0.3;
                       const strengthFactor = 1 - ((1 - minStrengthFactor) * normalizedDistance);
-                      
+
                       // Apply the movement with distance-based intensity
                       flower.style.left = `${origLeft + (dx * windStrength * strengthFactor)}em`;
                       flower.style.top = `${origTop + (dy * windStrength * strengthFactor)}em`;
@@ -1559,12 +1598,12 @@
             windMarker.textContent = directionArrows[direction];
           }
         }
-        
+
         // Create a circular wave effect emanating from a specific point
         function createCircularWave(centerX, centerY) {
           // Get all visible flowers to animate
           const flowers = Array.from(document.querySelectorAll('.flower.visible'));
-          
+
           // Create a map of flowers for quick lookup
           const flowerMap = {};
           flowers.forEach(flower => {
@@ -1572,21 +1611,21 @@
             const y = parseInt(flower.dataset.y, 10);
             flowerMap[`${x},${y}`] = flower;
           });
-          
+
           // Wave animation parameters
           const maxRadius = 500; // Maximum radius of the wave (in grid cells)
           const waveWidth = 2; // Width of the wave (in grid cells)
           const waveSpeed = 33; // Speed of the wave propagation (ms per cell)
           const animationDuration = 200; // How long each flower animates (ms)
-          
+
           // Function to calculate distance between two points
           function distanceToCenter(x, y) {
             return Math.sqrt(
-              Math.pow(x - centerX, 2) + 
+              Math.pow(x - centerX, 2) +
               Math.pow(y - centerY, 2)
             );
           }
-          
+
           // Function to apply wave effect to flowers at a specific radius
           function animateWaveAtRadius(radius) {
             // Find grid positions at current wave radius
@@ -1594,7 +1633,7 @@
               for (let x = Math.max(0, centerX - radius - waveWidth); x <= Math.min(config.gridWidth - 1, centerX + radius + waveWidth); x++) {
                 // Calculate distance from this position to center
                 const distance = distanceToCenter(x, y);
-                
+
                 // Check if this position is within the current wave front
                 if (Math.abs(distance - radius) <= waveWidth) {
                   // Get the flower at this position
@@ -1602,27 +1641,27 @@
                   if (flower && !flower.dataset.animating) {
                     // Mark as animating to prevent overlapping animations
                     flower.dataset.animating = "true";
-                    
+
                     // Calculate displacement direction (away from center)
                     const dx = (x - centerX) === 0 ? 0 : (x - centerX) / Math.abs(x - centerX);
                     const dy = (y - centerY) === 0 ? 0 : (y - centerY) / Math.abs(y - centerY);
-                    
+
                     // Scale by distance from center for more natural effect
                     const distanceFactor = Math.min(1, 1 / Math.max(0.5, distance / 5));
-                    
+
                     // Apply the transformation
                     const baseX = parseFloat(flower.dataset.baseX);
                     const baseY = parseFloat(flower.dataset.baseY);
-                    
+
                     // Move slightly outward from center
                     flower.style.left = `${baseX + dx * 1.0 * distanceFactor}em`;
                     flower.style.top = `${baseY + dy * 1.2 * distanceFactor}em`;
-                    
+
                     // Reset position after animation completes
                     setTimeout(() => {
                       flower.style.left = `${baseX}em`;
                       flower.style.top = `${baseY}em`;
-                      
+
                       // Remove animating flag once animation is complete
                       setTimeout(() => {
                         flower.dataset.animating = "";
@@ -1633,13 +1672,13 @@
               }
             }
           }
-          
+
           // Animate the expanding wave
           let currentRadius = 1;
           const waveInterval = setInterval(() => {
             animateWaveAtRadius(currentRadius);
             currentRadius++;
-            
+
             // Stop the animation when the wave reaches max radius
             if (currentRadius > maxRadius) {
               clearInterval(waveInterval);
@@ -1702,31 +1741,31 @@
         function wanderingTextElements() {
           // Get all visible text elements
           const textElements = Array.from(document.querySelectorAll('.info-text.visible'));
-          
+
           // If no elements to move, exit early
           if (textElements.length === 0) return;
-          
+
           // Function to get element dimensions
           function getElementDimensions(el) {
             // Get the width based on the longest child element
             let maxWidth = 0;
             let height = 0;
-            
+
             // Iterate through child elements to find the longest one
             Array.from(el.children).forEach(child => {
               maxWidth = Math.max(maxWidth, child.textContent.length);
               height++; // Count each child as one row
             });
-            
+
             // If no children, use the element's own text length
             if (height === 0) {
               maxWidth = el.textContent.length;
               height = 1;
             }
-            
+
             return { width: maxWidth, height: height };
           }
-          
+
           // Function to check if a position is occupied by any text element
           // Accounts for the full dimensions of text elements (width and height)
           function isPositionOccupied(x, y, width, height, currentElement) {
@@ -1747,9 +1786,9 @@
               // 2. One box's right edge is to the right of the other's left edge, AND
               // 3. One box's top edge is above the other's bottom edge, AND
               // 4. One box's bottom edge is below the other's top edge
-              const horizontalOverlap = 
+              const horizontalOverlap =
                 x < (elX + elWidth) && (x + width) > elX;
-              const verticalOverlap = 
+              const verticalOverlap =
                 y < (elY + elHeight) && (y + height) > elY;
 
               if (horizontalOverlap && verticalOverlap) {
@@ -1767,17 +1806,17 @@
 
           // Move to the next element
           lastMovedElementIndex = (lastMovedElementIndex + 1) % textElements.length;
-          
+
           // Get the element to move
           const el = textElements[lastMovedElementIndex];
-          
+
           // Skip if element doesn't have position data
           if (!el.dataset.currentX || !el.dataset.currentY) return;
 
           // Get the first 20 chars of any text for logging
           const debugText = el.textContent.replace(/\s+/g, ' ').substring(0, 20);
           console.log(`Moving text element ${lastMovedElementIndex}: "${debugText}${debugText.length > 20 ? '...' : ''}"`);
-          
+
           const currentX = parseInt(el.dataset.currentX, 10);
           const currentY = parseInt(el.dataset.currentY, 10);
           const { width, height } = getElementDimensions(el);
@@ -1805,9 +1844,9 @@
             // Handle collision - move the colliding element down
             const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
             const collidingDimensions = getElementDimensions(collidingElement);
-            
+
             // Make sure we don't go off the bottom of the screen and respect padding
-            const safeY = Math.min(config.gridHeight - collidingDimensions.height - PADDING, 
+            const safeY = Math.min(config.gridHeight - collidingDimensions.height - PADDING,
                                    Math.max(PADDING, collidingY));
 
             // Update position of colliding element
@@ -1842,25 +1881,25 @@
 
         // Store the timestamp of the most recent flower for time updates
         let lastFlowerTimestamp = 0;
-        
+
         // Function to fetch information about the last planted flower
         async function fetchLastFlowerInfo(flowerId) {
           try {
             console.log(`Fetching information for flower #${flowerId} from contract`);
-            
+
             // Make sure we have a valid flower ID
             if (!flowerId || flowerId <= 0) {
               console.error(`Invalid flower ID: ${flowerId}`);
               return;
             }
-            
+
             // Create resource array for the flower endpoint
             const resource = ['flower', flowerId.toString()];
             console.log(`Resource array: ${JSON.stringify(resource)}`);
-            
+
             // Empty params array
             const params = [];
-            
+
             // Call the request function on the Garden contract
             console.log(`Calling contract at ${GARDEN_CONTRACT_ADDRESS}`);
             const result = await publicClient.readContract({
@@ -1869,48 +1908,48 @@
               functionName: 'request',
               args: [resource, params]
             });
-            
+
             // Extract response data
             const [statusCode, body, headers] = result;
-            
+
             console.log(`Response status: ${statusCode}, body: ${body}`);
-            
+
             // Check if we got a successful response
             if (statusCode === 200n) {
               try {
                 // Parse the JSON response
                 const flowerData = JSON.parse(body);
                 console.log('Flower data:', flowerData);
-                
+
                 if (flowerData && flowerData.planter && flowerData.timestamp) {
                   // Format the planter address/name
                   let planterDisplay = flowerData.planter;
-                  
+
                   // If it's an Ethereum address, truncate it
                   if (planterDisplay.startsWith('0x') && planterDisplay.length === 42) {
                     planterDisplay = `${planterDisplay.substring(0, 6)}...${planterDisplay.substring(38)}`;
                   }
-                  
+
                   // Store the timestamp for later updates
                   const timestamp = Number(flowerData.timestamp);
                   lastFlowerTimestamp = timestamp;
-                  
+
                   // Format the timestamp to a human-readable format
                   const timeAgo = formatTimeAgo(timestamp);
-                  
+
                   // Update the display elements
                   const timeEl = document.getElementById('last-flower-time');
                   const planterEl = document.getElementById('last-flower-planter');
-                  
+
                   if (timeEl && planterEl) {
                     timeEl.textContent = timeAgo;
                     planterEl.textContent = planterDisplay;
-                    
+
                     // Save the raw timestamp as a data attribute for updates
                     timeEl.dataset.timestamp = timestamp;
-                    
+
                     console.log(`Updated flower panel: ${timeAgo} by ${planterDisplay}`);
-                    
+
                     // Make sure the panel is visible
                     const panelEl = document.getElementById('last-flower-panel');
                     if (panelEl) {
@@ -1937,12 +1976,12 @@
             }, 2000);
           }
         }
-        
+
         // Function to format Unix timestamp to "time ago" format
         function formatTimeAgo(timestamp) {
           const now = Math.floor(Date.now() / 1000);
           const secondsAgo = now - timestamp;
-          
+
           if (secondsAgo < 60) {
             return 'just now';
           } else if (secondsAgo < 3600) {
@@ -1957,11 +1996,33 @@
           }
         }
 
+        // Function to toggle inverted mode
+        function toggleInvertedMode() {
+          // Toggle config setting
+          config.invertedMode = !config.invertedMode;
+
+          // Apply or remove inverted class to body
+          if (config.invertedMode) {
+            document.body.classList.add('inverted');
+          } else {
+            document.body.classList.remove('inverted');
+          }
+
+          // Update debug panel if it's visible
+          const invertedStateEl = document.getElementById('inverted-state');
+          if (invertedStateEl) {
+            invertedStateEl.textContent = config.invertedMode ? 'On' : 'Off';
+          }
+
+          console.log(`Inverted mode ${config.invertedMode ? 'enabled' : 'disabled'}`);
+          return config.invertedMode;
+        }
+
         // Function to start the timer that updates the "time ago" display
         function startTimeAgoUpdater() {
           console.log('Starting time ago updater');
-          
-          // Update every minute
+
+          // Update every 5 seconds
           setInterval(() => {
             // Update the time ago display if we have a timestamp
             if (lastFlowerTimestamp > 0) {
@@ -1972,7 +2033,7 @@
                 console.log(`Updated time ago: ${updatedTimeAgo}`);
               }
             }
-          }, 5000); // Update every minute
+          }, 5000); // Update every 5 seconds
         }
 
         // Start the application
