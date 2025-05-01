@@ -768,32 +768,23 @@
                   // Since waveDir is normalized (-1, 0, or 1), we can simplify
                   const projectionOnWavePath = dx2 * waveDx + dy2 * waveDy;
                   
-                  // Calculate how far along the path the current wave is
-                  const waveProgressAlongPath = waveProgress;
+                  // Check if this point is close to the current wave progress along the path
+                  const distanceFromWaveFront = Math.abs(projectionOnWavePath - waveProgress);
                   
-                  // If point's projection is near the current wave progress, it's in the wave
-                  const distanceFromWaveFront = Math.abs(projectionOnWavePath - waveProgressAlongPath);
-                  
-                  // Also calculate perpendicular distance to the wave path
-                  // This ensures we only affect points near the wave path
+                  // The wave should be narrow in the direction of movement but wide perpendicular to it
+                  // Calculate perpendicular distance (distance to the diagonal line)
                   // For a line with direction (dx,dy), the perpendicular is (-dy,dx)
-                  const perpDistance = Math.abs(dx2 * (-waveDy) + dy2 * waveDx);
+                  const perpendicular = Math.abs(dx2 * (-waveDy) + dy2 * waveDx);
                   
-                  // A point is in the wave if it's:
-                  // 1. Close to the wave front (within waveWidth)
-                  // 2. Close to the wave path (within perpendicular distance)
+                  // A point is in the wave if:
+                  // 1. It's close to the current wave front (within waveWidth in the direction of travel)
+                  // 2. It's close to the diagonal path (within a wider range perpendicular to travel)
                   
-                  // Let's use a simpler, more controlled approach for diagonal waves
+                  // Calculate diagonal width as a percentage of grid size to ensure good coverage
+                  const gridDiagonal = Math.sqrt(Math.pow(config.gridWidth, 2) + Math.pow(config.gridHeight, 2));
+                  const diagonalPerpWidth = Math.max(20, gridDiagonal / 15); // Wider perpendicular spread
                   
-                  // Calculate distance from this point to the current wave position
-                  const distToWavePos = Math.sqrt(Math.pow(x - waveX, 2) + Math.pow(y - waveY, 2));
-                  
-                  // For diagonal waves, use a simple distance check with a larger radius
-                  // This creates a circular wave that moves along the diagonal path
-                  const diagonalWaveWidth = waveWidth * 4;
-                  
-                  // A point is in the wave if it's close to the current wave position
-                  isInWave = distToWavePos <= diagonalWaveWidth;
+                  isInWave = (distanceFromWaveFront <= waveWidth * 1.5) && (perpendicular <= diagonalPerpWidth);
                 }
                 
                 // If this position is in the wave and has a flower, animate it
