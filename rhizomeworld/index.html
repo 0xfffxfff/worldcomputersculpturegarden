@@ -133,23 +133,77 @@
       <div>Wandering Text: <span id="wandering-state">On</span></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
+    <!-- Load viem library -->
+    <script type="module">
+      import * as viem from 'https://cdn.jsdelivr.net/npm/viem@2.28.1/+esm'
+      import { mainnet } from 'https://cdn.jsdelivr.net/npm/viem@2.28.1/chains/+esm'
+      
+      // Make viem and chains available globally
+      window.viem = viem; 
+      window.viemChains = { mainnet };
+    </script>
     <script>
-      document.addEventListener('DOMContentLoaded', async () => {
+      // Wait for both DOM and viem to be ready before initializing
+      function checkDependencies() {
+        if (typeof window.viem === 'undefined' || typeof window.viemChains === 'undefined') {
+          // viem or chains haven't loaded yet, wait a bit longer
+          setTimeout(checkDependencies, 100);
+          return;
+        }
+        
+        // Initialize once everything is ready
+        initializeGarden();
+      }
+      
+      // Start the dependency check when DOM is ready
+      document.addEventListener('DOMContentLoaded', checkDependencies);
+      
+      async function initializeGarden() {
         // Constants
         const GARDEN_CONTRACT_ADDRESS = '0x2a362fF002f7ce62D3468509dD2A4a9f5A8EBBb0';
+        // Define ABI using viem's format
         const GARDEN_ABI = [
-          "function flowers() view returns (uint256)",
-          "function authors() view returns (string[] memory)",
-          "function sculptures() view returns (address[] memory)"
+          {
+            name: 'flowers',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [],
+            outputs: [{ type: 'uint256' }]
+          },
+          {
+            name: 'authors',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [],
+            outputs: [{ type: 'string[]' }]
+          },
+          {
+            name: 'sculptures',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [],
+            outputs: [{ type: 'address[]' }]
+          }
         ];
         const SCULPTURE_ABI = [
-          "function title() view returns (string memory)",
-          "function authors() view returns (string[] memory)"
+          {
+            name: 'title',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [],
+            outputs: [{ type: 'string' }]
+          },
+          {
+            name: 'authors',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [],
+            outputs: [{ type: 'string[]' }]
+          }
         ];
 
-        // Contract interaction setup
-        let provider, gardenContract;
+        // Contract interaction setup using viem
+        let publicClient;
         let isDebugMode = location.search.includes('debug=true');
         let artworkInfo = [
             {
@@ -160,50 +214,43 @@
               title: "Echoes",
               authors: ["0xhaiku"],
               address: "0x17a79a4900F3Dd0E0b35D5B0c19Bc2E1189174Dc",
-              updateEveryBlock: 7200, // once a day
-              contract: null // Will be populated when provider is available
+              updateEveryBlock: 7200 // once a day
             },
             { 
               title: "Extimacy", 
               authors: ["113"], 
               address: "0xB44018DF3284Daf608a8f6b7F8049F30FE14ec92",
-              updateEveryBlock: 1,
-              contract: null
+              updateEveryBlock: 1
             },
             { 
               title: "Dear God, Layer of Roads (Travelers)", 
               authors: ["Loucas Braconnier (Figure31)"], 
               address: "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01",
-              updateEveryBlock: 0, // never
-              contract: null
+              updateEveryBlock: 0 // never
             },
             { 
               title: "Yesbot", 
               authors: ["Sarah Friend"], 
               address: "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16",
-              updateEveryBlock: 0, // never
-              contract: null
+              updateEveryBlock: 0 // never
             },
             { 
               title: "Modulation Studies", 
               authors: ["Material Protocol Arts"], 
               address: "0xb78212285CcC039733Ea3453F38e591eD91F1D63",
-              updateEveryBlock: 0, // never
-              contract: null
+              updateEveryBlock: 0 // never
             },
             { 
               title: "Critique of This Show", 
               authors: ["Rhea Myers et al."], 
               address: "0x6582Adc209769bb9974e42cA61F4Db802D25997E",
-              updateEveryBlock: 0, // never
-              contract: null
+              updateEveryBlock: 0 // never
             },
             { 
               title: "Real Abstraction (A Line Made by Proofs)", 
               authors: ["Paul Seidler"], 
               address: "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8",
-              updateEveryBlock: 0, // never
-              contract: null
+              updateEveryBlock: 0 // never
             },
           ];
 ;
@@ -292,9 +339,29 @@
               }
             });
 
-            // Connect to Ethereum
-            provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a");
-            gardenContract = new ethers.Contract(GARDEN_CONTRACT_ADDRESS, GARDEN_ABI, provider);
+            // Connect to Ethereum using viem and public RPC endpoints
+            try {
+              console.log("Connecting to Ethereum using viem...");
+              
+              // Create a client with fallback transport - combines multiple public endpoints
+              publicClient = viem.createPublicClient({
+                chain: window.viemChains.mainnet,
+                transport: viem.fallback([
+                  // Try multiple public endpoints for redundancy
+                  viem.http('https://eth.llamarpc.com'),
+                  viem.http('https://cloudflare-eth.com'),
+                  viem.http('https://ethereum.publicnode.com'),
+                  viem.http('https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a'),
+                ])
+              });
+              
+              // Test the connection by getting a block number
+              const blockNumber = await publicClient.getBlockNumber();
+              console.log(`Connected to Ethereum at block ${blockNumber}`);
+            } catch (error) {
+              console.error("Failed to connect to Ethereum:", error);
+              throw new Error("Unable to connect to any Ethereum RPC endpoint");
+            }
 
             // Get flower count
             await fetchFlowerCount();
@@ -302,8 +369,8 @@
             // For initial load, do a custom fetch of artwork info to initialize
             // without using the regular update mechanism
             try {
-              const initialBlock = await provider.getBlockNumber();
-              console.log(`Performing initial artwork fetch at block ${initialBlock}`);
+              const initialBlock = await publicClient.getBlockNumber();
+              console.log(`Performing initial artwork fetch at block ${Number(initialBlock)}`);
               
               // Only create contract instances for sculptures with updateEveryBlock > 0
               const dynamicSculptures = artworkInfo.filter(s => s.address && s.updateEveryBlock > 0);
@@ -314,26 +381,43 @@
               } else {
                 console.log(`Initializing ${dynamicSculptures.length} dynamic sculptures`);
                 
-                // Create contract instances only for dynamic sculptures
+                // With viem, we don't need to create contract instances
+                // Just initialize the block counter for dynamic sculptures
                 for (const sculpture of dynamicSculptures) {
-                  if (!sculpture.contract) {
-                    sculpture.contract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
-                    console.log(`Created initial contract instance for ${sculpture.title}`);
-                    
-                    // Record this as the last update block to start the counter
-                    lastUpdatedBlocks[sculpture.address] = initialBlock;
-                  }
+                  // Record this as the last update block to start the counter
+                  lastUpdatedBlocks[sculpture.address] = Number(initialBlock);
                 
-                  // Fetch initial data
+                  // Fetch initial data using viem
                   try {
-                    const title = await sculpture.contract.title();
-                    const authors = await sculpture.contract.authors();
+                    // Using multicall to batch requests
+                    const [title, authors] = await publicClient.multicall({
+                      contracts: [
+                        {
+                          address: sculpture.address,
+                          abi: SCULPTURE_ABI,
+                          functionName: 'title',
+                        },
+                        {
+                          address: sculpture.address,
+                          abi: SCULPTURE_ABI,
+                          functionName: 'authors',
+                        }
+                      ]
+                    });
                     
-                    // Update data if different
-                    if (sculpture.title !== title || !arraysEqual(sculpture.authors, authors)) {
-                      sculpture.title = title;
-                      sculpture.authors = authors;
-                      console.log(`Initial data fetch for "${title}" by ${authors.join(', ')}`);
+                    // Process the results
+                    if (title.status === 'success' && authors.status === 'success') {
+                      const titleValue = title.result;
+                      const authorsValue = authors.result;
+                      
+                      // Update data if different
+                      if (sculpture.title !== titleValue || !arraysEqual(sculpture.authors, authorsValue)) {
+                        sculpture.title = titleValue;
+                        sculpture.authors = authorsValue;
+                        console.log(`Initial data fetch for "${titleValue}" by ${authorsValue.join(', ')}`);
+                      }
+                    } else {
+                      throw new Error('Failed to fetch initial data');
                     }
                   } catch (err) {
                     console.warn(`Initial fetch failed for ${sculpture.title}: ${err.message}`);
@@ -354,14 +438,23 @@
             // Generate the initial garden
             generateGarden();
 
-            // Setup block listeners for updates - with proper event handling
+            // Setup block listeners for updates using viem's watchBlocks
             let lastProcessedBlock = 0;
-            provider.on('block', (blockNumber) => {
-              // Prevent multiple processing of the same block or out-of-order processing
-              if (blockNumber > lastProcessedBlock) {
-                lastProcessedBlock = blockNumber;
-                console.log(`Processing new block: ${blockNumber}`);
-                onNewBlock(blockNumber);
+            
+            // Create a block watcher
+            blockWatcher = publicClient.watchBlocks({
+              onBlock: (block) => {
+                const blockNumber = Number(block.number);
+                
+                // Prevent multiple processing of the same block or out-of-order processing
+                if (blockNumber > lastProcessedBlock) {
+                  lastProcessedBlock = blockNumber;
+                  console.log(`Processing new block: ${blockNumber}`);
+                  onNewBlock(blockNumber);
+                }
+              },
+              onError: (error) => {
+                console.error('Error watching for blocks:', error);
               }
             });
 
@@ -384,11 +477,18 @@
           }
         }
 
-        // Fetch the current flower count from the contract
+        // Fetch the current flower count from the contract using viem
         async function fetchFlowerCount() {
           try {
-            const count = await gardenContract.flowers();
-            currentFlowerCount = parseInt(count.toString(), 10);
+            // Read the flowers function from the garden contract with viem
+            const result = await publicClient.readContract({
+              address: GARDEN_CONTRACT_ADDRESS,
+              abi: GARDEN_ABI,
+              functionName: 'flowers'
+            });
+            
+            // Convert BigInt to Number
+            currentFlowerCount = Number(result);
 
             // Store the flower count in localStorage for future sessions
             localStorage.setItem('flowerCount', currentFlowerCount.toString());
@@ -438,13 +538,8 @@
               return;
             }
             
-            // Create any missing contract instances for dynamic sculptures
-            for (const sculpture of dynamicSculptures) {
-              if (!sculpture.contract) {
-                sculpture.contract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
-                console.log(`Created contract instance for ${sculpture.title} at ${sculpture.address}`);
-              }
-            }
+            // With viem, we don't need to create contract instances - 
+            // we just need the address and ABI which we already have
             
             // Find artworks that need updates based on block frequency
             const artworksToUpdate = [];
@@ -473,19 +568,48 @@
             for (const sculpture of artworksToUpdate) {
               try {
                 console.log(`Fetching data for ${sculpture.title}`);
-                const title = await sculpture.contract.title();
-                const authors = await sculpture.contract.authors();
                 
-                // Record successful update time
-                lastUpdatedBlocks[sculpture.address] = currentBlock;
+                // Using viem's multicall to batch requests
+                const [title, authors] = await publicClient.multicall({
+                  contracts: [
+                    // Title read
+                    {
+                      address: sculpture.address,
+                      abi: SCULPTURE_ABI,
+                      functionName: 'title',
+                    },
+                    // Authors read
+                    {
+                      address: sculpture.address,
+                      abi: SCULPTURE_ABI,
+                      functionName: 'authors',
+                    }
+                  ]
+                });
                 
-                // Only update and log if values actually changed
-                if (sculpture.title !== title || !arraysEqual(sculpture.authors, authors)) {
-                  console.log(`Data changed for "${title}" by ${authors.join(', ')}`);
-                  sculpture.title = title;
-                  sculpture.authors = authors;
+                // Handle results, checking for errors
+                if (title.status === 'success' && authors.status === 'success') {
+                  // Record successful update time
+                  lastUpdatedBlocks[sculpture.address] = currentBlock;
+                  
+                  // Extract the values from the result
+                  const titleValue = title.result;
+                  const authorsValue = authors.result;
+                  
+                  // Only update and log if values actually changed
+                  if (sculpture.title !== titleValue || !arraysEqual(sculpture.authors, authorsValue)) {
+                    console.log(`Data changed for "${titleValue}" by ${authorsValue.join(', ')}`);
+                    sculpture.title = titleValue;
+                    sculpture.authors = authorsValue;
+                  } else {
+                    console.log(`No changes for ${sculpture.title}`);
+                  }
                 } else {
-                  console.log(`No changes for ${sculpture.title}`);
+                  // Handle errors from multicall
+                  let errorMessage = '';
+                  if (title.status === 'failure') errorMessage += ` Title error: ${title.error?.message || 'unknown'}`;
+                  if (authors.status === 'failure') errorMessage += ` Authors error: ${authors.error?.message || 'unknown'}`;
+                  throw new Error(`Contract read failed: ${errorMessage}`);
                 }
               } catch (err) {
                 console.warn(`Error fetching info for ${sculpture.title} at ${sculpture.address}:`, err.message);
@@ -1329,7 +1453,7 @@
         
         // Start the application
         init();
-      });
+      }
     </script>
   </body>
 </html>
