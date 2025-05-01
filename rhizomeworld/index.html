@@ -634,7 +634,15 @@
           // Wave animation parameters
           const waveWidth = 4; // How many cells wide the wave is
           const waveFrameInterval = 100; // ms between wave animation frames
-          const waveDistance = Math.max(maxX - minX, maxY - minY) + waveWidth * 2; // How far the wave travels
+          
+          // Calculate wave distance based on actual grid dimensions and direction
+          // For horizontal waves, use the full grid width
+          // For vertical waves, use the full grid height
+          const waveDistance = waveHorizontal ? config.gridWidth : config.gridHeight;
+          
+          // Calculate total wave duration based on distance and frame interval
+          // This ensures waves complete their full journey regardless of grid size
+          const waveTotalDuration = waveDistance * waveFrameInterval;
           
           // Animate the wave passing through the garden
           let waveProgress = 0;
@@ -644,16 +652,21 @@
             
             if (waveProgress > waveDistance) {
               clearInterval(waveTimer);
+              resetWindEffect();
               return;
             }
             
             // Calculate which flowers are affected by the current wave position
             if (waveHorizontal) {
               // Wave moves horizontally (left to right)
-              for (let y = minY; y <= maxY; y++) {
-                for (let x = minX; x <= maxX; x++) {
+              // Use entire grid width for checking to ensure the wave crosses fully
+              const currentWavePos = minX + waveProgress;
+              
+              // Check all grid positions for better coverage
+              for (let y = 0; y < config.gridHeight; y++) {
+                for (let x = 0; x < config.gridWidth; x++) {
                   // Check if this position is within the current wave front
-                  if (Math.abs(x - (minX + waveProgress)) <= waveWidth) {
+                  if (Math.abs(x - currentWavePos) <= waveWidth) {
                     const flower = flowerMap[`${x},${y}`];
                     if (flower) {
                       // Move the flower by adjusting its position
@@ -673,10 +686,14 @@
               }
             } else {
               // Wave moves vertically (top to bottom)
-              for (let x = minX; x <= maxX; x++) {
-                for (let y = minY; y <= maxY; y++) {
+              // Use entire grid height for checking to ensure the wave crosses fully
+              const currentWavePos = minY + waveProgress;
+              
+              // Check all grid positions for better coverage
+              for (let x = 0; x < config.gridWidth; x++) {
+                for (let y = 0; y < config.gridHeight; y++) {
                   // Check if this position is within the current wave front 
-                  if (Math.abs(y - (minY + waveProgress)) <= waveWidth) {
+                  if (Math.abs(y - currentWavePos) <= waveWidth) {
                     const flower = flowerMap[`${x},${y}`];
                     if (flower) {
                       // Move the flower by adjusting its position
@@ -697,11 +714,15 @@
             }
           }, waveFrameInterval);
           
-          // Stop the wave after the total wind duration
+          // Instead of using a fixed wind duration, let the wave complete naturally
+          // Only clear the timer if it takes too long (safety measure)
+          // Use the calculated duration plus a small buffer, rather than a fixed time
           setTimeout(() => {
-            clearInterval(waveTimer);
-            resetWindEffect();
-          }, config.windDuration);
+            if (waveTimer) {
+              clearInterval(waveTimer);
+              resetWindEffect();
+            }
+          }, waveTotalDuration + 500); // Add a small buffer
         }
 
         // Reset wind effect (return to normal position)
@@ -755,14 +776,14 @@
             applyWindEffect(direction, strength);
             
             // After the wave is done, allow new waves
+            // We'll use a computed dynamic duration based on the wave's travel distance
+            // This gets calculated inside applyWindEffect as waveTotalDuration
+            // Estimate the max total duration: gridWidth or gridHeight * frameInterval + buffer
+            const estimatedMaxDuration = Math.max(config.gridWidth, config.gridHeight) * 100 + 1000;
+            
             setTimeout(() => {
               waveInProgress = false;
-            }, config.windDuration + 500); // Add a small buffer
-
-            // Reset after wind duration
-            setTimeout(() => {
-              resetWindEffect();
-            }, config.windDuration);
+            }, estimatedMaxDuration); // Use the max possible duration to be safe
           }, config.windInterval);
         }
 
