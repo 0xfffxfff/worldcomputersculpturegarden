@@ -545,6 +545,12 @@
 
             // Generate the initial garden
             generateGarden();
+            
+            // Fetch the initial flower information
+            if (currentFlowerCount > 0) {
+              console.log(`Fetching initial flower info for flower #${currentFlowerCount}`);
+              fetchLastFlowerInfo(currentFlowerCount);
+            }
 
             // Setup block listeners for updates using viem's watchBlocks
             let lastProcessedBlock = 0;
@@ -570,6 +576,10 @@
             // Just hide loading screen and mark as initialized
             loadingEl.style.display = 'none';
             isInitialized = true;
+            
+            // Start a timer to periodically update the "time ago" display
+            // This ensures the display stays accurate even when no new blocks arrive
+            startTimeAgoUpdater();
 
             console.log('Garden visualization initialized');
           } catch (error) {
@@ -1170,9 +1180,10 @@
           }
 
           // Always fetch flower count on every block
+          const oldFlowerCount = currentFlowerCount;
           const newFlowerCount = await fetchFlowerCount();
 
-          console.log(`new flower count ${newFlowerCount} (old: ${currentFlowerCount})`)
+          console.log(`new flower count ${newFlowerCount} (old: ${oldFlowerCount})`)
 
           // Only check for artwork updates that need updating
           // First, determine if any artwork needs updating at this block number
@@ -1202,13 +1213,18 @@
           }
 
           // Add new flowers if needed
-          if (newFlowerCount > currentFlowerCount) {
-            console.log(`New flowers detected: ${newFlowerCount - currentFlowerCount}`);
-            currentFlowerCount = newFlowerCount;
+          if (newFlowerCount > oldFlowerCount) {
+            console.log(`New flowers detected: ${newFlowerCount - oldFlowerCount}`);
+            
+            // Update the garden with new flowers
             updateGarden(newFlowerCount);
             
-            // Fetch information about the last flower
-            fetchLastFlowerInfo(newFlowerCount);
+            // Fetch information about the last flower - make sure this happens
+            console.log(`Triggering flower info fetch for flower #${newFlowerCount}`);
+            // Use a small delay to ensure contract state is updated
+            setTimeout(() => {
+              fetchLastFlowerInfo(newFlowerCount);
+            }, 100);
           }
 
           // Trigger a wind effect on each new block
@@ -1490,7 +1506,7 @@
                 }
               }
             }
-          }, waveFrameInterval);
+          }, waveSpeed); // Use adjusted speed for diagonal waves
 
           // Calculate how long it should take for the wave to complete
           // We'll clear the wave timer once it completes its journey
@@ -1824,18 +1840,29 @@
           return config.wanderingTextEnabled;
         }
 
+        // Store the timestamp of the most recent flower for time updates
+        let lastFlowerTimestamp = 0;
+        
         // Function to fetch information about the last planted flower
         async function fetchLastFlowerInfo(flowerId) {
           try {
             console.log(`Fetching information for flower #${flowerId} from contract`);
             
+            // Make sure we have a valid flower ID
+            if (!flowerId || flowerId <= 0) {
+              console.error(`Invalid flower ID: ${flowerId}`);
+              return;
+            }
+            
             // Create resource array for the flower endpoint
             const resource = ['flower', flowerId.toString()];
+            console.log(`Resource array: ${JSON.stringify(resource)}`);
             
             // Empty params array
             const params = [];
             
             // Call the request function on the Garden contract
+            console.log(`Calling contract at ${GARDEN_CONTRACT_ADDRESS}`);
             const result = await publicClient.readContract({
               address: GARDEN_CONTRACT_ADDRESS,
               abi: GARDEN_ABI,
@@ -1850,37 +1877,64 @@
             
             // Check if we got a successful response
             if (statusCode === 200n) {
-              // Parse the JSON response
-              const flowerData = JSON.parse(body);
-              console.log('Flower data:', flowerData);
-              
-              if (flowerData && flowerData.planter && flowerData.timestamp) {
-                // Format the planter address/name
-                let planterDisplay = flowerData.planter;
+              try {
+                // Parse the JSON response
+                const flowerData = JSON.parse(body);
+                console.log('Flower data:', flowerData);
                 
-                // If it's an Ethereum address, truncate it
-                if (planterDisplay.startsWith('0x') && planterDisplay.length === 42) {
-                  planterDisplay = `${planterDisplay.substring(0, 6)}...${planterDisplay.substring(38)}`;
+                if (flowerData && flowerData.planter && flowerData.timestamp) {
+                  // Format the planter address/name
+                  let planterDisplay = flowerData.planter;
+                  
+                  // If it's an Ethereum address, truncate it
+                  if (planterDisplay.startsWith('0x') && planterDisplay.length === 42) {
+                    planterDisplay = `${planterDisplay.substring(0, 6)}...${planterDisplay.substring(38)}`;
+                  }
+                  
+                  // Store the timestamp for later updates
+                  const timestamp = Number(flowerData.timestamp);
+                  lastFlowerTimestamp = timestamp;
+                  
+                  // Format the timestamp to a human-readable format
+                  const timeAgo = formatTimeAgo(timestamp);
+                  
+                  // Update the display elements
+                  const timeEl = document.getElementById('last-flower-time');
+                  const planterEl = document.getElementById('last-flower-planter');
+                  
+                  if (timeEl && planterEl) {
+                    timeEl.textContent = timeAgo;
+                    planterEl.textContent = planterDisplay;
+                    
+                    // Save the raw timestamp as a data attribute for updates
+                    timeEl.dataset.timestamp = timestamp;
+                    
+                    console.log(`Updated flower panel: ${timeAgo} by ${planterDisplay}`);
+                    
+                    // Make sure the panel is visible
+                    const panelEl = document.getElementById('last-flower-panel');
+                    if (panelEl) {
+                      panelEl.style.display = 'block';
+                    }
+                  } else {
+                    console.error("Could not find time or planter elements");
+                  }
+                } else {
+                  console.error("Missing data in flower response:", flowerData);
                 }
-                
-                // Format the timestamp to a human-readable format
-                const timeAgo = formatTimeAgo(Number(flowerData.timestamp));
-                
-                // Update the display elements
-                const timeEl = document.getElementById('last-flower-time');
-                const planterEl = document.getElementById('last-flower-planter');
-                
-                if (timeEl && planterEl) {
-                  timeEl.textContent = timeAgo;
-                  planterEl.textContent = planterDisplay;
-                  console.log(`Updated flower panel: ${timeAgo} by ${planterDisplay}`);
-                }
+              } catch (jsonError) {
+                console.error("Error parsing JSON response:", jsonError, "Body:", body);
               }
             } else {
               throw new Error(`Failed to fetch flower info: Status ${statusCode}`);
             }
           } catch (error) {
             console.error('Error fetching flower info:', error);
+            // Add a retry with a delay
+            console.log(`Retrying fetch in 2 seconds...`);
+            setTimeout(() => {
+              fetchLastFlowerInfo(flowerId);
+            }, 2000);
           }
         }
         
@@ -1901,6 +1955,24 @@
             const days = Math.floor(secondsAgo / 86400);
             return `${days} day${days !== 1 ? 's' : ''} ago`;
           }
+        }
+
+        // Function to start the timer that updates the "time ago" display
+        function startTimeAgoUpdater() {
+          console.log('Starting time ago updater');
+          
+          // Update every minute
+          setInterval(() => {
+            // Update the time ago display if we have a timestamp
+            if (lastFlowerTimestamp > 0) {
+              const timeEl = document.getElementById('last-flower-time');
+              if (timeEl) {
+                const updatedTimeAgo = formatTimeAgo(lastFlowerTimestamp);
+                timeEl.textContent = updatedTimeAgo;
+                console.log(`Updated time ago: ${updatedTimeAgo}`);
+              }
+            }
+          }, 5000); // Update every minute
         }
 
         // Start the application
