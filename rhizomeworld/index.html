@@ -629,8 +629,13 @@
                   // Only update and log if values actually changed
                   if (sculpture.title !== titleValue || !arraysEqual(sculpture.authors, authorsValue)) {
                     console.log(`Data changed for "${titleValue}" by ${authorsValue.join(', ')}`);
+                    
+                    // Update in-memory data
                     sculpture.title = titleValue;
                     sculpture.authors = authorsValue;
+                    
+                    // Update DOM elements for this artwork
+                    updateArtworkDOM(sculpture);
                   } else {
                     console.log(`No changes for ${sculpture.title}`);
                   }
@@ -662,6 +667,50 @@
             if (a[i] !== b[i]) return false;
           }
           return true;
+        }
+        
+        // Function to update DOM elements when artwork info changes
+        function updateArtworkDOM(artwork) {
+          if (!artwork.address) return;
+          
+          console.log(`Updating DOM for artwork at address ${artwork.address}`);
+          
+          // Find the title element for this artwork
+          const titleEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="title"]`);
+          if (titleEl) {
+            console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
+            titleEl.textContent = artwork.title;
+          } else {
+            console.warn(`Could not find title element for artwork at ${artwork.address}`);
+          }
+          
+          // Find all author elements for this artwork
+          const authorEls = document.querySelectorAll(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="author"]`);
+          
+          // Check if we need to add/remove author elements
+          if (authorEls.length !== artwork.authors.length) {
+            console.log(`Author count changed for ${artwork.address}: ${authorEls.length} elements vs ${artwork.authors.length} authors`);
+            
+            // For simplicity, we'll just recreate all author elements
+            // We could be more sophisticated here in a future version
+            
+            // First, remove all existing author elements
+            authorEls.forEach(el => el.remove());
+            
+            // Then trigger a regeneration of the garden to create new elements
+            // This is a bit heavy-handed but ensures correct layout
+            generateGarden();
+            return;
+          }
+          
+          // Update existing author elements if counts match
+          authorEls.forEach(authorEl => {
+            const index = parseInt(authorEl.dataset.authorIndex, 10);
+            if (index < artwork.authors.length) {
+              console.log(`Updating author ${index} for ${artwork.address} from "${authorEl.textContent}" to "${artwork.authors[index]}"`);
+              authorEl.textContent = artwork.authors[index];
+            }
+          });
         }
 
         // Generate the garden visualization
@@ -855,9 +904,16 @@
             titleEl.style.left = `${titlePos.x * 1.0}em`;
             titleEl.style.top = `${titlePos.y * 1.2}em`;
             
+            // Add data attributes to track artwork elements by address
+            if (artwork.address) {
+              titleEl.dataset.artworkAddress = artwork.address;
+              titleEl.dataset.elementType = 'title';
+            }
+            
             gardenField.appendChild(titleEl);
             
             // Place authors in grid, below the title
+            const authorEls = []; // Track the author elements created
             artwork.authors.forEach((author, authorIndex) => {
               const authorLength = author.length;
               // Position below the title
@@ -872,7 +928,15 @@
               authorEl.style.left = `${authorPos.x * 1.0}em`;
               authorEl.style.top = `${authorPos.y * 1.2}em`;
               
+              // Add data attributes to track artwork elements by address
+              if (artwork.address) {
+                authorEl.dataset.artworkAddress = artwork.address;
+                authorEl.dataset.elementType = 'author';
+                authorEl.dataset.authorIndex = authorIndex;
+              }
+              
               gardenField.appendChild(authorEl);
+              authorEls.push(authorEl);
             });
 
             // Make text elements visible immediately
@@ -888,8 +952,8 @@
             titleEl.dataset.currentX = titleX;
             titleEl.dataset.currentY = titleY;
 
-            artwork.authors.forEach((_, i) => {
-              const authorEl = gardenField.querySelectorAll('.info-text')[index * (artwork.authors.length + 1) + i + 1];
+            // Make author elements visible and store their positions
+            authorEls.forEach(authorEl => {
               authorEl.classList.add('visible');
               
               // Extract position from style (remove 'em' and convert to number)
