@@ -130,6 +130,7 @@
       <div>Flowers: <span id="flower-count">0</span></div>
       <div>Block: <span id="current-block">-</span></div>
       <div>Wind Effect: <span id="wind-effect">None</span></div>
+      <div>Wandering Text: <span id="wandering-state">On</span></div>
     </div>
 
     <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
@@ -178,9 +179,11 @@
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
           windStrength: 1.0,      // Wind effect strength (1 unit = 1 cell)
-          windInterval: 1000,    // Ms between checking for new wind waves - increased for less frequent animations
-          windDuration: 2500,     // Ms each wind wave lasts - increased to allow for full propagation
-          flowerFadeInTime: 15000 // Ms for new flowers to fade in
+          windInterval: 1000,     // Ms between checking for new wind waves
+          windDuration: 2500,     // Ms each wind wave lasts
+          flowerFadeInTime: 15000, // Ms for new flowers to fade in
+          wanderingTextEnabled: true, // Enable/disable wandering text feature
+          wanderingTextInterval: 12000 // Ms between text movements
         };
 
         // Calculate optimal grid size based on screen dimensions
@@ -217,6 +220,14 @@
               window.resizeTimer = setTimeout(() => {
                 generateGarden();
               }, 500);
+            });
+            
+            // Add keyboard shortcut to toggle wandering text (press 'w')
+            document.addEventListener('keydown', (event) => {
+              if (event.key === 'w') {
+                const isEnabled = toggleWanderingText();
+                console.log(`Wandering text ${isEnabled ? 'enabled' : 'disabled'}`);
+              }
             });
 
             // Connect to Ethereum
@@ -537,10 +548,30 @@
 
             // Make text elements visible immediately
             titleEl.classList.add('visible');
+            
+            // Extract position from style (remove 'em' and convert to number)
+            const titleX = parseInt(titleEl.style.left.replace('em', ''));
+            const titleY = parseInt(titleEl.style.top.replace('em', '')) / 1.2;
+            
+            // Store initial position for wandering
+            titleEl.dataset.baseX = titleX;
+            titleEl.dataset.baseY = titleY;
+            titleEl.dataset.currentX = titleX;
+            titleEl.dataset.currentY = titleY;
 
             artwork.authors.forEach((_, i) => {
               const authorEl = gardenField.querySelectorAll('.info-text')[index * (artwork.authors.length + 1) + i + 1];
               authorEl.classList.add('visible');
+              
+              // Extract position from style (remove 'em' and convert to number)
+              const authorX = parseInt(authorEl.style.left.replace('em', ''));
+              const authorY = parseInt(authorEl.style.top.replace('em', '')) / 1.2;
+              
+              // Store initial position for wandering
+              authorEl.dataset.baseX = authorX;
+              authorEl.dataset.baseY = authorY;
+              authorEl.dataset.currentX = authorX;
+              authorEl.dataset.currentY = authorY;
             });
           });
         }
@@ -604,7 +635,7 @@
         }
 
         // Apply wave-like ripple effect across the garden
-        function applyWindEffect(direction, strength) {
+        function applyWindEffect(direction, windStrength) {
           if (isDebugMode) {
             windEffectEl.textContent = direction;
           }
@@ -802,8 +833,8 @@
                       flower.dataset.animating = "true";
                       
                       // Apply the movement with a greatly reduced offset (quarter of the original)
-                      flower.style.left = `${origLeft + (dx * 0.5)}em`;
-                      flower.style.top = `${origTop + (dy * 0.5)}em`;
+                      flower.style.left = `${origLeft + (dx * windStrength)}em`;
+                      flower.style.top = `${origTop + (dy * windStrength)}em`;
                       
                       // Reset flower position after a brief time
                       setTimeout(() => {
@@ -879,14 +910,11 @@
             const dirIndex = Math.floor(windRandom() * directions.length);
             const direction = directions[dirIndex];
             
-            // Deterministic but varied strength (use smaller values for the wave effect)
-            const strength = (0.3 + (0.5 * windRandom())) * config.windStrength;
-            
             // Mark a wave as in progress
             waveInProgress = true;
             
             // Start a wave
-            applyWindEffect(direction, strength);
+            applyWindEffect(direction, windStrength);
             
             // Calculate an appropriate timeout based on grid size
             // We want to ensure the wave completes fully before allowing a new one
@@ -967,6 +995,134 @@
           return higher + (lower - higher) * (1 - logValue);
         }
 
+        // Function to make text elements wander around the grid
+        function wanderingTextElements() {
+          // Get all visible text elements
+          const textElements = document.querySelectorAll('.info-text.visible');
+          
+          // Function to check if a position is occupied by any text element
+          // Accounts for the full width of text elements
+          function isPositionOccupied(x, y, currentElement) {
+            for (const el of textElements) {
+              // Skip if this is the element we're checking for
+              if (el === currentElement) continue;
+              
+              // Skip if element doesn't have position data
+              if (!el.dataset.currentX || !el.dataset.currentY) continue;
+              
+              const elX = parseInt(el.dataset.currentX, 10);
+              const elY = parseInt(el.dataset.currentY, 10);
+              const elLength = el.textContent.length;
+              
+              // Check if position falls within this element's span
+              if (elY === y && x >= elX && x < elX + elLength) {
+                return el; // Return the element occupying this position
+              }
+            }
+            return null; // Position is not occupied
+          }
+          
+          // Function to check if a new position would cause collision
+          function checkCollision(element, newX, newY) {
+            const elementLength = element.textContent.length;
+            
+            // Check every position the element would occupy
+            for (let i = 0; i < elementLength; i++) {
+              const collidingElement = isPositionOccupied(newX + i, newY, element);
+              if (collidingElement) {
+                return collidingElement;
+              }
+            }
+            return null; // No collision
+          }
+          
+          // Process each text element
+          textElements.forEach(el => {
+            // Skip if element doesn't have position data
+            if (!el.dataset.currentX || !el.dataset.currentY) return;
+            
+            const currentX = parseInt(el.dataset.currentX, 10);
+            const currentY = parseInt(el.dataset.currentY, 10);
+            
+            // Randomly choose a direction to move (-1, 0, or 1 for both x and y)
+            const directions = [-1, 0, 1];
+            const dx = directions[Math.floor(Math.random() * 3)];
+            const dy = directions[Math.floor(Math.random() * 3)];
+            
+            // Calculate new position
+            let newX = currentX + dx;
+            let newY = currentY + dy;
+            
+            // Ensure we stay within grid boundaries
+            newX = Math.max(0, Math.min(config.gridWidth - el.textContent.length, newX));
+            newY = Math.max(0, Math.min(config.gridHeight - 1, newY));
+            
+            // Check for collisions at the new position
+            const collidingElement = checkCollision(el, newX, newY);
+            
+            if (collidingElement) {
+              // Handle collision - move the colliding element down
+              const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
+              // Make sure we don't go off the bottom of the screen
+              const safeY = Math.min(config.gridHeight - 1, collidingY);
+              
+              // Update position of colliding element
+              collidingElement.style.top = `${safeY * 1.2}em`;
+              collidingElement.dataset.currentY = safeY;
+            }
+            
+            // Update element position without transition (immediate jump)
+            el.style.left = `${newX * 1.0}em`;
+            el.style.top = `${newY * 1.2}em`;
+            
+            // Update dataset values
+            el.dataset.currentX = newX;
+            el.dataset.currentY = newY;
+          });
+        }
+        
+        // Schedule wandering of text elements based on configuration
+        let wanderingTextInterval = null;
+        
+        function startWanderingText() {
+          if (config.wanderingTextEnabled && !wanderingTextInterval) {
+            wanderingTextInterval = setInterval(wanderingTextElements, config.wanderingTextInterval);
+            console.log('Text wandering started');
+          }
+        }
+        
+        function stopWanderingText() {
+          if (wanderingTextInterval) {
+            clearInterval(wanderingTextInterval);
+            wanderingTextInterval = null;
+            console.log('Text wandering stopped');
+          }
+        }
+        
+        // Toggle wandering text based on config
+        function toggleWanderingText() {
+          config.wanderingTextEnabled = !config.wanderingTextEnabled;
+          
+          if (config.wanderingTextEnabled) {
+            startWanderingText();
+          } else {
+            stopWanderingText();
+          }
+          
+          // Update debug panel if it's visible
+          const wanderingStateEl = document.getElementById('wandering-state');
+          if (wanderingStateEl) {
+            wanderingStateEl.textContent = config.wanderingTextEnabled ? 'On' : 'Off';
+          }
+          
+          return config.wanderingTextEnabled;
+        }
+        
+        // Initialize text wandering if enabled in config
+        if (config.wanderingTextEnabled) {
+          startWanderingText();
+        }
+        
         // Start the application
         init();
       });
