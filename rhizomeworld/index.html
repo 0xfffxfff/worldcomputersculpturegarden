@@ -681,8 +681,9 @@
               }
             }
             
-            // If no position is found, return a fallback
-            return { x: 5, y: 5 + artworkInfo.indexOf(artwork) * 2 };
+            // If no position is found, return a fallback position
+            // Use a fixed fallback position that doesn't reference undefined variables
+            return { x: 5, y: 5 };
           }
           
           // Start index for art placements
