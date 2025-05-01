@@ -277,12 +277,12 @@
         const windEffectEl = document.getElementById('wind-effect');
         const loadingEl = document.querySelector('.loading');
 
-        // Create wind marker element
-        const windMarker = document.createElement('div');
-        windMarker.className = 'wind-marker';
-        windMarker.id = 'wind-marker';
-        windMarker.textContent = '↑'; // Default direction
-        gardenField.appendChild(windMarker);
+        // Wind marker is disabled for now
+        // const windMarker = document.createElement('div');
+        // windMarker.className = 'wind-marker';
+        // windMarker.id = 'wind-marker';
+        // windMarker.textContent = '↑'; // Default direction
+        // gardenField.appendChild(windMarker);
 
         // Show debug panel if needed
         if (isDebugMode) {
@@ -748,9 +748,8 @@
             flowerEl.classList.add('visible');
           });
 
-          // Place a wind marker using noise algorithm (like flowers)
-          // Use the same grid to ensure it doesn't overlap with flowers
-          const windMarkerPosition = placeWindMarker(grid);
+          // Wind marker is currently disabled
+          // const windMarkerPosition = placeWindMarker(grid);
 
           // Place artwork info text
           if (artworkInfo.length > 0) {
@@ -1200,8 +1199,8 @@
             windEffectEl.textContent = direction;
           }
 
-          // Update wind marker direction
-          updateWindMarkerDirection(direction);
+          // Wind marker is disabled for now
+          // updateWindMarkerDirection(direction);
 
           // Get all visible flowers and organize them by position
           const flowers = Array.from(document.querySelectorAll('.flower.visible'));
