@@ -617,69 +617,68 @@
           
           // Direction vectors for the flower movement and wave direction
           let dx = 0, dy = 0;
-          let startX, startY, endX, endY;
+          let waveDirection = 'horizontal'; // Default to horizontal
+          let waveStartX = 0, waveStartY = 0;
+          let waveDx = 0, waveDy = 0; // Wave direction vector
           
           switch (direction) {
             case 'left': 
               dx = -1;
-              startX = config.gridWidth - 1; // Start from right edge
-              startY = 0;
-              endX = 0; // End at left edge
-              endY = config.gridHeight - 1;
+              waveDirection = 'horizontal';
+              waveStartX = config.gridWidth - 1; // Start from right edge
+              waveStartY = 0;
+              waveDx = -1; waveDy = 0; // Wave moves left
               break;
             case 'right': 
               dx = 1;
-              startX = 0; // Start from left edge
-              startY = 0;
-              endX = config.gridWidth - 1; // End at right edge
-              endY = config.gridHeight - 1;
+              waveDirection = 'horizontal';
+              waveStartX = 0; // Start from left edge
+              waveStartY = 0;
+              waveDx = 1; waveDy = 0; // Wave moves right
               break;
             case 'up': 
               dy = -1;
-              startX = 0;
-              startY = config.gridHeight - 1; // Start from bottom edge
-              endX = config.gridWidth - 1;
-              endY = 0; // End at top edge
+              waveDirection = 'vertical';
+              waveStartX = 0;
+              waveStartY = config.gridHeight - 1; // Start from bottom edge
+              waveDx = 0; waveDy = -1; // Wave moves up
               break;
             case 'down': 
               dy = 1;
-              startX = 0;
-              startY = 0; // Start from top edge
-              endX = config.gridWidth - 1;
-              endY = config.gridHeight - 1; // End at bottom edge
+              waveDirection = 'vertical';
+              waveStartX = 0;
+              waveStartY = 0; // Start from top edge
+              waveDx = 0; waveDy = 1; // Wave moves down
               break;
             case 'diagonal-up-right': 
               dx = 1; dy = -1;
-              startX = 0; // Start from bottom-left
-              startY = config.gridHeight - 1;
-              endX = config.gridWidth - 1; // End at top-right
-              endY = 0;
+              waveDirection = 'diagonal';
+              waveStartX = 0; // Start from bottom-left
+              waveStartY = config.gridHeight - 1;
+              waveDx = 1; waveDy = -1; // Wave moves up-right
               break;
             case 'diagonal-up-left': 
               dx = -1; dy = -1;
-              startX = config.gridWidth - 1; // Start from bottom-right
-              startY = config.gridHeight - 1;
-              endX = 0; // End at top-left
-              endY = 0;
+              waveDirection = 'diagonal';
+              waveStartX = config.gridWidth - 1; // Start from bottom-right
+              waveStartY = config.gridHeight - 1;
+              waveDx = -1; waveDy = -1; // Wave moves up-left
               break;
             case 'diagonal-down-right': 
               dx = 1; dy = 1;
-              startX = 0; // Start from top-left
-              startY = 0;
-              endX = config.gridWidth - 1; // End at bottom-right
-              endY = config.gridHeight - 1;
+              waveDirection = 'diagonal';
+              waveStartX = 0; // Start from top-left
+              waveStartY = 0;
+              waveDx = 1; waveDy = 1; // Wave moves down-right
               break;
             case 'diagonal-down-left': 
               dx = -1; dy = 1;
-              startX = config.gridWidth - 1; // Start from top-right
-              startY = 0;
-              endX = 0; // End at bottom-left
-              endY = config.gridHeight - 1;
+              waveDirection = 'diagonal';
+              waveStartX = config.gridWidth - 1; // Start from top-right
+              waveStartY = 0;
+              waveDx = -1; waveDy = 1; // Wave moves down-left
               break;
           }
-          
-          // Determine if wave moves horizontally, vertically, or diagonally
-          const waveType = dx !== 0 && dy !== 0 ? 'diagonal' : (dx !== 0 ? 'horizontal' : 'vertical');
           
           // Wave animation parameters
           const waveWidth = 4; // How many cells wide the wave is
@@ -687,10 +686,10 @@
           
           // Calculate wave distance based on direction
           let waveDistance;
-          if (waveType === 'diagonal') {
-            // For diagonal, use Pythagorean distance
-            waveDistance = Math.ceil(Math.sqrt(config.gridWidth * config.gridWidth + config.gridHeight * config.gridHeight));
-          } else if (waveType === 'horizontal') {
+          if (waveDirection === 'diagonal') {
+            // For diagonal, use max of width and height to ensure full coverage
+            waveDistance = Math.max(config.gridWidth, config.gridHeight) * 1.5;
+          } else if (waveDirection === 'horizontal') {
             waveDistance = config.gridWidth;
           } else { // vertical
             waveDistance = config.gridHeight;
@@ -718,38 +717,60 @@
               for (let x = 0; x < config.gridWidth; x++) {
                 let isInWave = false;
                 
-                if (waveType === 'horizontal') {
-                  // For left direction, wave travels right to left (startX -> endX)
-                  // For right direction, wave travels left to right (startX -> endX)
-                  const wavePos = dx > 0 ? 
-                    startX + waveProgress : // right: moves from left to right
-                    startX - waveProgress;  // left: moves from right to left
-                  
+                if (waveDirection === 'horizontal') {
+                  // For horizontal waves
+                  const wavePos = waveStartX + (waveDx * waveProgress);
                   isInWave = Math.abs(x - wavePos) <= waveWidth;
                 }
-                else if (waveType === 'vertical') {
-                  // For up direction, wave travels bottom to top (startY -> endY)
-                  // For down direction, wave travels top to bottom (startY -> endY)
-                  const wavePos = dy > 0 ? 
-                    startY + waveProgress : // down: moves from top to bottom
-                    startY - waveProgress;  // up: moves from bottom to top
-                  
+                else if (waveDirection === 'vertical') {
+                  // For vertical waves
+                  const wavePos = waveStartY + (waveDy * waveProgress);
                   isInWave = Math.abs(y - wavePos) <= waveWidth;
                 }
-                else if (waveType === 'diagonal') {
-                  // For diagonal, we need to calculate positions along the line
-                  // Normalize progress along the diagonal path
-                  const progressRatio = waveProgress / waveDistance;
+                else if (waveDirection === 'diagonal') {
+                  // For diagonal waves, we need a different approach
+                  // Project the point onto the wave path to see if it's within the current wave front
                   
-                  // Interpolate between start and end points based on progress
-                  const waveX = startX + (endX - startX) * progressRatio;
-                  const waveY = startY + (endY - startY) * progressRatio;
+                  // Wave path is defined by the start point and the direction
+                  // Calculate current wave position along the diagonal
+                  const waveX = waveStartX + (waveDx * waveProgress);
+                  const waveY = waveStartY + (waveDy * waveProgress);
                   
-                  // Calculate distance from current point to the wave front
-                  const distToWave = Math.sqrt(Math.pow(x - waveX, 2) + Math.pow(y - waveY, 2));
+                  // Calculate the distance along the wave path (dot product)
+                  // This gives us how far along the path this point would be
+                  const dx2 = x - waveStartX;
+                  const dy2 = y - waveStartY;
                   
-                  // Check if this point is within the wave width
-                  isInWave = distToWave <= waveWidth;
+                  // Project the point onto the wave direction vector
+                  // This is effectively dot(point - waveStart, waveDir) / |waveDir|
+                  // Since waveDir is normalized (-1, 0, or 1), we can simplify
+                  const projectionOnWavePath = dx2 * waveDx + dy2 * waveDy;
+                  
+                  // Calculate how far along the path the current wave is
+                  const waveProgressAlongPath = waveProgress;
+                  
+                  // If point's projection is near the current wave progress, it's in the wave
+                  const distanceFromWaveFront = Math.abs(projectionOnWavePath - waveProgressAlongPath);
+                  
+                  // Also calculate perpendicular distance to the wave path
+                  // This ensures we only affect points near the wave path
+                  // For a line with direction (dx,dy), the perpendicular is (-dy,dx)
+                  const perpDistance = Math.abs(dx2 * (-waveDy) + dy2 * waveDx);
+                  
+                  // A point is in the wave if it's:
+                  // 1. Close to the wave front (within waveWidth)
+                  // 2. Close to the wave path (within perpendicular distance)
+                  
+                  // Calculate a wave thickness based on grid dimensions to ensure
+                  // we have a good number of flowers in the wave
+                  // Use at least 20% of the diagonal distance of the grid
+                  const diagDistance = Math.sqrt(config.gridWidth * config.gridWidth + config.gridHeight * config.gridHeight);
+                  const waveThickness = Math.max(10, diagDistance / 5);
+                  
+                  // Increase wave width for diagonal to ensure enough flowers are affected
+                  const diagonalWaveWidth = waveWidth * 3;
+                  
+                  isInWave = distanceFromWaveFront <= diagonalWaveWidth && perpDistance <= waveThickness;
                 }
                 
                 // If this position is in the wave and has a flower, animate it
