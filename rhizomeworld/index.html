@@ -326,8 +326,8 @@
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', (event) => {
-              // 'w' to toggle wandering text
-              if (event.key === 'w') {
+              // 't' to toggle wandering text
+              if (event.key === 't') {
                 const isEnabled = toggleWanderingText();
                 console.log(`Wandering text ${isEnabled ? 'enabled' : 'disabled'}`);
               }
@@ -336,6 +336,38 @@
               if (event.key === 'f') {
                 // Add 1 flower
                 addNewFlowers(1);
+              }
+              
+              // 'w' to trigger a wind effect in random direction
+              if (event.key === 'w') {
+                const directions = [
+                  'left', 'right', 'up', 'down',
+                  'diagonal-up-right', 'diagonal-up-left',
+                  'diagonal-down-right', 'diagonal-down-left'
+                ];
+                
+                // Choose a random direction
+                const direction = directions[Math.floor(Math.random() * directions.length)];
+                console.log(`Manually triggering wind effect: ${direction}`);
+                
+                // Trigger wind with normal strength
+                applyWindEffect(direction, config.windStrength);
+              }
+              
+              // Number keys 1-8 to trigger specific wind directions
+              if (event.key >= '1' && event.key <= '8') {
+                const directions = [
+                  'left', 'right', 'up', 'down', 
+                  'diagonal-up-right', 'diagonal-up-left',
+                  'diagonal-down-right', 'diagonal-down-left'
+                ];
+                
+                // Use key number (1-8) to pick direction (index 0-7)
+                const index = parseInt(event.key) - 1;
+                const direction = directions[index];
+                
+                console.log(`Manually triggering wind effect: ${direction}`);
+                applyWindEffect(direction, config.windStrength);
               }
             });
 
