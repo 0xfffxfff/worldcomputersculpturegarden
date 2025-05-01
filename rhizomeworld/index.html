@@ -222,11 +222,18 @@
               }, 500);
             });
             
-            // Add keyboard shortcut to toggle wandering text (press 'w')
+            // Add keyboard shortcuts
             document.addEventListener('keydown', (event) => {
+              // 'w' to toggle wandering text
               if (event.key === 'w') {
                 const isEnabled = toggleWanderingText();
                 console.log(`Wandering text ${isEnabled ? 'enabled' : 'disabled'}`);
+              }
+              
+              // 'f' to add a flower
+              if (event.key === 'f') {
+                // Add 1 flower
+                addNewFlowers(1);
               }
             });
 
@@ -362,78 +369,55 @@
         
         // Place flowers using deterministic noise algorithm (based on GardenContributions.sol)
         function placeFlowersUsingNoise(grid, count) {
-          // Use a fixed seed for deterministic placement
-          // This will ensure we get the same pattern every time
-          const fixedSeed = 12345; // Fixed seed for consistent patterns
-          const random = createSeededRandom(fixedSeed);
+          // Always use the same fixed seed for the initial garden
+          // But use a separate random generator for positions (not affected by seed)
+          const fixedSeed = 12345; 
+          const initialRandom = createSeededRandom(fixedSeed);
+          
+          // For individual flower placements, use position-independent randomness
+          const positionRandom = Math.random;
           
           const positions = [];
           let placed = 0;
           let attempts = 0;
+          const maxAttempts = count * 100; // Plenty of attempts
           
-          // Ensure even distribution - divide screen into sections and ensure flowers in each
+          // Ensure even distribution - divide screen into sections
           const numSections = 4; // Divide screen into quarters
           const sectionHeight = config.gridHeight / numSections;
-          const flowersPerSection = Math.ceil(count / numSections);
           
-          // Track how many flowers we've placed in each section
-          const sectionCounts = new Array(numSections).fill(0);
+          console.log(`Attempting to place ${count} flowers...`);
           
-          // Try to place all flowers with better distribution
-          while (placed < count && attempts < count * 20) {
+          // Try to place all flowers
+          while (placed < count && attempts < maxAttempts) {
             attempts++;
 
-            // Choose a section that needs more flowers
-            // Focus on underfilled sections, especially the bottom ones
-            let sectionIndex;
-            if (attempts < count * 10) {
-              // During first half of attempts, prioritize empty sections
-              // Give bottom sections higher priority
-              const weights = sectionCounts.map((count, index) => {
-                // More weight to sections with fewer flowers and sections near the bottom
-                return (flowersPerSection - count) * (index + 1);
-              });
-              
-              const totalWeight = weights.reduce((sum, weight) => sum + Math.max(0, weight), 0);
-              let randomValue = random() * totalWeight;
-              
-              for (sectionIndex = 0; sectionIndex < numSections; sectionIndex++) {
-                if (weights[sectionIndex] <= 0) continue;
-                randomValue -= weights[sectionIndex];
-                if (randomValue <= 0) break;
-              }
-              if (sectionIndex >= numSections) {
-                sectionIndex = numSections - 1; // Default to bottom section
-              }
-            } else {
-              // For later attempts, just place anywhere
-              sectionIndex = Math.floor(random() * numSections);
-            }
+            // Choose a random section (weighted toward bottom)
+            const sectionIndex = Math.floor(positionRandom() * numSections);
             
             // Get position within that section
             const sectionStartY = Math.floor(sectionIndex * sectionHeight);
             const sectionEndY = Math.floor(Math.min(config.gridHeight, (sectionIndex + 1) * sectionHeight));
             
-            const x = Math.floor(random() * config.gridWidth);
-            const y = sectionStartY + Math.floor(random() * (sectionEndY - sectionStartY));
+            const x = Math.floor(positionRandom() * config.gridWidth);
+            const y = sectionStartY + Math.floor(positionRandom() * (sectionEndY - sectionStartY));
 
             // For this grid cell, calculate a noise value
             const noiseVal = gridNoise(x, y, 0xf);
 
-            // We'll make the threshold more lenient as we place more flowers
-            // This ensures we get a nice pattern but still place enough flowers
-            const baseThreshold = 0.7; // Lower threshold = more flowers
-            const threshold = Math.max(0.3, baseThreshold - (placed / count) * 0.5);
-
+            // Use a fixed threshold that ensures we get enough flowers
+            const threshold = 0.3;
+            
+            // Only place if position is valid according to noise and grid
             if (Math.abs(noiseVal) > threshold && grid[y][x] === ' ') {
               // Place flower in grid
               grid[y][x] = '⚘';
               positions.push({ x, y });
               placed++;
-              sectionCounts[sectionIndex]++;
             }
           }
 
+          console.log(`Placed ${placed} flowers out of ${count} requested`);
           return positions;
         }
 
@@ -576,13 +560,23 @@
           });
         }
 
-        // Update garden when new flowers are detected
-        async function updateGarden(newFlowerCount) {
-          if (newFlowerCount <= displayedFlowers) return;
-
-          const additionalFlowers = newFlowerCount - displayedFlowers;
+        // Function to add new flowers to the garden
+        function addNewFlowers(count = 1) {
+          // Update flower count
+          const previousCount = currentFlowerCount;
+          currentFlowerCount += count;
+          
+          // Update localStorage to persist this change
+          localStorage.setItem('flowerCount', currentFlowerCount.toString());
+          
+          // Update debug display if visible
+          if (isDebugMode) {
+            flowerCountEl.textContent = currentFlowerCount;
+          }
+          
+          // Create grid and add new flowers
           const grid = createEmptyGrid(config.gridWidth, config.gridHeight);
-
+          
           // Mark existing flowers in grid
           const existingFlowers = document.querySelectorAll('.flower.visible');
           existingFlowers.forEach(flower => {
@@ -592,27 +586,36 @@
               grid[y][x] = '⚘';
             }
           });
-
+          
           // Add new flowers
-          const newPositions = placeFlowersUsingNoise(grid, additionalFlowers);
-
+          console.log(`Attempting to place ${count} new flowers...`);
+          const newPositions = placeFlowersUsingNoise(grid, count);
+          console.log(`Found ${newPositions.length} positions for new flowers`);
+          
           // Create and add new flower elements
           newPositions.forEach(pos => {
+            console.log(`Placing flower at (${pos.x}, ${pos.y})`);
             const flowerEl = createFlowerElement(pos.x, pos.y);
             gardenField.appendChild(flowerEl);
-
-            // Fade in the new flower
-            setTimeout(() => {
-              flowerEl.classList.add('visible');
-            }, Math.random() * 1000);
+            
+            // Make flower immediately visible for better feedback
+            flowerEl.classList.add('visible');
           });
-
-          displayedFlowers = newFlowerCount;
-
-          // Update debug info
-          if (isDebugMode) {
-            flowerCountEl.textContent = newFlowerCount;
-          }
+          
+          displayedFlowers = currentFlowerCount;
+          
+          console.log(`Added ${count} flower(s). New count: ${currentFlowerCount}`);
+          return count;
+        }
+        
+        // Update garden when new flowers are detected
+        async function updateGarden(newFlowerCount) {
+          if (newFlowerCount <= displayedFlowers) return;
+          
+          const additionalFlowers = newFlowerCount - displayedFlowers;
+          
+          // Use the addNewFlowers function to add the additional flowers
+          addNewFlowers(additionalFlowers);
         }
 
         // Handle new blocks from the blockchain
