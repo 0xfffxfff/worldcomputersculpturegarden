@@ -149,7 +149,7 @@
         ];
 
         // Contract interaction setup
-        let provider, gardenContract, sculptureContracts = [];
+        let provider, gardenContract;
         let isDebugMode = location.search.includes('debug=true');
         let artworkInfo = [
             {
@@ -159,14 +159,52 @@
             {
               title: "Echoes",
               authors: ["0xhaiku"],
-              address: "0x17a79a4900F3Dd0E0b35D5B0c19Bc2E1189174Dc"
+              address: "0x17a79a4900F3Dd0E0b35D5B0c19Bc2E1189174Dc",
+              updateEveryBlock: 7200, // once a day
+              contract: null // Will be populated when provider is available
             },
-            { title: "Extimacy", authors: ["113"], address: "0xB44018DF3284Daf608a8f6b7F8049F30FE14ec92" },
-            { title: "Dear God, Layer of Roads (Travelers)", authors: ["Loucas Braconnier (Figure31)"], address: "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01" },
-            { title: "Yesbot", authors: ["Sarah Friend"], address: "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16" },
-            { title: "Modulation Studies", authors: ["Material Protocol Arts"], address: "0xb78212285CcC039733Ea3453F38e591eD91F1D63" },
-            { title: "Critique of This Show", authors: ["Rhea Myers et al."], address: "0x6582Adc209769bb9974e42cA61F4Db802D25997E" },
-            { title: "Real Abstraction (A Line Made by Proofs)", authors: ["Paul Seidler"], address: "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8" },
+            { 
+              title: "Extimacy", 
+              authors: ["113"], 
+              address: "0xB44018DF3284Daf608a8f6b7F8049F30FE14ec92",
+              updateEveryBlock: 1,
+              contract: null
+            },
+            { 
+              title: "Dear God, Layer of Roads (Travelers)", 
+              authors: ["Loucas Braconnier (Figure31)"], 
+              address: "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01",
+              updateEveryBlock: 0, // never
+              contract: null
+            },
+            { 
+              title: "Yesbot", 
+              authors: ["Sarah Friend"], 
+              address: "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16",
+              updateEveryBlock: 0, // never
+              contract: null
+            },
+            { 
+              title: "Modulation Studies", 
+              authors: ["Material Protocol Arts"], 
+              address: "0xb78212285CcC039733Ea3453F38e591eD91F1D63",
+              updateEveryBlock: 0, // never
+              contract: null
+            },
+            { 
+              title: "Critique of This Show", 
+              authors: ["Rhea Myers et al."], 
+              address: "0x6582Adc209769bb9974e42cA61F4Db802D25997E",
+              updateEveryBlock: 0, // never
+              contract: null
+            },
+            { 
+              title: "Real Abstraction (A Line Made by Proofs)", 
+              authors: ["Paul Seidler"], 
+              address: "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8",
+              updateEveryBlock: 0, // never
+              contract: null
+            },
           ];
 ;
         // Try to get stored flower count, default to 283 if not available
@@ -265,8 +303,16 @@
             // Generate the initial garden
             generateGarden();
 
-            // Setup block listeners for updates
-            provider.on('block', onNewBlock);
+            // Setup block listeners for updates - with proper event handling
+            let lastProcessedBlock = 0;
+            provider.on('block', (blockNumber) => {
+              // Prevent multiple processing of the same block or out-of-order processing
+              if (blockNumber > lastProcessedBlock) {
+                lastProcessedBlock = blockNumber;
+                console.log(`Processing new block: ${blockNumber}`);
+                onNewBlock(blockNumber);
+              }
+            });
 
             // Start wind effects
             scheduleWindEffect();
@@ -309,24 +355,37 @@
         // Fetch information about the artworks
         async function fetchArtworkInfo() {
           try {
-            // Get sculpture addresses
+            // Get sculpture addresses - only those with addresses
             const sculptures = artworkInfo.filter(o => !!o.address);
 
-            // For each sculpture, create a contract instance and get info
+            // First pass - create contract instances for each sculpture
             for (const sculpture of sculptures) {
-              const sculptureContract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
-              try {
-                const title = await sculptureContract.title();
-                const authors = await sculptureContract.authors();
-                console.log(`Fetched ${title} and ${authors}`)
-                sculpture.title = title;
-                sculpture.authors = authors;
-              } catch (err) {
-                console.warn(`Failed to get info for sculpture at ${config.address}:`, err);
+              // Only create contract if it doesn't already exist
+              if (!sculpture.contract) {
+                sculpture.contract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
+                console.log(`Created contract instance for ${sculpture.title} at ${sculpture.address}`);
               }
             }
 
-            console.log('Artwork info:', artworkInfo);
+            // Second pass - fetch data from blockchain using the persisted contracts
+            for (const sculpture of sculptures) {
+              try {
+                // Only try to fetch if we have a valid contract
+                if (sculpture.contract) {
+                  const title = await sculpture.contract.title();
+                  const authors = await sculpture.contract.authors();
+                  console.log(`Fetched "${title}" by ${authors.join(', ')}`);
+                  
+                  // Update artwork info with blockchain data
+                  sculpture.title = title;
+                  sculpture.authors = authors;
+                }
+              } catch (err) {
+                console.warn(`Failed to get info for sculpture at ${sculpture.address}:`, err);
+              }
+            }
+
+            console.log('Artwork info updated from blockchain');
           } catch (error) {
             console.error('Error fetching artwork info:', error);
           }
@@ -638,8 +697,11 @@
             currentBlockEl.textContent = blockNumber;
           }
 
-          // Fetch updated flower count
-          const newFlowerCount = await fetchFlowerCount();
+          // Fetch updated flower count and artwork info in parallel
+          const [newFlowerCount] = await Promise.all([
+            fetchFlowerCount(),
+            fetchArtworkInfo() // Update artwork info on every block
+          ]);
 
           // Add new flowers if needed
           if (newFlowerCount > currentFlowerCount) {
