@@ -687,12 +687,16 @@
           // Calculate wave distance based on direction
           let waveDistance;
           if (waveDirection === 'diagonal') {
-            // For diagonal, use max of width and height to ensure full coverage
-            waveDistance = Math.max(config.gridWidth, config.gridHeight) * 1.5;
+            // For diagonal, calculate the exact diagonal distance across the grid
+            // Using Pythagorean theorem for the diagonal distance from one corner to the other
+            waveDistance = Math.ceil(Math.sqrt(
+              Math.pow(config.gridWidth, 2) + 
+              Math.pow(config.gridHeight, 2)
+            )) + 20; // Add extra distance to ensure it goes all the way
           } else if (waveDirection === 'horizontal') {
-            waveDistance = config.gridWidth;
+            waveDistance = config.gridWidth + 10; // Add extra to ensure full coverage
           } else { // vertical
-            waveDistance = config.gridHeight;
+            waveDistance = config.gridHeight + 10; // Add extra to ensure full coverage
           }
           
           // Calculate total wave duration based on distance and frame interval
@@ -761,16 +765,17 @@
                   // 1. Close to the wave front (within waveWidth)
                   // 2. Close to the wave path (within perpendicular distance)
                   
-                  // Calculate a wave thickness based on grid dimensions to ensure
-                  // we have a good number of flowers in the wave
-                  // Use at least 20% of the diagonal distance of the grid
-                  const diagDistance = Math.sqrt(config.gridWidth * config.gridWidth + config.gridHeight * config.gridHeight);
-                  const waveThickness = Math.max(10, diagDistance / 5);
+                  // Let's use a simpler, more controlled approach for diagonal waves
                   
-                  // Increase wave width for diagonal to ensure enough flowers are affected
-                  const diagonalWaveWidth = waveWidth * 3;
+                  // Calculate distance from this point to the current wave position
+                  const distToWavePos = Math.sqrt(Math.pow(x - waveX, 2) + Math.pow(y - waveY, 2));
                   
-                  isInWave = distanceFromWaveFront <= diagonalWaveWidth && perpDistance <= waveThickness;
+                  // For diagonal waves, use a simple distance check with a larger radius
+                  // This creates a circular wave that moves along the diagonal path
+                  const diagonalWaveWidth = waveWidth * 4;
+                  
+                  // A point is in the wave if it's close to the current wave position
+                  isInWave = distToWavePos <= diagonalWaveWidth;
                 }
                 
                 // If this position is in the wave and has a flower, animate it
