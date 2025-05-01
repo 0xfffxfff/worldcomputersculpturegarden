@@ -218,6 +218,37 @@
             stateMutability: 'view',
             inputs: [],
             outputs: [{ type: 'address[]' }]
+          },
+          {
+            name: 'request',
+            type: 'function',
+            stateMutability: 'view',
+            inputs: [
+              { 
+                name: 'resource', 
+                type: 'string[]' 
+              },
+              {
+                name: 'params',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', type: 'string' },
+                  { name: 'value', type: 'string' }
+                ]
+              }
+            ],
+            outputs: [
+              { name: 'statusCode', type: 'uint256' },
+              { name: 'body', type: 'string' },
+              {
+                name: 'headers',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', type: 'string' },
+                  { name: 'value', type: 'string' }
+                ]
+              }
+            ]
           }
         ];
         const SCULPTURE_ABI = [
@@ -1317,6 +1348,8 @@
 
           // Calculate wave distance based on direction
           let waveDistance;
+          let waveSpeed = waveFrameInterval; // Default frame interval
+          
           if (waveDirection === 'diagonal') {
             // For diagonal, calculate the exact diagonal distance across the grid
             // Using Pythagorean theorem for the diagonal distance from one corner to the other
@@ -1324,15 +1357,18 @@
               Math.pow(config.gridWidth, 2) +
               Math.pow(config.gridHeight, 2)
             )) + 20; // Add extra distance to ensure it goes all the way
+            
+            // Make diagonal waves faster to compensate for longer distance
+            waveSpeed = Math.floor(waveFrameInterval * 0.6); // 60% of the original interval = faster
           } else if (waveDirection === 'horizontal') {
             waveDistance = config.gridWidth + 10; // Add extra to ensure full coverage
           } else { // vertical
             waveDistance = config.gridHeight + 10; // Add extra to ensure full coverage
           }
 
-          // Calculate total wave duration based on distance and frame interval
+          // Calculate total wave duration based on distance and adjusted speed
           // This ensures waves complete their full journey regardless of grid size
-          const waveTotalDuration = waveDistance * waveFrameInterval;
+          const waveTotalDuration = waveDistance * waveSpeed;
 
           // Animate the wave passing through the garden
           let waveProgress = 0;
@@ -1791,37 +1827,57 @@
         // Function to fetch information about the last planted flower
         async function fetchLastFlowerInfo(flowerId) {
           try {
-            console.log(`Fetching information for flower #${flowerId}`);
-            const response = await fetch(`https://worldcomputersculpture.garden/flower/${flowerId}`);
+            console.log(`Fetching information for flower #${flowerId} from contract`);
             
-            if (!response.ok) {
-              throw new Error(`Failed to fetch flower info: ${response.statusText}`);
-            }
+            // Create resource array for the flower endpoint
+            const resource = ['flower', flowerId.toString()];
             
-            const flowerData = await response.json();
-            console.log('Flower data:', flowerData);
+            // Empty params array
+            const params = [];
             
-            if (flowerData && flowerData.planter && flowerData.timestamp) {
-              // Format the planter address/name
-              let planterDisplay = flowerData.planter;
+            // Call the request function on the Garden contract
+            const result = await publicClient.readContract({
+              address: GARDEN_CONTRACT_ADDRESS,
+              abi: GARDEN_ABI,
+              functionName: 'request',
+              args: [resource, params]
+            });
+            
+            // Extract response data
+            const [statusCode, body, headers] = result;
+            
+            console.log(`Response status: ${statusCode}, body: ${body}`);
+            
+            // Check if we got a successful response
+            if (statusCode === 200n) {
+              // Parse the JSON response
+              const flowerData = JSON.parse(body);
+              console.log('Flower data:', flowerData);
               
-              // If it's an Ethereum address, truncate it
-              if (planterDisplay.startsWith('0x') && planterDisplay.length === 42) {
-                planterDisplay = `${planterDisplay.substring(0, 6)}...${planterDisplay.substring(38)}`;
+              if (flowerData && flowerData.planter && flowerData.timestamp) {
+                // Format the planter address/name
+                let planterDisplay = flowerData.planter;
+                
+                // If it's an Ethereum address, truncate it
+                if (planterDisplay.startsWith('0x') && planterDisplay.length === 42) {
+                  planterDisplay = `${planterDisplay.substring(0, 6)}...${planterDisplay.substring(38)}`;
+                }
+                
+                // Format the timestamp to a human-readable format
+                const timeAgo = formatTimeAgo(Number(flowerData.timestamp));
+                
+                // Update the display elements
+                const timeEl = document.getElementById('last-flower-time');
+                const planterEl = document.getElementById('last-flower-planter');
+                
+                if (timeEl && planterEl) {
+                  timeEl.textContent = timeAgo;
+                  planterEl.textContent = planterDisplay;
+                  console.log(`Updated flower panel: ${timeAgo} by ${planterDisplay}`);
+                }
               }
-              
-              // Format the timestamp to a human-readable format
-              const timeAgo = formatTimeAgo(flowerData.timestamp);
-              
-              // Update the display elements
-              const timeEl = document.getElementById('last-flower-time');
-              const planterEl = document.getElementById('last-flower-planter');
-              
-              if (timeEl && planterEl) {
-                timeEl.textContent = timeAgo;
-                planterEl.textContent = planterDisplay;
-                console.log(`Updated flower panel: ${timeAgo} by ${planterDisplay}`);
-              }
+            } else {
+              throw new Error(`Failed to fetch flower info: Status ${statusCode}`);
             }
           } catch (error) {
             console.error('Error fetching flower info:', error);
