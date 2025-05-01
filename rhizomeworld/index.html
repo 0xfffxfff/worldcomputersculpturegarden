@@ -96,7 +96,7 @@
         opacity: 1;
       }
       .artwork-title {
-        font-style: italic;
+        /* Remove italics */
       }
       .artwork-author {
         /* margin-bottom: 2px; */
@@ -149,7 +149,6 @@
         font-size: 12px;
         z-index: 200; /* Increase z-index to ensure visibility */
         display: block !important; /* Force display */
-        box-shadow: 0 0 5px rgba(0,0,0,0.2); /* Add shadow for better visibility */
       }
     </style>
   </head>
@@ -721,29 +720,32 @@
 
           console.log(`Updating DOM for artwork at address ${artwork.address}`);
 
-          // Find the artwork info element
-          const infoEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-info"]`);
+          // Find the title and author elements as separate elements
+          const titleEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-title"]`);
+          const authorEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-author"]`);
           
-          if (infoEl) {
-            // Find the title and author elements within the info element
-            const titleEl = infoEl.querySelector('.artwork-title');
-            const authorEl = infoEl.querySelector('.artwork-author');
-            
-            // Update title if found
-            if (titleEl) {
-              console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
-              titleEl.textContent = artwork.title;
-            }
-            
-            // Update author if found
-            if (authorEl) {
-              const authorText = artwork.authors.join(', ');
-              console.log(`Updating authors for ${artwork.address} from "${authorEl.textContent}" to "${authorText}"`);
-              authorEl.textContent = authorText;
-            }
+          let needsRegeneration = false;
+          
+          // Update title if found
+          if (titleEl) {
+            console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
+            titleEl.textContent = artwork.title;
           } else {
-            console.warn(`Could not find info element for artwork at ${artwork.address}`);
-            // If we can't find the element, regenerate the garden to ensure proper display
+            needsRegeneration = true;
+          }
+          
+          // Update author if found
+          if (authorEl) {
+            const authorText = artwork.authors.join(', ');
+            console.log(`Updating authors for ${artwork.address} from "${authorEl.textContent}" to "${authorText}"`);
+            authorEl.textContent = authorText;
+          } else {
+            needsRegeneration = true;
+          }
+          
+          // If we can't find either element, regenerate the garden to ensure proper display
+          if (needsRegeneration) {
+            console.warn(`Could not find elements for artwork at ${artwork.address}`);
             generateGarden();
           }
         }
@@ -996,59 +998,67 @@
           let posIndex = 100; // Skip some of the first positions to make room for flowers
 
           artworkInfo.forEach((artwork, index) => {
-            // Find the maximum length between author and title for position
-            const maxLength = Math.max(
-              artwork.title.length,
-              ...artwork.authors.map(author => author.length)
-            );
+            // Create separate positions for title and author
             
-            // Place combined info element in grid
-            const infoPos = findAvailablePosition(maxLength, posIndex);
-            posIndex += 50; // Move forward to space out the artworks
-
-            const infoEl = document.createElement('div');
-            infoEl.className = 'info-text';
-            infoEl.style.left = `${infoPos.x * 1.0}em`;
-            infoEl.style.top = `${infoPos.y * 1.2}em`;
+            // Get author text
+            const authorText = artwork.authors.join(', ');
             
-            // Add data attributes to track artwork elements by address
+            // Place author element
+            const authorPos = findAvailablePosition(authorText.length, posIndex);
+            posIndex += 50; // Space between author and title
+            
+            const authorEl = document.createElement('div');
+            authorEl.className = 'info-text artwork-author';
+            authorEl.style.left = `${authorPos.x * 1.0}em`;
+            authorEl.style.top = `${authorPos.y * 1.2}em`;
+            authorEl.textContent = authorText;
+            
+            // Add data attributes for author element
             if (artwork.address) {
-              infoEl.dataset.artworkAddress = artwork.address;
-              infoEl.dataset.elementType = 'artwork-info';
+              authorEl.dataset.artworkAddress = artwork.address;
+              authorEl.dataset.elementType = 'artwork-author';
             }
             
-            // Create author element inside the info element
-            const authorText = artwork.authors.join(', ');
-            const authorEl = document.createElement('div');
-            authorEl.className = 'artwork-author';
-            authorEl.textContent = authorText;
-            infoEl.appendChild(authorEl);
+            // Add to garden field
+            gardenField.appendChild(authorEl);
+            authorEl.classList.add('visible');
             
-            // Create title element inside the info element
+            // Store position data for wandering
+            const authorPosX = parseInt(authorEl.style.left.replace('em', ''));
+            const authorPosY = parseInt(authorEl.style.top.replace('em', '')) / 1.2;
+            authorEl.dataset.baseX = authorPosX;
+            authorEl.dataset.baseY = authorPosY;
+            authorEl.dataset.currentX = authorPosX;
+            authorEl.dataset.currentY = authorPosY;
+            
+            // Find position for title
+            const titlePos = findAvailablePosition(artwork.title.length, posIndex);
+            posIndex += 50; // Space for next artwork
+            
+            // Create title element
             const titleEl = document.createElement('div');
-            titleEl.className = 'artwork-title';
+            titleEl.className = 'info-text artwork-title';
+            titleEl.style.left = `${titlePos.x * 1.0}em`;
+            titleEl.style.top = `${titlePos.y * 1.2}em`;
             titleEl.textContent = artwork.title;
-            infoEl.appendChild(titleEl);
+            
+            // Add data attributes for title element
+            if (artwork.address) {
+              titleEl.dataset.artworkAddress = artwork.address;
+              titleEl.dataset.elementType = 'artwork-title';
+            }
             
             // Add to garden field
-            gardenField.appendChild(infoEl);
+            gardenField.appendChild(titleEl);
+            titleEl.classList.add('visible');
             
-            // Make text element visible immediately
-            infoEl.classList.add('visible');
-
-            // Extract position from style (remove 'em' and convert to number)
-            const posX = parseInt(infoEl.style.left.replace('em', ''));
-            const posY = parseInt(infoEl.style.top.replace('em', '')) / 1.2;
-
-            // Store initial position for wandering
-            infoEl.dataset.baseX = posX;
-            infoEl.dataset.baseY = posY;
-            infoEl.dataset.currentX = posX;
-            infoEl.dataset.currentY = posY;
-            
-            // Save inner elements for data updating
-            infoEl.dataset.titleEl = 'artwork-title';
-            infoEl.dataset.authorEl = 'artwork-author';
+            // Store position data for wandering
+            const titlePosX = parseInt(titleEl.style.left.replace('em', ''));
+            const titlePosY = parseInt(titleEl.style.top.replace('em', '')) / 1.2;
+            titleEl.dataset.baseX = titlePosX;
+            titleEl.dataset.baseY = titlePosY;
+            titleEl.dataset.currentX = titlePosX;
+            titleEl.dataset.currentY = titlePosY;
           });
         }
 
