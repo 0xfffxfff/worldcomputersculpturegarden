@@ -1393,10 +1393,30 @@
                     if (!flower.dataset.animating) {
                       // Mark as animating to prevent overlapping animations
                       flower.dataset.animating = "true";
-
-                      // Apply the movement with a greatly reduced offset (quarter of the original)
-                      flower.style.left = `${origLeft + (dx * windStrength)}em`;
-                      flower.style.top = `${origTop + (dy * windStrength)}em`;
+                      
+                      // Calculate distance from wave front for intensity scaling
+                      let distanceFromStart;
+                      if (waveDirection === 'horizontal') {
+                        distanceFromStart = Math.abs(waveStartX - x);
+                      } else if (waveDirection === 'vertical') {
+                        distanceFromStart = Math.abs(waveStartY - y);
+                      } else { // diagonal
+                        // For diagonal, use Manhattan distance from starting point
+                        distanceFromStart = Math.abs(waveStartX - x) + Math.abs(waveStartY - y);
+                      }
+                      
+                      // Normalize distance to range [0,1] based on grid dimensions
+                      const maxPossibleDistance = config.gridWidth + config.gridHeight;
+                      const normalizedDistance = Math.min(1, distanceFromStart / maxPossibleDistance);
+                      
+                      // Calculate diminishing factor (starts at 1.0, goes down to 0.3)
+                      // This ensures we never drop below 30% of the original strength
+                      const minStrengthFactor = 0.3;
+                      const strengthFactor = 1 - ((1 - minStrengthFactor) * normalizedDistance);
+                      
+                      // Apply the movement with distance-based intensity
+                      flower.style.left = `${origLeft + (dx * windStrength * strengthFactor)}em`;
+                      flower.style.top = `${origTop + (dy * windStrength * strengthFactor)}em`;
 
                       // Reset flower position after a brief time
                       setTimeout(() => {
