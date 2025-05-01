@@ -913,7 +913,7 @@
         // Place text elements with artwork information
         function placeInfoText() {
           // Use same seeded random generator for consistent text placement
-          const random = createSeededRandom(789012); // Different seed from flower placement
+          const random = createSeededRandom(789016); // Different seed from flower placement
 
           // Create an array of grid positions that match where flowers could be placed
           // We'll place text at these grid positions to ensure alignment
@@ -1623,11 +1623,17 @@
           return higher + (lower - higher) * (1 - logValue);
         }
 
-        // Function to make text elements wander around the grid
+        // Track which element should move next
+        let lastMovedElementIndex = -1;
+
+        // Function to make text elements wander around the grid - one at a time
         function wanderingTextElements() {
           // Get all visible text elements
-          const textElements = document.querySelectorAll('.info-text.visible');
-
+          const textElements = Array.from(document.querySelectorAll('.info-text.visible'));
+          
+          // If no elements to move, exit early
+          if (textElements.length === 0) return;
+          
           // Function to check if a position is occupied by any text element
           // Accounts for the full width of text elements
           function isPositionOccupied(x, y, currentElement) {
@@ -1664,49 +1670,54 @@
             return null; // No collision
           }
 
-          // Process each text element
-          textElements.forEach(el => {
-            // Skip if element doesn't have position data
-            if (!el.dataset.currentX || !el.dataset.currentY) return;
+          // Move to the next element
+          lastMovedElementIndex = (lastMovedElementIndex + 1) % textElements.length;
+          
+          // Get the element to move
+          const el = textElements[lastMovedElementIndex];
+          
+          // Skip if element doesn't have position data
+          if (!el.dataset.currentX || !el.dataset.currentY) return;
 
-            const currentX = parseInt(el.dataset.currentX, 10);
-            const currentY = parseInt(el.dataset.currentY, 10);
+          console.log(`Moving text element ${lastMovedElementIndex}: "${el.textContent.substring(0, 20)}${el.textContent.length > 20 ? '...' : ''}"`);
+          
+          const currentX = parseInt(el.dataset.currentX, 10);
+          const currentY = parseInt(el.dataset.currentY, 10);
 
-            // Randomly choose a direction to move (-1, 0, or 1 for both x and y)
-            const directions = [-1, 0, 1];
-            const dx = directions[Math.floor(Math.random() * 3)];
-            const dy = directions[Math.floor(Math.random() * 3)];
+          // Randomly choose a direction to move (-1, 0, or 1 for both x and y)
+          const directions = [-1, 0, 1];
+          const dx = directions[Math.floor(Math.random() * 3)];
+          const dy = directions[Math.floor(Math.random() * 3)];
 
-            // Calculate new position
-            let newX = currentX + dx;
-            let newY = currentY + dy;
+          // Calculate new position
+          let newX = currentX + dx;
+          let newY = currentY + dy;
 
-            // Ensure we stay within grid boundaries
-            newX = Math.max(0, Math.min(config.gridWidth - el.textContent.length, newX));
-            newY = Math.max(0, Math.min(config.gridHeight - 1, newY));
+          // Ensure we stay within grid boundaries
+          newX = Math.max(0, Math.min(config.gridWidth - el.textContent.length, newX));
+          newY = Math.max(0, Math.min(config.gridHeight - 1, newY));
 
-            // Check for collisions at the new position
-            const collidingElement = checkCollision(el, newX, newY);
+          // Check for collisions at the new position
+          const collidingElement = checkCollision(el, newX, newY);
 
-            if (collidingElement) {
-              // Handle collision - move the colliding element down
-              const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
-              // Make sure we don't go off the bottom of the screen
-              const safeY = Math.min(config.gridHeight - 1, collidingY);
+          if (collidingElement) {
+            // Handle collision - move the colliding element down
+            const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
+            // Make sure we don't go off the bottom of the screen
+            const safeY = Math.min(config.gridHeight - 1, collidingY);
 
-              // Update position of colliding element
-              collidingElement.style.top = `${safeY * 1.2}em`;
-              collidingElement.dataset.currentY = safeY;
-            }
+            // Update position of colliding element
+            collidingElement.style.top = `${safeY * 1.2}em`;
+            collidingElement.dataset.currentY = safeY;
+          }
 
-            // Update element position without transition (immediate jump)
-            el.style.left = `${newX * 1.0}em`;
-            el.style.top = `${newY * 1.2}em`;
+          // Update element position without transition (immediate jump)
+          el.style.left = `${newX * 1.0}em`;
+          el.style.top = `${newY * 1.2}em`;
 
-            // Update dataset values
-            el.dataset.currentX = newX;
-            el.dataset.currentY = newY;
-          });
+          // Update dataset values
+          el.dataset.currentX = newX;
+          el.dataset.currentY = newY;
         }
 
         // Text wandering is now block-based instead of time-based
