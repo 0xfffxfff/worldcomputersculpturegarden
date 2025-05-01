@@ -296,9 +296,9 @@
           gridWidth: 120,         // Characters per line
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
-          windStrength: 1.0,      // Wind effect strength (1 unit = 1 cell)
+          windStrength: 0.25,      // Wind effect strength (1 unit = 1 cell)
           windInterval: 1000,     // Ms between checking for new wind waves
-          windDuration: 2500,     // Ms each wind wave lasts
+          windSpeed: 33, // ms
           flowerFadeInTime: 15000, // Ms for new flowers to fade in
           wanderingTextEnabled: true, // Enable/disable wandering text feature
           wanderingTextInterval: 12000 // Ms between text movements
@@ -1290,8 +1290,8 @@
           }
 
           // Wave animation parameters - defined globally so they can be used in timeout calculations
-          const waveWidth = 2; // How many cells wide the wave is
-          const waveFrameInterval = 49; // ms between wave animation frames
+          const waveWidth = 4; // How many cells wide the wave is
+          const waveFrameInterval = 33; // ms between wave animation frames
           // Store in window for access from other functions
           window.currentWaveFrameInterval = waveFrameInterval;
 
@@ -1408,7 +1408,7 @@
                         setTimeout(() => {
                           flower.dataset.animating = "";
                         }, 300); // Slightly longer than the transition time
-                      }, waveWidth * 100); // Use fixed value of 100ms here
+                      }, waveWidth * waveFrameInterval); // Use fixed value of 100ms here
                     }
                   }
                 }
