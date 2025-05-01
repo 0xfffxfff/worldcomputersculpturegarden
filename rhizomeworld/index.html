@@ -86,11 +86,20 @@
         white-space: nowrap;
         background-color: #fff; /* White background with slight transparency */
         padding: 0 4px; /* Horizontal padding for better readability */
-        border-radius: 2px; /* Slightly rounded corners */
+        line-height: 1.2;
+        box-sizing: border-box;
         z-index: 10; /* Ensure text appears above flowers */
+        display: flex;
+        flex-direction: column;
       }
       .info-text.visible {
         opacity: 1;
+      }
+      .artwork-title {
+        font-style: italic;
+      }
+      .artwork-author {
+        /* margin-bottom: 2px; */
       }
       .debug-panel {
         position: fixed;
@@ -692,42 +701,31 @@
 
           console.log(`Updating DOM for artwork at address ${artwork.address}`);
 
-          // Find the title element for this artwork
-          const titleEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="title"]`);
-          if (titleEl) {
-            console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
-            titleEl.textContent = artwork.title;
-          } else {
-            console.warn(`Could not find title element for artwork at ${artwork.address}`);
-          }
-
-          // Find all author elements for this artwork
-          const authorEls = document.querySelectorAll(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="author"]`);
-
-          // Check if we need to add/remove author elements
-          if (authorEls.length !== artwork.authors.length) {
-            console.log(`Author count changed for ${artwork.address}: ${authorEls.length} elements vs ${artwork.authors.length} authors`);
-
-            // For simplicity, we'll just recreate all author elements
-            // We could be more sophisticated here in a future version
-
-            // First, remove all existing author elements
-            authorEls.forEach(el => el.remove());
-
-            // Then trigger a regeneration of the garden to create new elements
-            // This is a bit heavy-handed but ensures correct layout
-            generateGarden();
-            return;
-          }
-
-          // Update existing author elements if counts match
-          authorEls.forEach(authorEl => {
-            const index = parseInt(authorEl.dataset.authorIndex, 10);
-            if (index < artwork.authors.length) {
-              console.log(`Updating author ${index} for ${artwork.address} from "${authorEl.textContent}" to "${artwork.authors[index]}"`);
-              authorEl.textContent = artwork.authors[index];
+          // Find the artwork info element
+          const infoEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="artwork-info"]`);
+          
+          if (infoEl) {
+            // Find the title and author elements within the info element
+            const titleEl = infoEl.querySelector('.artwork-title');
+            const authorEl = infoEl.querySelector('.artwork-author');
+            
+            // Update title if found
+            if (titleEl) {
+              console.log(`Found title element for ${artwork.address} - updating from "${titleEl.textContent}" to "${artwork.title}"`);
+              titleEl.textContent = artwork.title;
             }
-          });
+            
+            // Update author if found
+            if (authorEl) {
+              const authorText = artwork.authors.join(', ');
+              console.log(`Updating authors for ${artwork.address} from "${authorEl.textContent}" to "${authorText}"`);
+              authorEl.textContent = authorText;
+            }
+          } else {
+            console.warn(`Could not find info element for artwork at ${artwork.address}`);
+            // If we can't find the element, regenerate the garden to ensure proper display
+            generateGarden();
+          }
         }
 
         // Generate the garden visualization
@@ -913,7 +911,7 @@
         // Place text elements with artwork information
         function placeInfoText() {
           // Use same seeded random generator for consistent text placement
-          const random = createSeededRandom(789016); // Different seed from flower placement
+          const random = createSeededRandom(789018); // Different seed from flower placement
 
           // Create an array of grid positions that match where flowers could be placed
           // We'll place text at these grid positions to ensure alignment
@@ -969,79 +967,59 @@
           let posIndex = 100; // Skip some of the first positions to make room for flowers
 
           artworkInfo.forEach((artwork, index) => {
-            // Place title in grid
-            const titleLength = artwork.title.length;
-            const titlePos = findAvailablePosition(titleLength, posIndex);
+            // Find the maximum length between author and title for position
+            const maxLength = Math.max(
+              artwork.title.length,
+              ...artwork.authors.map(author => author.length)
+            );
+            
+            // Place combined info element in grid
+            const infoPos = findAvailablePosition(maxLength, posIndex);
             posIndex += 50; // Move forward to space out the artworks
 
-            const titleEl = document.createElement('div');
-            titleEl.className = 'info-text';
-            titleEl.textContent = artwork.title;
-            titleEl.style.left = `${titlePos.x * 1.0}em`;
-            titleEl.style.top = `${titlePos.y * 1.2}em`;
-
+            const infoEl = document.createElement('div');
+            infoEl.className = 'info-text';
+            infoEl.style.left = `${infoPos.x * 1.0}em`;
+            infoEl.style.top = `${infoPos.y * 1.2}em`;
+            
             // Add data attributes to track artwork elements by address
             if (artwork.address) {
-              titleEl.dataset.artworkAddress = artwork.address;
-              titleEl.dataset.elementType = 'title';
+              infoEl.dataset.artworkAddress = artwork.address;
+              infoEl.dataset.elementType = 'artwork-info';
             }
-
-            gardenField.appendChild(titleEl);
-
-            // Place authors in grid, below the title
-            const authorEls = []; // Track the author elements created
-            artwork.authors.forEach((author, authorIndex) => {
-              const authorLength = author.length;
-              // Position below the title
-              const authorPos = findAvailablePosition(
-                authorLength,
-                posIndex + authorIndex * 20
-              );
-
-              const authorEl = document.createElement('div');
-              authorEl.className = 'info-text';
-              authorEl.textContent = author;
-              authorEl.style.left = `${authorPos.x * 1.0}em`;
-              authorEl.style.top = `${authorPos.y * 1.2}em`;
-
-              // Add data attributes to track artwork elements by address
-              if (artwork.address) {
-                authorEl.dataset.artworkAddress = artwork.address;
-                authorEl.dataset.elementType = 'author';
-                authorEl.dataset.authorIndex = authorIndex;
-              }
-
-              gardenField.appendChild(authorEl);
-              authorEls.push(authorEl);
-            });
-
-            // Make text elements visible immediately
-            titleEl.classList.add('visible');
+            
+            // Create author element inside the info element
+            const authorText = artwork.authors.join(', ');
+            const authorEl = document.createElement('div');
+            authorEl.className = 'artwork-author';
+            authorEl.textContent = authorText;
+            infoEl.appendChild(authorEl);
+            
+            // Create title element inside the info element
+            const titleEl = document.createElement('div');
+            titleEl.className = 'artwork-title';
+            titleEl.textContent = artwork.title;
+            infoEl.appendChild(titleEl);
+            
+            // Add to garden field
+            gardenField.appendChild(infoEl);
+            
+            // Make text element visible immediately
+            infoEl.classList.add('visible');
 
             // Extract position from style (remove 'em' and convert to number)
-            const titleX = parseInt(titleEl.style.left.replace('em', ''));
-            const titleY = parseInt(titleEl.style.top.replace('em', '')) / 1.2;
+            const posX = parseInt(infoEl.style.left.replace('em', ''));
+            const posY = parseInt(infoEl.style.top.replace('em', '')) / 1.2;
 
             // Store initial position for wandering
-            titleEl.dataset.baseX = titleX;
-            titleEl.dataset.baseY = titleY;
-            titleEl.dataset.currentX = titleX;
-            titleEl.dataset.currentY = titleY;
-
-            // Make author elements visible and store their positions
-            authorEls.forEach(authorEl => {
-              authorEl.classList.add('visible');
-
-              // Extract position from style (remove 'em' and convert to number)
-              const authorX = parseInt(authorEl.style.left.replace('em', ''));
-              const authorY = parseInt(authorEl.style.top.replace('em', '')) / 1.2;
-
-              // Store initial position for wandering
-              authorEl.dataset.baseX = authorX;
-              authorEl.dataset.baseY = authorY;
-              authorEl.dataset.currentX = authorX;
-              authorEl.dataset.currentY = authorY;
-            });
+            infoEl.dataset.baseX = posX;
+            infoEl.dataset.baseY = posY;
+            infoEl.dataset.currentX = posX;
+            infoEl.dataset.currentY = posY;
+            
+            // Save inner elements for data updating
+            infoEl.dataset.titleEl = 'artwork-title';
+            infoEl.dataset.authorEl = 'artwork-author';
           });
         }
 
@@ -1634,9 +1612,30 @@
           // If no elements to move, exit early
           if (textElements.length === 0) return;
           
+          // Function to get element dimensions
+          function getElementDimensions(el) {
+            // Get the width based on the longest child element
+            let maxWidth = 0;
+            let height = 0;
+            
+            // Iterate through child elements to find the longest one
+            Array.from(el.children).forEach(child => {
+              maxWidth = Math.max(maxWidth, child.textContent.length);
+              height++; // Count each child as one row
+            });
+            
+            // If no children, use the element's own text length
+            if (height === 0) {
+              maxWidth = el.textContent.length;
+              height = 1;
+            }
+            
+            return { width: maxWidth, height: height };
+          }
+          
           // Function to check if a position is occupied by any text element
-          // Accounts for the full width of text elements
-          function isPositionOccupied(x, y, currentElement) {
+          // Accounts for the full dimensions of text elements (width and height)
+          function isPositionOccupied(x, y, width, height, currentElement) {
             for (const el of textElements) {
               // Skip if this is the element we're checking for
               if (el === currentElement) continue;
@@ -1646,10 +1645,20 @@
 
               const elX = parseInt(el.dataset.currentX, 10);
               const elY = parseInt(el.dataset.currentY, 10);
-              const elLength = el.textContent.length;
+              const { width: elWidth, height: elHeight } = getElementDimensions(el);
 
-              // Check if position falls within this element's span
-              if (elY === y && x >= elX && x < elX + elLength) {
+              // Check for overlap in both dimensions
+              // Two boxes overlap if:
+              // 1. One box's left edge is to the left of the other's right edge, AND
+              // 2. One box's right edge is to the right of the other's left edge, AND
+              // 3. One box's top edge is above the other's bottom edge, AND
+              // 4. One box's bottom edge is below the other's top edge
+              const horizontalOverlap = 
+                x < (elX + elWidth) && (x + width) > elX;
+              const verticalOverlap = 
+                y < (elY + elHeight) && (y + height) > elY;
+
+              if (horizontalOverlap && verticalOverlap) {
                 return el; // Return the element occupying this position
               }
             }
@@ -1658,16 +1667,8 @@
 
           // Function to check if a new position would cause collision
           function checkCollision(element, newX, newY) {
-            const elementLength = element.textContent.length;
-
-            // Check every position the element would occupy
-            for (let i = 0; i < elementLength; i++) {
-              const collidingElement = isPositionOccupied(newX + i, newY, element);
-              if (collidingElement) {
-                return collidingElement;
-              }
-            }
-            return null; // No collision
+            const { width, height } = getElementDimensions(element);
+            return isPositionOccupied(newX, newY, width, height, element);
           }
 
           // Move to the next element
@@ -1679,10 +1680,13 @@
           // Skip if element doesn't have position data
           if (!el.dataset.currentX || !el.dataset.currentY) return;
 
-          console.log(`Moving text element ${lastMovedElementIndex}: "${el.textContent.substring(0, 20)}${el.textContent.length > 20 ? '...' : ''}"`);
+          // Get the first 20 chars of any text for logging
+          const debugText = el.textContent.replace(/\s+/g, ' ').substring(0, 20);
+          console.log(`Moving text element ${lastMovedElementIndex}: "${debugText}${debugText.length > 20 ? '...' : ''}"`);
           
           const currentX = parseInt(el.dataset.currentX, 10);
           const currentY = parseInt(el.dataset.currentY, 10);
+          const { width, height } = getElementDimensions(el);
 
           // Randomly choose a direction to move (-1, 0, or 1 for both x and y)
           const directions = [-1, 0, 1];
@@ -1694,8 +1698,8 @@
           let newY = currentY + dy;
 
           // Ensure we stay within grid boundaries
-          newX = Math.max(0, Math.min(config.gridWidth - el.textContent.length, newX));
-          newY = Math.max(0, Math.min(config.gridHeight - 1, newY));
+          newX = Math.max(0, Math.min(config.gridWidth - width, newX));
+          newY = Math.max(0, Math.min(config.gridHeight - height, newY));
 
           // Check for collisions at the new position
           const collidingElement = checkCollision(el, newX, newY);
@@ -1703,8 +1707,10 @@
           if (collidingElement) {
             // Handle collision - move the colliding element down
             const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
+            const collidingDimensions = getElementDimensions(collidingElement);
+            
             // Make sure we don't go off the bottom of the screen
-            const safeY = Math.min(config.gridHeight - 1, collidingY);
+            const safeY = Math.min(config.gridHeight - collidingDimensions.height, collidingY);
 
             // Update position of colliding element
             collidingElement.style.top = `${safeY * 1.2}em`;
