@@ -296,9 +296,60 @@
             provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a");
             gardenContract = new ethers.Contract(GARDEN_CONTRACT_ADDRESS, GARDEN_ABI, provider);
 
-            // Get flower count and artwork information
+            // Get flower count
             await fetchFlowerCount();
-            await fetchArtworkInfo();
+            
+            // For initial load, do a custom fetch of artwork info to initialize
+            // without using the regular update mechanism
+            try {
+              const initialBlock = await provider.getBlockNumber();
+              console.log(`Performing initial artwork fetch at block ${initialBlock}`);
+              
+              // Only create contract instances for sculptures with updateEveryBlock > 0
+              const dynamicSculptures = artworkInfo.filter(s => s.address && s.updateEveryBlock > 0);
+              
+              // Skip everything if there are no dynamic sculptures
+              if (dynamicSculptures.length === 0) {
+                console.log('No dynamic sculptures to initialize');
+              } else {
+                console.log(`Initializing ${dynamicSculptures.length} dynamic sculptures`);
+                
+                // Create contract instances only for dynamic sculptures
+                for (const sculpture of dynamicSculptures) {
+                  if (!sculpture.contract) {
+                    sculpture.contract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
+                    console.log(`Created initial contract instance for ${sculpture.title}`);
+                    
+                    // Record this as the last update block to start the counter
+                    lastUpdatedBlocks[sculpture.address] = initialBlock;
+                  }
+                
+                  // Fetch initial data
+                  try {
+                    const title = await sculpture.contract.title();
+                    const authors = await sculpture.contract.authors();
+                    
+                    // Update data if different
+                    if (sculpture.title !== title || !arraysEqual(sculpture.authors, authors)) {
+                      sculpture.title = title;
+                      sculpture.authors = authors;
+                      console.log(`Initial data fetch for "${title}" by ${authors.join(', ')}`);
+                    }
+                  } catch (err) {
+                    console.warn(`Initial fetch failed for ${sculpture.title}: ${err.message}`);
+                  }
+                }
+              }
+              
+              // Log static sculptures for clarity
+              const staticSculptures = artworkInfo.filter(s => s.address && s.updateEveryBlock === 0);
+              if (staticSculptures.length > 0) {
+                console.log(`Skipping ${staticSculptures.length} static sculptures with updateEveryBlock: 0`);
+                staticSculptures.forEach(s => console.log(` - ${s.title}`));
+              }
+            } catch (error) {
+              console.error('Error in initial artwork fetch:', error);
+            }
 
             // Generate the initial garden
             generateGarden();
@@ -352,43 +403,111 @@
           }
         }
 
+        // Track last update block for each artwork
+        const lastUpdatedBlocks = {};
+        
+        // Flag to prevent multiple concurrent fetches
+        let isFetchingArtworkInfo = false;
+        
         // Fetch information about the artworks
-        async function fetchArtworkInfo() {
+        async function fetchArtworkInfo(currentBlock) {
+          // Prevent concurrent fetches that could lead to 429 errors
+          if (isFetchingArtworkInfo) {
+            console.log('Already fetching artwork info, skipping');
+            return;
+          }
+          
+          // Must have a valid block number
+          if (!currentBlock) {
+            console.log('No block number provided, skipping artwork update');
+            return;
+          }
+          
           try {
-            // Get sculpture addresses - only those with addresses
-            const sculptures = artworkInfo.filter(o => !!o.address);
-
-            // First pass - create contract instances for each sculpture
-            for (const sculpture of sculptures) {
-              // Only create contract if it doesn't already exist
+            isFetchingArtworkInfo = true;
+            console.log(`Checking for artwork updates at block ${currentBlock}`);
+            
+            // Only proceed with dynamic sculptures that need updates
+            const dynamicSculptures = artworkInfo.filter(s => 
+              s.address && s.updateEveryBlock > 0
+            );
+            
+            // If no dynamic sculptures, exit early
+            if (dynamicSculptures.length === 0) {
+              console.log('No dynamic sculptures configured for updates');
+              return;
+            }
+            
+            // Create any missing contract instances for dynamic sculptures
+            for (const sculpture of dynamicSculptures) {
               if (!sculpture.contract) {
                 sculpture.contract = new ethers.Contract(sculpture.address, SCULPTURE_ABI, provider);
                 console.log(`Created contract instance for ${sculpture.title} at ${sculpture.address}`);
               }
             }
-
-            // Second pass - fetch data from blockchain using the persisted contracts
-            for (const sculpture of sculptures) {
-              try {
-                // Only try to fetch if we have a valid contract
-                if (sculpture.contract) {
-                  const title = await sculpture.contract.title();
-                  const authors = await sculpture.contract.authors();
-                  console.log(`Fetched "${title}" by ${authors.join(', ')}`);
-                  
-                  // Update artwork info with blockchain data
-                  sculpture.title = title;
-                  sculpture.authors = authors;
-                }
-              } catch (err) {
-                console.warn(`Failed to get info for sculpture at ${sculpture.address}:`, err);
+            
+            // Find artworks that need updates based on block frequency
+            const artworksToUpdate = [];
+            
+            for (const sculpture of dynamicSculptures) {              
+              // Initialize last updated block if not set
+              if (!lastUpdatedBlocks[sculpture.address]) {
+                lastUpdatedBlocks[sculpture.address] = 0;
+              }
+              
+              // Check if it's time to update this sculpture
+              const blocksSinceLastUpdate = currentBlock - lastUpdatedBlocks[sculpture.address];
+              if (blocksSinceLastUpdate >= sculpture.updateEveryBlock) {
+                artworksToUpdate.push(sculpture);
+                console.log(`Will update ${sculpture.title} (${blocksSinceLastUpdate} blocks since last update)`);
               }
             }
-
-            console.log('Artwork info updated from blockchain');
+            
+            // No updates needed? Exit early
+            if (artworksToUpdate.length === 0) {
+              console.log('No artworks need updating at this time');
+              return;
+            }
+            
+            // Update all needed artworks serially to avoid overwhelming the provider
+            for (const sculpture of artworksToUpdate) {
+              try {
+                console.log(`Fetching data for ${sculpture.title}`);
+                const title = await sculpture.contract.title();
+                const authors = await sculpture.contract.authors();
+                
+                // Record successful update time
+                lastUpdatedBlocks[sculpture.address] = currentBlock;
+                
+                // Only update and log if values actually changed
+                if (sculpture.title !== title || !arraysEqual(sculpture.authors, authors)) {
+                  console.log(`Data changed for "${title}" by ${authors.join(', ')}`);
+                  sculpture.title = title;
+                  sculpture.authors = authors;
+                } else {
+                  console.log(`No changes for ${sculpture.title}`);
+                }
+              } catch (err) {
+                console.warn(`Error fetching info for ${sculpture.title} at ${sculpture.address}:`, err.message);
+              }
+            }
           } catch (error) {
-            console.error('Error fetching artwork info:', error);
+            console.error('Error in fetchArtworkInfo:', error);
+          } finally {
+            isFetchingArtworkInfo = false;
           }
+        }
+        
+        // Helper function to compare arrays
+        function arraysEqual(a, b) {
+          if (a === b) return true;
+          if (a == null || b == null) return false;
+          if (a.length !== b.length) return false;
+          
+          for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+          }
+          return true;
         }
 
         // Generate the garden visualization
@@ -697,11 +816,37 @@
             currentBlockEl.textContent = blockNumber;
           }
 
-          // Fetch updated flower count and artwork info in parallel
-          const [newFlowerCount] = await Promise.all([
-            fetchFlowerCount(),
-            fetchArtworkInfo() // Update artwork info on every block
-          ]);
+          // Always fetch flower count on every block
+          const newFlowerCount = await fetchFlowerCount();
+
+          console.log(`new flower count ${newFlowerCount} (old: ${currentFlowerCount})`)
+          
+          // Only check for artwork updates that need updating
+          // First, determine if any artwork needs updating at this block number
+          let needsArtworkUpdate = false;
+          
+          for (const sculpture of artworkInfo) {
+            // Skip artworks with no address or updateEveryBlock = 0
+            if (!sculpture.address || sculpture.updateEveryBlock <= 0) continue;
+            
+            // Initialize last update block if not set
+            if (!lastUpdatedBlocks[sculpture.address]) {
+              lastUpdatedBlocks[sculpture.address] = 0;
+            }
+            
+            // Check if it's time to update this sculpture
+            const blocksSinceLastUpdate = blockNumber - lastUpdatedBlocks[sculpture.address];
+            if (blocksSinceLastUpdate >= sculpture.updateEveryBlock) {
+              needsArtworkUpdate = true;
+              console.log(`Artwork ${sculpture.title} needs update at block ${blockNumber}`);
+              break; // No need to check more if at least one needs update
+            }
+          }
+          
+          // Only fetch artwork info if at least one artwork needs updating
+          if (needsArtworkUpdate) {
+            await fetchArtworkInfo(blockNumber);
+          }
 
           // Add new flowers if needed
           if (newFlowerCount > currentFlowerCount) {
