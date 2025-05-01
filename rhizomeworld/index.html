@@ -458,10 +458,8 @@
               }
             });
 
-            // Start wind effects
-            scheduleWindEffect();
-
-            // Hide loading screen
+            // No need to schedule wind effects - they're triggered by blocks now
+            // Just hide loading screen and mark as initialized
             loadingEl.style.display = 'none';
             isInitialized = true;
 
@@ -933,6 +931,9 @@
           addNewFlowers(additionalFlowers);
         }
 
+        // Track block-triggered events
+        let lastTextMovementBlock = 0;
+        
         // Handle new blocks from the blockchain
         async function onNewBlock(blockNumber) {
           if (!isInitialized) return;
@@ -979,6 +980,38 @@
             currentFlowerCount = newFlowerCount;
             updateGarden(newFlowerCount);
           }
+          
+          // Trigger a wind effect on each new block
+          triggerWindOnBlock(blockNumber);
+          
+          // Move text elements every 5 blocks
+          if (blockNumber - lastTextMovementBlock >= 5) {
+            if (config.wanderingTextEnabled) {
+              wanderingTextElements();
+              lastTextMovementBlock = blockNumber;
+              console.log(`Moving text elements at block ${blockNumber}`);
+            }
+          }
+        }
+        
+        // Trigger wind effect based on block number
+        function triggerWindOnBlock(blockNumber) {
+          // Use block number as seed for deterministic wind direction
+          const directions = [
+            'left', 'right', 'up', 'down',
+            'diagonal-up-right', 'diagonal-up-left',
+            'diagonal-down-right', 'diagonal-down-left'
+          ];
+          
+          // Use modulo to select a direction based on block number
+          const dirIndex = blockNumber % directions.length;
+          const direction = directions[dirIndex];
+          
+          console.log(`Block ${blockNumber}: Triggering wind effect (${direction})`);
+          
+          // Apply the wind effect with strength based on block hash last digit
+          // For simplicity, we use a fixed moderate strength
+          applyWindEffect(direction, config.windStrength);
         }
 
         // Apply wave-like ripple effect across the garden
@@ -1230,54 +1263,7 @@
           });
         }
 
-        // Schedule wind effects with deterministic pattern
-        function scheduleWindEffect() {
-          // Use a seeded random generator for wind pattern
-          // This creates a deterministic sequence that repeats
-          const windRandom = createSeededRandom(54321);
-          let windCounter = 0;
-          let waveInProgress = false;
-          
-          // Use a longer interval between wind effects to reduce animation frequency
-          // Only start a new wave if none is in progress
-          const checkInterval = setInterval(() => {
-            // Don't start a new wave if one is already in progress
-            if (waveInProgress) return;
-            
-            // Wind directions in a deterministic sequence
-            const directions = [
-              'left', 'right', 'up', 'down',
-              'diagonal-up-right', 'diagonal-up-left',
-              'diagonal-down-right', 'diagonal-down-left'
-            ];
-            
-            // Use modulo arithmetic to create a repeating pattern
-            // But still with some variety based on the seeded random
-            windCounter = (windCounter + 1) % 100;
-            const dirIndex = Math.floor(windRandom() * directions.length);
-            const direction = directions[dirIndex];
-            
-            // Mark a wave as in progress
-            waveInProgress = true;
-            
-            // Start a wave
-            applyWindEffect(direction, config.windStrength);
-            
-            // Calculate an appropriate timeout based on grid size
-            // We want to ensure the wave completes fully before allowing a new one
-            const maxGridDimension = Math.sqrt(
-              Math.pow(config.gridWidth, 2) + 
-              Math.pow(config.gridHeight, 2)
-            );
-            const timeoutDuration = maxGridDimension * window.currentWaveFrameInterval * 1.5;
-            
-            // After the wave is done, allow new waves
-            setTimeout(() => {
-              waveInProgress = false;
-              resetWindEffect(); // Ensure all flowers are reset
-            }, timeoutDuration);
-          }, config.windInterval * 3); // Increase interval between winds by 3x
-        }
+        // Wind effects are now triggered by blockchain events instead of on a schedule
 
         // Create a static garden as fallback for network issues
         function displayStaticGarden() {
@@ -1286,8 +1272,10 @@
 
           // Add static artwork info
           generateGarden();
-          scheduleWindEffect();
           isInitialized = true;
+          
+          // In static mode (offline), trigger an initial wind effect
+          triggerWindOnBlock(Math.floor(Math.random() * 1000));
         }
 
         // Grid noise function from GardenContributions.sol
@@ -1409,33 +1397,11 @@
           });
         }
         
-        // Schedule wandering of text elements based on configuration
-        let wanderingTextInterval = null;
-        
-        function startWanderingText() {
-          if (config.wanderingTextEnabled && !wanderingTextInterval) {
-            wanderingTextInterval = setInterval(wanderingTextElements, config.wanderingTextInterval);
-            console.log('Text wandering started');
-          }
-        }
-        
-        function stopWanderingText() {
-          if (wanderingTextInterval) {
-            clearInterval(wanderingTextInterval);
-            wanderingTextInterval = null;
-            console.log('Text wandering stopped');
-          }
-        }
+        // Text wandering is now block-based instead of time-based
         
         // Toggle wandering text based on config
         function toggleWanderingText() {
           config.wanderingTextEnabled = !config.wanderingTextEnabled;
-          
-          if (config.wanderingTextEnabled) {
-            startWanderingText();
-          } else {
-            stopWanderingText();
-          }
           
           // Update debug panel if it's visible
           const wanderingStateEl = document.getElementById('wandering-state');
@@ -1443,12 +1409,8 @@
             wanderingStateEl.textContent = config.wanderingTextEnabled ? 'On' : 'Off';
           }
           
+          console.log(`Text wandering ${config.wanderingTextEnabled ? 'enabled' : 'disabled'}`);
           return config.wanderingTextEnabled;
-        }
-        
-        // Initialize text wandering if enabled in config
-        if (config.wanderingTextEnabled) {
-          startWanderingText();
         }
         
         // Start the application
