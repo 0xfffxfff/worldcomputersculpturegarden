@@ -118,6 +118,16 @@
       .loading-text {
         font-size: 15px;
       }
+
+      .wind-marker {
+        position: absolute;
+        font-size: 15px;
+        pointer-events: none;
+        text-align: center;
+        font-family: "Courier", "Courier New", monospace; /* this fixes the arrows */
+        width: 1em;
+        z-index: 10;
+      }
     </style>
   </head>
   <body>
@@ -136,9 +146,9 @@
     <script type="module">
       import * as viem from 'https://cdn.jsdelivr.net/npm/viem@2.28.1/+esm'
       import { mainnet } from 'https://cdn.jsdelivr.net/npm/viem@2.28.1/chains/+esm'
-      
+
       // Make viem and chains available globally
-      window.viem = viem; 
+      window.viem = viem;
       window.viemChains = { mainnet };
     </script>
     <script>
@@ -149,14 +159,14 @@
           setTimeout(checkDependencies, 100);
           return;
         }
-        
+
         // Initialize once everything is ready
         initializeGarden();
       }
-      
+
       // Start the dependency check when DOM is ready
       document.addEventListener('DOMContentLoaded', checkDependencies);
-      
+
       async function initializeGarden() {
         // Constants
         const GARDEN_CONTRACT_ADDRESS = '0x2a362fF002f7ce62D3468509dD2A4a9f5A8EBBb0';
@@ -215,39 +225,39 @@
               address: "0x17a79a4900F3Dd0E0b35D5B0c19Bc2E1189174Dc",
               updateEveryBlock: 7200 // once a day
             },
-            { 
-              title: "Extimacy", 
-              authors: ["113"], 
+            {
+              title: "Extimacy",
+              authors: ["113"],
               address: "0xB44018DF3284Daf608a8f6b7F8049F30FE14ec92",
               updateEveryBlock: 1
             },
-            { 
-              title: "Dear God, Layer of Roads (Travelers)", 
-              authors: ["Loucas Braconnier (Figure31)"], 
+            {
+              title: "Dear God, Layer of Roads (Travelers)",
+              authors: ["Loucas Braconnier (Figure31)"],
               address: "0x8170e7DB1AB0930D6afbBB67b7be81Dbd66B7c01",
               updateEveryBlock: 0 // never
             },
-            { 
-              title: "Yesbot", 
-              authors: ["Sarah Friend"], 
+            {
+              title: "Yesbot",
+              authors: ["Sarah Friend"],
               address: "0x6802Ba6353bc5a6338DC7598D5e5eE568e807B16",
               updateEveryBlock: 0 // never
             },
-            { 
-              title: "Modulation Studies", 
-              authors: ["Material Protocol Arts"], 
+            {
+              title: "Modulation Studies",
+              authors: ["Material Protocol Arts"],
               address: "0xb78212285CcC039733Ea3453F38e591eD91F1D63",
               updateEveryBlock: 0 // never
             },
-            { 
-              title: "Critique of This Show", 
-              authors: ["Rhea Myers et al."], 
+            {
+              title: "Critique of This Show",
+              authors: ["Rhea Myers et al."],
               address: "0x6582Adc209769bb9974e42cA61F4Db802D25997E",
               updateEveryBlock: 0 // never
             },
-            { 
-              title: "Real Abstraction (A Line Made by Proofs)", 
-              authors: ["Paul Seidler"], 
+            {
+              title: "Real Abstraction (A Line Made by Proofs)",
+              authors: ["Paul Seidler"],
               address: "0x3471D8aCdD789a12Aa5c07E7d32c71d7959688E8",
               updateEveryBlock: 0 // never
             },
@@ -265,6 +275,13 @@
         const currentBlockEl = document.getElementById('current-block');
         const windEffectEl = document.getElementById('wind-effect');
         const loadingEl = document.querySelector('.loading');
+
+        // Create wind marker element
+        const windMarker = document.createElement('div');
+        windMarker.className = 'wind-marker';
+        windMarker.id = 'wind-marker';
+        windMarker.textContent = '↑'; // Default direction
+        gardenField.appendChild(windMarker);
 
         // Show debug panel if needed
         if (isDebugMode) {
@@ -322,7 +339,7 @@
                 generateGarden();
               }, 500);
             });
-            
+
             // Add keyboard shortcuts
             document.addEventListener('keydown', (event) => {
               // 't' to toggle wandering text
@@ -330,13 +347,13 @@
                 const isEnabled = toggleWanderingText();
                 console.log(`Wandering text ${isEnabled ? 'enabled' : 'disabled'}`);
               }
-              
+
               // 'f' to add a flower
               if (event.key === 'f') {
                 // Add 1 flower
                 addNewFlowers(1);
               }
-              
+
               // 'w' to trigger a wind effect in random direction
               if (event.key === 'w') {
                 const directions = [
@@ -344,27 +361,27 @@
                   'diagonal-up-right', 'diagonal-up-left',
                   'diagonal-down-right', 'diagonal-down-left'
                 ];
-                
+
                 // Choose a random direction
                 const direction = directions[Math.floor(Math.random() * directions.length)];
                 console.log(`Manually triggering wind effect: ${direction}`);
-                
+
                 // Trigger wind with normal strength
                 applyWindEffect(direction, config.windStrength);
               }
-              
+
               // Number keys 1-8 to trigger specific wind directions
               if (event.key >= '1' && event.key <= '8') {
                 const directions = [
-                  'left', 'right', 'up', 'down', 
+                  'left', 'right', 'up', 'down',
                   'diagonal-up-right', 'diagonal-up-left',
                   'diagonal-down-right', 'diagonal-down-left'
                 ];
-                
+
                 // Use key number (1-8) to pick direction (index 0-7)
                 const index = parseInt(event.key) - 1;
                 const direction = directions[index];
-                
+
                 console.log(`Manually triggering wind effect: ${direction}`);
                 applyWindEffect(direction, config.windStrength);
               }
@@ -373,7 +390,7 @@
             // Connect to Ethereum using viem and public RPC endpoints
             try {
               console.log("Connecting to Ethereum using viem...");
-              
+
               // Create a client with fallback transport - combines multiple public endpoints
               publicClient = viem.createPublicClient({
                 chain: window.viemChains.mainnet,
@@ -385,7 +402,7 @@
                   viem.http('https://mainnet.infura.io/v3/cd625a10fd7343a987a4463b1bc0873a'),
                 ])
               });
-              
+
               // Test the connection by getting a block number
               const blockNumber = await publicClient.getBlockNumber();
               console.log(`Connected to Ethereum at block ${blockNumber}`);
@@ -396,28 +413,28 @@
 
             // Get flower count
             await fetchFlowerCount();
-            
+
             // For initial load, do a custom fetch of artwork info to initialize
             // without using the regular update mechanism
             try {
               const initialBlock = await publicClient.getBlockNumber();
               console.log(`Performing initial artwork fetch at block ${Number(initialBlock)}`);
-              
+
               // Only create contract instances for sculptures with updateEveryBlock > 0
               const dynamicSculptures = artworkInfo.filter(s => s.address && s.updateEveryBlock > 0);
-              
+
               // Skip everything if there are no dynamic sculptures
               if (dynamicSculptures.length === 0) {
                 console.log('No dynamic sculptures to initialize');
               } else {
                 console.log(`Initializing ${dynamicSculptures.length} dynamic sculptures`);
-                
+
                 // With viem, we don't need to create contract instances
                 // Just initialize the block counter for dynamic sculptures
                 for (const sculpture of dynamicSculptures) {
                   // Record this as the last update block to start the counter
                   lastUpdatedBlocks[sculpture.address] = Number(initialBlock);
-                
+
                   // Fetch initial data using viem
                   try {
                     // Using multicall to batch requests
@@ -435,12 +452,12 @@
                         }
                       ]
                     });
-                    
+
                     // Process the results
                     if (title.status === 'success' && authors.status === 'success') {
                       const titleValue = title.result;
                       const authorsValue = authors.result;
-                      
+
                       // Update data if different
                       if (sculpture.title !== titleValue || !arraysEqual(sculpture.authors, authorsValue)) {
                         sculpture.title = titleValue;
@@ -455,7 +472,7 @@
                   }
                 }
               }
-              
+
               // Log static sculptures for clarity
               const staticSculptures = artworkInfo.filter(s => s.address && s.updateEveryBlock === 0);
               if (staticSculptures.length > 0) {
@@ -471,12 +488,12 @@
 
             // Setup block listeners for updates using viem's watchBlocks
             let lastProcessedBlock = 0;
-            
+
             // Create a block watcher
             blockWatcher = publicClient.watchBlocks({
               onBlock: (block) => {
                 const blockNumber = Number(block.number);
-                
+
                 // Prevent multiple processing of the same block or out-of-order processing
                 if (blockNumber > lastProcessedBlock) {
                   lastProcessedBlock = blockNumber;
@@ -515,7 +532,7 @@
               abi: GARDEN_ABI,
               functionName: 'flowers'
             });
-            
+
             // Convert BigInt to Number
             currentFlowerCount = Number(result);
 
@@ -534,10 +551,10 @@
 
         // Track last update block for each artwork
         const lastUpdatedBlocks = {};
-        
+
         // Flag to prevent multiple concurrent fetches
         let isFetchingArtworkInfo = false;
-        
+
         // Fetch information about the artworks
         async function fetchArtworkInfo(currentBlock) {
           // Prevent concurrent fetches that could lead to 429 errors
@@ -545,40 +562,40 @@
             console.log('Already fetching artwork info, skipping');
             return;
           }
-          
+
           // Must have a valid block number
           if (!currentBlock) {
             console.log('No block number provided, skipping artwork update');
             return;
           }
-          
+
           try {
             isFetchingArtworkInfo = true;
             console.log(`Checking for artwork updates at block ${currentBlock}`);
-            
+
             // Only proceed with dynamic sculptures that need updates
-            const dynamicSculptures = artworkInfo.filter(s => 
+            const dynamicSculptures = artworkInfo.filter(s =>
               s.address && s.updateEveryBlock > 0
             );
-            
+
             // If no dynamic sculptures, exit early
             if (dynamicSculptures.length === 0) {
               console.log('No dynamic sculptures configured for updates');
               return;
             }
-            
-            // With viem, we don't need to create contract instances - 
+
+            // With viem, we don't need to create contract instances -
             // we just need the address and ABI which we already have
-            
+
             // Find artworks that need updates based on block frequency
             const artworksToUpdate = [];
-            
-            for (const sculpture of dynamicSculptures) {              
+
+            for (const sculpture of dynamicSculptures) {
               // Initialize last updated block if not set
               if (!lastUpdatedBlocks[sculpture.address]) {
                 lastUpdatedBlocks[sculpture.address] = 0;
               }
-              
+
               // Check if it's time to update this sculpture
               const blocksSinceLastUpdate = currentBlock - lastUpdatedBlocks[sculpture.address];
               if (blocksSinceLastUpdate >= sculpture.updateEveryBlock) {
@@ -586,18 +603,18 @@
                 console.log(`Will update ${sculpture.title} (${blocksSinceLastUpdate} blocks since last update)`);
               }
             }
-            
+
             // No updates needed? Exit early
             if (artworksToUpdate.length === 0) {
               console.log('No artworks need updating at this time');
               return;
             }
-            
+
             // Update all needed artworks serially to avoid overwhelming the provider
             for (const sculpture of artworksToUpdate) {
               try {
                 console.log(`Fetching data for ${sculpture.title}`);
-                
+
                 // Using viem's multicall to batch requests
                 const [title, authors] = await publicClient.multicall({
                   contracts: [
@@ -615,24 +632,24 @@
                     }
                   ]
                 });
-                
+
                 // Handle results, checking for errors
                 if (title.status === 'success' && authors.status === 'success') {
                   // Record successful update time
                   lastUpdatedBlocks[sculpture.address] = currentBlock;
-                  
+
                   // Extract the values from the result
                   const titleValue = title.result;
                   const authorsValue = authors.result;
-                  
+
                   // Only update and log if values actually changed
                   if (sculpture.title !== titleValue || !arraysEqual(sculpture.authors, authorsValue)) {
                     console.log(`Data changed for "${titleValue}" by ${authorsValue.join(', ')}`);
-                    
+
                     // Update in-memory data
                     sculpture.title = titleValue;
                     sculpture.authors = authorsValue;
-                    
+
                     // Update DOM elements for this artwork
                     updateArtworkDOM(sculpture);
                   } else {
@@ -655,25 +672,25 @@
             isFetchingArtworkInfo = false;
           }
         }
-        
+
         // Helper function to compare arrays
         function arraysEqual(a, b) {
           if (a === b) return true;
           if (a == null || b == null) return false;
           if (a.length !== b.length) return false;
-          
+
           for (let i = 0; i < a.length; i++) {
             if (a[i] !== b[i]) return false;
           }
           return true;
         }
-        
+
         // Function to update DOM elements when artwork info changes
         function updateArtworkDOM(artwork) {
           if (!artwork.address) return;
-          
+
           console.log(`Updating DOM for artwork at address ${artwork.address}`);
-          
+
           // Find the title element for this artwork
           const titleEl = document.querySelector(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="title"]`);
           if (titleEl) {
@@ -682,26 +699,26 @@
           } else {
             console.warn(`Could not find title element for artwork at ${artwork.address}`);
           }
-          
+
           // Find all author elements for this artwork
           const authorEls = document.querySelectorAll(`.info-text[data-artwork-address="${artwork.address}"][data-element-type="author"]`);
-          
+
           // Check if we need to add/remove author elements
           if (authorEls.length !== artwork.authors.length) {
             console.log(`Author count changed for ${artwork.address}: ${authorEls.length} elements vs ${artwork.authors.length} authors`);
-            
+
             // For simplicity, we'll just recreate all author elements
             // We could be more sophisticated here in a future version
-            
+
             // First, remove all existing author elements
             authorEls.forEach(el => el.remove());
-            
+
             // Then trigger a regeneration of the garden to create new elements
             // This is a bit heavy-handed but ensures correct layout
             generateGarden();
             return;
           }
-          
+
           // Update existing author elements if counts match
           authorEls.forEach(authorEl => {
             const index = parseInt(authorEl.dataset.authorIndex, 10);
@@ -730,12 +747,72 @@
             flowerEl.classList.add('visible');
           });
 
+          // Place a wind marker using noise algorithm (like flowers)
+          // Use the same grid to ensure it doesn't overlap with flowers
+          const windMarkerPosition = placeWindMarker(grid);
+
           // Place artwork info text
           if (artworkInfo.length > 0) {
             placeInfoText();
           }
 
           displayedFlowers = flowersToDisplay;
+        }
+
+        // Place wind marker using noise algorithm
+        function placeWindMarker(grid) {
+          // Use a different seed for wind marker placement to ensure uniqueness
+          const fixedSeed = 67890;
+          const random = createSeededRandom(fixedSeed);
+
+          // Find a suitable position that doesn't overlap with flowers
+          let attempts = 0;
+          const maxAttempts = 100;
+
+          while (attempts < maxAttempts) {
+            attempts++;
+
+            // Generate position proposals with a preference for center area visibility
+            const x = Math.floor(config.gridWidth * (0.3 + random() * 0.4)); // 30-70% of width
+            const y = Math.floor(config.gridHeight * (0.3 + random() * 0.4)); // 30-70% of height
+
+            // Check if position is available (not occupied by flower)
+            if (grid[y][x] === ' ') {
+              // Create the marker
+              const marker = document.createElement('div');
+              marker.className = 'wind-marker';
+              marker.id = 'wind-marker';
+              marker.textContent = '↑'; // Default direction
+              marker.style.left = `${x * 1.0}em`;
+              marker.style.top = `${y * 1.2}em`;
+              marker.dataset.x = x;
+              marker.dataset.y = y;
+
+              // Add to garden
+              gardenField.appendChild(marker);
+
+              // Mark position as used in grid
+              grid[y][x] = 'W'; // W for wind marker
+
+              return { x, y };
+            }
+          }
+
+          // Fallback - if all positions are occupied, place at a fixed position
+          const x = Math.floor(config.gridWidth * 0.5);
+          const y = Math.floor(config.gridHeight * 0.2);
+
+          const marker = document.createElement('div');
+          marker.className = 'wind-marker';
+          marker.id = 'wind-marker';
+          marker.textContent = '↑';
+          marker.style.left = `${x * 1.0}em`;
+          marker.style.top = `${y * 1.2}em`;
+          marker.dataset.x = x;
+          marker.dataset.y = y;
+
+          gardenField.appendChild(marker);
+          return { x, y };
         }
 
         // Create an empty grid
@@ -758,39 +835,39 @@
             return (seed - 1) / 2147483646;
           };
         }
-        
+
         // Place flowers using deterministic noise algorithm (based on GardenContributions.sol)
         function placeFlowersUsingNoise(grid, count) {
           // Always use the same fixed seed for the initial garden
           // But use a separate random generator for positions (not affected by seed)
-          const fixedSeed = 12345; 
+          const fixedSeed = 12345;
           const initialRandom = createSeededRandom(fixedSeed);
-          
+
           // For individual flower placements, use position-independent randomness
           const positionRandom = Math.random;
-          
+
           const positions = [];
           let placed = 0;
           let attempts = 0;
           const maxAttempts = count * 100; // Plenty of attempts
-          
+
           // Ensure even distribution - divide screen into sections
           const numSections = 4; // Divide screen into quarters
           const sectionHeight = config.gridHeight / numSections;
-          
+
           console.log(`Attempting to place ${count} flowers...`);
-          
+
           // Try to place all flowers
           while (placed < count && attempts < maxAttempts) {
             attempts++;
 
             // Choose a random section (weighted toward bottom)
             const sectionIndex = Math.floor(positionRandom() * numSections);
-            
+
             // Get position within that section
             const sectionStartY = Math.floor(sectionIndex * sectionHeight);
             const sectionEndY = Math.floor(Math.min(config.gridHeight, (sectionIndex + 1) * sectionHeight));
-            
+
             const x = Math.floor(positionRandom() * config.gridWidth);
             const y = sectionStartY + Math.floor(positionRandom() * (sectionEndY - sectionStartY));
 
@@ -799,7 +876,7 @@
 
             // Use a fixed threshold that ensures we get enough flowers
             const threshold = 0.3;
-            
+
             // Only place if position is valid according to noise and grid
             if (Math.abs(noiseVal) > threshold && grid[y][x] === ' ') {
               // Place flower in grid
@@ -825,11 +902,11 @@
           flower.dataset.baseX = x * 1.0;
           flower.dataset.baseY = y * 1.2;
           flower.dataset.animating = ""; // Initialize animation state
-          
+
           // Prevent potential rendering issues for animation
           flower.style.willChange = 'left, top'; // Hint to browser about properties that will change
           flower.style.backfaceVisibility = 'hidden'; // Prevent flickering in some browsers
-          
+
           return flower;
         }
 
@@ -837,33 +914,33 @@
         function placeInfoText() {
           // Use same seeded random generator for consistent text placement
           const random = createSeededRandom(789012); // Different seed from flower placement
-          
+
           // Create an array of grid positions that match where flowers could be placed
           // We'll place text at these grid positions to ensure alignment
           const gridPositions = [];
-          
+
           // Generate grid positions (essentially the same as the flower placement logic)
           for (let y = 0; y < config.gridHeight; y++) {
             for (let x = 0; x < config.gridWidth; x++) {
               gridPositions.push({ x, y });
             }
           }
-          
+
           // Shuffle the positions using our deterministic random
           for (let i = gridPositions.length - 1; i > 0; i--) {
             const j = Math.floor(random() * (i + 1));
             [gridPositions[i], gridPositions[j]] = [gridPositions[j], gridPositions[i]];
           }
-          
+
           // Keep track of used positions to avoid overlap
           const usedPositions = new Set();
-          
+
           // Function to find an available position for text
           function findAvailablePosition(length, startIdx) {
             // Find a position that has enough space for the text
             for (let i = startIdx; i < gridPositions.length; i++) {
               const pos = gridPositions[i];
-              
+
               // Check if this position and needed length is available
               let available = true;
               for (let j = 0; j < length; j++) {
@@ -873,7 +950,7 @@
                   break;
                 }
               }
-              
+
               // If we found an available spot, mark it as used
               if (available) {
                 for (let j = 0; j < length; j++) {
@@ -882,69 +959,69 @@
                 return pos;
               }
             }
-            
+
             // If no position is found, return a fallback position
             // Use a fixed fallback position that doesn't reference undefined variables
             return { x: 5, y: 5 };
           }
-          
+
           // Start index for art placements
           let posIndex = 100; // Skip some of the first positions to make room for flowers
-          
+
           artworkInfo.forEach((artwork, index) => {
             // Place title in grid
             const titleLength = artwork.title.length;
             const titlePos = findAvailablePosition(titleLength, posIndex);
             posIndex += 50; // Move forward to space out the artworks
-            
+
             const titleEl = document.createElement('div');
             titleEl.className = 'info-text';
             titleEl.textContent = artwork.title;
             titleEl.style.left = `${titlePos.x * 1.0}em`;
             titleEl.style.top = `${titlePos.y * 1.2}em`;
-            
+
             // Add data attributes to track artwork elements by address
             if (artwork.address) {
               titleEl.dataset.artworkAddress = artwork.address;
               titleEl.dataset.elementType = 'title';
             }
-            
+
             gardenField.appendChild(titleEl);
-            
+
             // Place authors in grid, below the title
             const authorEls = []; // Track the author elements created
             artwork.authors.forEach((author, authorIndex) => {
               const authorLength = author.length;
               // Position below the title
               const authorPos = findAvailablePosition(
-                authorLength, 
+                authorLength,
                 posIndex + authorIndex * 20
               );
-              
+
               const authorEl = document.createElement('div');
               authorEl.className = 'info-text';
               authorEl.textContent = author;
               authorEl.style.left = `${authorPos.x * 1.0}em`;
               authorEl.style.top = `${authorPos.y * 1.2}em`;
-              
+
               // Add data attributes to track artwork elements by address
               if (artwork.address) {
                 authorEl.dataset.artworkAddress = artwork.address;
                 authorEl.dataset.elementType = 'author';
                 authorEl.dataset.authorIndex = authorIndex;
               }
-              
+
               gardenField.appendChild(authorEl);
               authorEls.push(authorEl);
             });
 
             // Make text elements visible immediately
             titleEl.classList.add('visible');
-            
+
             // Extract position from style (remove 'em' and convert to number)
             const titleX = parseInt(titleEl.style.left.replace('em', ''));
             const titleY = parseInt(titleEl.style.top.replace('em', '')) / 1.2;
-            
+
             // Store initial position for wandering
             titleEl.dataset.baseX = titleX;
             titleEl.dataset.baseY = titleY;
@@ -954,11 +1031,11 @@
             // Make author elements visible and store their positions
             authorEls.forEach(authorEl => {
               authorEl.classList.add('visible');
-              
+
               // Extract position from style (remove 'em' and convert to number)
               const authorX = parseInt(authorEl.style.left.replace('em', ''));
               const authorY = parseInt(authorEl.style.top.replace('em', '')) / 1.2;
-              
+
               // Store initial position for wandering
               authorEl.dataset.baseX = authorX;
               authorEl.dataset.baseY = authorY;
@@ -973,18 +1050,18 @@
           // Update flower count
           const previousCount = currentFlowerCount;
           currentFlowerCount += count;
-          
+
           // Update localStorage to persist this change
           localStorage.setItem('flowerCount', currentFlowerCount.toString());
-          
+
           // Update debug display if visible
           if (isDebugMode) {
             flowerCountEl.textContent = currentFlowerCount;
           }
-          
+
           // Create grid and add new flowers
           const grid = createEmptyGrid(config.gridWidth, config.gridHeight);
-          
+
           // Mark existing flowers in grid
           const existingFlowers = document.querySelectorAll('.flower.visible');
           existingFlowers.forEach(flower => {
@@ -994,41 +1071,41 @@
               grid[y][x] = '⚘';
             }
           });
-          
+
           // Add new flowers
           console.log(`Attempting to place ${count} new flowers...`);
           const newPositions = placeFlowersUsingNoise(grid, count);
           console.log(`Found ${newPositions.length} positions for new flowers`);
-          
+
           // Create and add new flower elements
           newPositions.forEach(pos => {
             console.log(`Placing flower at (${pos.x}, ${pos.y})`);
             const flowerEl = createFlowerElement(pos.x, pos.y);
             gardenField.appendChild(flowerEl);
-            
+
             // Make flower immediately visible for better feedback
             flowerEl.classList.add('visible');
           });
-          
+
           displayedFlowers = currentFlowerCount;
-          
+
           console.log(`Added ${count} flower(s). New count: ${currentFlowerCount}`);
           return count;
         }
-        
+
         // Update garden when new flowers are detected
         async function updateGarden(newFlowerCount) {
           if (newFlowerCount <= displayedFlowers) return;
-          
+
           const additionalFlowers = newFlowerCount - displayedFlowers;
-          
+
           // Use the addNewFlowers function to add the additional flowers
           addNewFlowers(additionalFlowers);
         }
 
         // Track block-triggered events
         let lastTextMovementBlock = 0;
-        
+
         // Handle new blocks from the blockchain
         async function onNewBlock(blockNumber) {
           if (!isInitialized) return;
@@ -1041,20 +1118,20 @@
           const newFlowerCount = await fetchFlowerCount();
 
           console.log(`new flower count ${newFlowerCount} (old: ${currentFlowerCount})`)
-          
+
           // Only check for artwork updates that need updating
           // First, determine if any artwork needs updating at this block number
           let needsArtworkUpdate = false;
-          
+
           for (const sculpture of artworkInfo) {
             // Skip artworks with no address or updateEveryBlock = 0
             if (!sculpture.address || sculpture.updateEveryBlock <= 0) continue;
-            
+
             // Initialize last update block if not set
             if (!lastUpdatedBlocks[sculpture.address]) {
               lastUpdatedBlocks[sculpture.address] = 0;
             }
-            
+
             // Check if it's time to update this sculpture
             const blocksSinceLastUpdate = blockNumber - lastUpdatedBlocks[sculpture.address];
             if (blocksSinceLastUpdate >= sculpture.updateEveryBlock) {
@@ -1063,7 +1140,7 @@
               break; // No need to check more if at least one needs update
             }
           }
-          
+
           // Only fetch artwork info if at least one artwork needs updating
           if (needsArtworkUpdate) {
             await fetchArtworkInfo(blockNumber);
@@ -1075,10 +1152,10 @@
             currentFlowerCount = newFlowerCount;
             updateGarden(newFlowerCount);
           }
-          
+
           // Trigger a wind effect on each new block
           triggerWindOnBlock(blockNumber);
-          
+
           // Move text elements every 5 blocks
           if (blockNumber - lastTextMovementBlock >= 5) {
             if (config.wanderingTextEnabled) {
@@ -1088,7 +1165,7 @@
             }
           }
         }
-        
+
         // Trigger wind effect based on block number
         function triggerWindOnBlock(blockNumber) {
           // Use block number as seed for deterministic wind direction
@@ -1097,13 +1174,13 @@
             'diagonal-up-right', 'diagonal-up-left',
             'diagonal-down-right', 'diagonal-down-left'
           ];
-          
+
           // Use modulo to select a direction based on block number
           const dirIndex = blockNumber % directions.length;
           const direction = directions[dirIndex];
-          
+
           console.log(`Block ${blockNumber}: Triggering wind effect (${direction})`);
-          
+
           // Apply the wind effect with strength based on block hash last digit
           // For simplicity, we use a fixed moderate strength
           applyWindEffect(direction, config.windStrength);
@@ -1114,18 +1191,21 @@
           if (isDebugMode) {
             windEffectEl.textContent = direction;
           }
-          
+
+          // Update wind marker direction
+          updateWindMarkerDirection(direction);
+
           // Get all visible flowers and organize them by position
           const flowers = Array.from(document.querySelectorAll('.flower.visible'));
           const flowerMap = {};
-          
+
           // Create a map of flowers by their position for quick lookup
           flowers.forEach(flower => {
             const x = parseInt(flower.dataset.x, 10);
             const y = parseInt(flower.dataset.y, 10);
             flowerMap[`${x},${y}`] = flower;
           });
-          
+
           // Get grid boundaries
           let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
           flowers.forEach(flower => {
@@ -1136,64 +1216,64 @@
             minY = Math.min(minY, y);
             maxY = Math.max(maxY, y);
           });
-          
+
           // Direction vectors for the flower movement and wave direction
           let dx = 0, dy = 0;
           let waveDirection = 'horizontal'; // Default to horizontal
           let waveStartX = 0, waveStartY = 0;
           let waveDx = 0, waveDy = 0; // Wave direction vector
-          
+
           switch (direction) {
-            case 'left': 
+            case 'left':
               dx = -1;
               waveDirection = 'horizontal';
               waveStartX = config.gridWidth - 1; // Start from right edge
               waveStartY = 0;
               waveDx = -1; waveDy = 0; // Wave moves left
               break;
-            case 'right': 
+            case 'right':
               dx = 1;
               waveDirection = 'horizontal';
               waveStartX = 0; // Start from left edge
               waveStartY = 0;
               waveDx = 1; waveDy = 0; // Wave moves right
               break;
-            case 'up': 
+            case 'up':
               dy = -1;
               waveDirection = 'vertical';
               waveStartX = 0;
               waveStartY = config.gridHeight - 1; // Start from bottom edge
               waveDx = 0; waveDy = -1; // Wave moves up
               break;
-            case 'down': 
+            case 'down':
               dy = 1;
               waveDirection = 'vertical';
               waveStartX = 0;
               waveStartY = 0; // Start from top edge
               waveDx = 0; waveDy = 1; // Wave moves down
               break;
-            case 'diagonal-up-right': 
+            case 'diagonal-up-right':
               dx = 1; dy = -1;
               waveDirection = 'diagonal';
               waveStartX = 0; // Start from bottom-left
               waveStartY = config.gridHeight - 1;
               waveDx = 1; waveDy = -1; // Wave moves up-right
               break;
-            case 'diagonal-up-left': 
+            case 'diagonal-up-left':
               dx = -1; dy = -1;
               waveDirection = 'diagonal';
               waveStartX = config.gridWidth - 1; // Start from bottom-right
               waveStartY = config.gridHeight - 1;
               waveDx = -1; waveDy = -1; // Wave moves up-left
               break;
-            case 'diagonal-down-right': 
+            case 'diagonal-down-right':
               dx = 1; dy = 1;
               waveDirection = 'diagonal';
               waveStartX = 0; // Start from top-left
               waveStartY = 0;
               waveDx = 1; waveDy = 1; // Wave moves down-right
               break;
-            case 'diagonal-down-left': 
+            case 'diagonal-down-left':
               dx = -1; dy = 1;
               waveDirection = 'diagonal';
               waveStartX = config.gridWidth - 1; // Start from top-right
@@ -1201,20 +1281,20 @@
               waveDx = -1; waveDy = 1; // Wave moves down-left
               break;
           }
-          
+
           // Wave animation parameters - defined globally so they can be used in timeout calculations
           const waveWidth = 2; // How many cells wide the wave is
           const waveFrameInterval = 49; // ms between wave animation frames
           // Store in window for access from other functions
           window.currentWaveFrameInterval = waveFrameInterval;
-          
+
           // Calculate wave distance based on direction
           let waveDistance;
           if (waveDirection === 'diagonal') {
             // For diagonal, calculate the exact diagonal distance across the grid
             // Using Pythagorean theorem for the diagonal distance from one corner to the other
             waveDistance = Math.ceil(Math.sqrt(
-              Math.pow(config.gridWidth, 2) + 
+              Math.pow(config.gridWidth, 2) +
               Math.pow(config.gridHeight, 2)
             )) + 20; // Add extra distance to ensure it goes all the way
           } else if (waveDirection === 'horizontal') {
@@ -1222,29 +1302,29 @@
           } else { // vertical
             waveDistance = config.gridHeight + 10; // Add extra to ensure full coverage
           }
-          
+
           // Calculate total wave duration based on distance and frame interval
           // This ensures waves complete their full journey regardless of grid size
           const waveTotalDuration = waveDistance * waveFrameInterval;
-          
+
           // Animate the wave passing through the garden
           let waveProgress = 0;
           const waveTimer = setInterval(() => {
             // Increment wave position
             waveProgress++;
-            
+
             if (waveProgress > waveDistance) {
               clearInterval(waveTimer);
               resetWindEffect();
               return;
             }
-            
+
             // Calculate which flowers are affected by the current wave position
             // Check all grid positions
             for (let y = 0; y < config.gridHeight; y++) {
               for (let x = 0; x < config.gridWidth; x++) {
                 let isInWave = false;
-                
+
                 if (waveDirection === 'horizontal') {
                   // For horizontal waves
                   const wavePos = waveStartX + (waveDx * waveProgress);
@@ -1258,42 +1338,42 @@
                 else if (waveDirection === 'diagonal') {
                   // For diagonal waves, we need a different approach
                   // Project the point onto the wave path to see if it's within the current wave front
-                  
+
                   // Wave path is defined by the start point and the direction
                   // Calculate current wave position along the diagonal
                   const waveX = waveStartX + (waveDx * waveProgress);
                   const waveY = waveStartY + (waveDy * waveProgress);
-                  
+
                   // Calculate the distance along the wave path (dot product)
                   // This gives us how far along the path this point would be
                   const dx2 = x - waveStartX;
                   const dy2 = y - waveStartY;
-                  
+
                   // Project the point onto the wave direction vector
                   // This is effectively dot(point - waveStart, waveDir) / |waveDir|
                   // Since waveDir is normalized (-1, 0, or 1), we can simplify
                   const projectionOnWavePath = dx2 * waveDx + dy2 * waveDy;
-                  
+
                   // Check if this point is close to the current wave progress along the path
                   const distanceFromWaveFront = Math.abs(projectionOnWavePath - waveProgress);
-                  
+
                   // The wave should be narrow in the direction of movement but wide perpendicular to it
                   // Calculate perpendicular distance (distance to the diagonal line)
                   // For a line with direction (dx,dy), the perpendicular is (-dy,dx)
                   const perpendicular = Math.abs(dx2 * (-waveDy) + dy2 * waveDx);
-                  
+
                   // A point is in the wave if:
                   // 1. It's close to the current wave front (within waveWidth in the direction of travel)
                   // 2. It's close to the diagonal path (within a wider range perpendicular to travel)
-                  
+
                   // Use the full grid diagonal as the perpendicular width
                   const gridDiagonal = Math.sqrt(Math.pow(config.gridWidth, 2) + Math.pow(config.gridHeight, 2));
                   // Set the perpendicular width to the full grid diagonal for maximum coverage
                   const diagonalPerpWidth = gridDiagonal;
-                  
+
                   isInWave = (distanceFromWaveFront <= waveWidth * 1.5) && (perpendicular <= diagonalPerpWidth);
                 }
-                
+
                 // If this position is in the wave and has a flower, animate it
                 if (isInWave) {
                   const flower = flowerMap[`${x},${y}`];
@@ -1301,22 +1381,22 @@
                     // Move the flower by adjusting its position
                     const origLeft = parseFloat(flower.dataset.baseX);
                     const origTop = parseFloat(flower.dataset.baseY);
-                    
+
                     // Check if this flower is already being animated
                     if (!flower.dataset.animating) {
                       // Mark as animating to prevent overlapping animations
                       flower.dataset.animating = "true";
-                      
+
                       // Apply the movement with a greatly reduced offset (quarter of the original)
                       flower.style.left = `${origLeft + (dx * windStrength)}em`;
                       flower.style.top = `${origTop + (dy * windStrength)}em`;
-                      
+
                       // Reset flower position after a brief time
                       setTimeout(() => {
                         // Return to original position with transition
                         flower.style.left = `${origLeft}em`;
                         flower.style.top = `${origTop}em`;
-                        
+
                         // After the transition completes, remove the animating flag
                         setTimeout(() => {
                           flower.dataset.animating = "";
@@ -1328,11 +1408,11 @@
               }
             }
           }, waveFrameInterval);
-          
+
           // Calculate how long it should take for the wave to complete
           // We'll clear the wave timer once it completes its journey
           const waveTimeout = waveTotalDuration + 500; // Add a small buffer
-          
+
           // Only schedule one timeout to clear the timer and reset wind effect
           setTimeout(() => {
             if (waveTimer) {
@@ -1358,6 +1438,29 @@
           });
         }
 
+        // Update the wind marker to show the current wind direction
+        function updateWindMarkerDirection(direction) {
+          const windMarker = document.getElementById('wind-marker');
+          if (!windMarker) return;
+
+          // Map wind directions to arrow characters
+          const directionArrows = {
+            'left': '←',
+            'right': '→',
+            'up': '↑',
+            'down': '↓',
+            'diagonal-up-right': '↗',
+            'diagonal-up-left': '↖',
+            'diagonal-down-right': '↘',
+            'diagonal-down-left': '↙'
+          };
+
+          // Update the arrow character
+          if (directionArrows[direction]) {
+            windMarker.textContent = directionArrows[direction];
+          }
+        }
+
         // Wind effects are now triggered by blockchain events instead of on a schedule
 
         // Create a static garden as fallback for network issues
@@ -1368,7 +1471,7 @@
           // Add static artwork info
           generateGarden();
           isInitialized = true;
-          
+
           // In static mode (offline), trigger an initial wind effect
           triggerWindOnBlock(Math.floor(Math.random() * 1000));
         }
@@ -1410,21 +1513,21 @@
         function wanderingTextElements() {
           // Get all visible text elements
           const textElements = document.querySelectorAll('.info-text.visible');
-          
+
           // Function to check if a position is occupied by any text element
           // Accounts for the full width of text elements
           function isPositionOccupied(x, y, currentElement) {
             for (const el of textElements) {
               // Skip if this is the element we're checking for
               if (el === currentElement) continue;
-              
+
               // Skip if element doesn't have position data
               if (!el.dataset.currentX || !el.dataset.currentY) continue;
-              
+
               const elX = parseInt(el.dataset.currentX, 10);
               const elY = parseInt(el.dataset.currentY, 10);
               const elLength = el.textContent.length;
-              
+
               // Check if position falls within this element's span
               if (elY === y && x >= elX && x < elX + elLength) {
                 return el; // Return the element occupying this position
@@ -1432,11 +1535,11 @@
             }
             return null; // Position is not occupied
           }
-          
+
           // Function to check if a new position would cause collision
           function checkCollision(element, newX, newY) {
             const elementLength = element.textContent.length;
-            
+
             // Check every position the element would occupy
             for (let i = 0; i < elementLength; i++) {
               const collidingElement = isPositionOccupied(newX + i, newY, element);
@@ -1446,68 +1549,68 @@
             }
             return null; // No collision
           }
-          
+
           // Process each text element
           textElements.forEach(el => {
             // Skip if element doesn't have position data
             if (!el.dataset.currentX || !el.dataset.currentY) return;
-            
+
             const currentX = parseInt(el.dataset.currentX, 10);
             const currentY = parseInt(el.dataset.currentY, 10);
-            
+
             // Randomly choose a direction to move (-1, 0, or 1 for both x and y)
             const directions = [-1, 0, 1];
             const dx = directions[Math.floor(Math.random() * 3)];
             const dy = directions[Math.floor(Math.random() * 3)];
-            
+
             // Calculate new position
             let newX = currentX + dx;
             let newY = currentY + dy;
-            
+
             // Ensure we stay within grid boundaries
             newX = Math.max(0, Math.min(config.gridWidth - el.textContent.length, newX));
             newY = Math.max(0, Math.min(config.gridHeight - 1, newY));
-            
+
             // Check for collisions at the new position
             const collidingElement = checkCollision(el, newX, newY);
-            
+
             if (collidingElement) {
               // Handle collision - move the colliding element down
               const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
               // Make sure we don't go off the bottom of the screen
               const safeY = Math.min(config.gridHeight - 1, collidingY);
-              
+
               // Update position of colliding element
               collidingElement.style.top = `${safeY * 1.2}em`;
               collidingElement.dataset.currentY = safeY;
             }
-            
+
             // Update element position without transition (immediate jump)
             el.style.left = `${newX * 1.0}em`;
             el.style.top = `${newY * 1.2}em`;
-            
+
             // Update dataset values
             el.dataset.currentX = newX;
             el.dataset.currentY = newY;
           });
         }
-        
+
         // Text wandering is now block-based instead of time-based
-        
+
         // Toggle wandering text based on config
         function toggleWanderingText() {
           config.wanderingTextEnabled = !config.wanderingTextEnabled;
-          
+
           // Update debug panel if it's visible
           const wanderingStateEl = document.getElementById('wandering-state');
           if (wanderingStateEl) {
             wanderingStateEl.textContent = config.wanderingTextEnabled ? 'On' : 'Off';
           }
-          
+
           console.log(`Text wandering ${config.wanderingTextEnabled ? 'enabled' : 'disabled'}`);
           return config.wanderingTextEnabled;
         }
-        
+
         // Start the application
         init();
       }
