@@ -61,9 +61,20 @@
         opacity: 0;
         position: absolute;
         font-size: 15px;
+        /* Prevent flickering during animation */
+        transform: translateZ(0); /* Force GPU acceleration */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Prevent text selection during animation */
+        user-select: none;
       }
       .flower.visible {
         opacity: 1;
+      }
+      /* Add a special class for animating flowers */
+      .flower[data-animating="true"] {
+        /* Higher z-index during animation to prevent overlapping issues */
+        z-index: 5;
       }
       .info-text {
         position: absolute;
@@ -167,8 +178,8 @@
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
           windStrength: 1.0,      // Wind effect strength (1 unit = 1 cell)
-          windInterval: 5000,     // Ms between checking for new wind waves
-          windDuration: 3000,     // Ms each wind wave lasts
+          windInterval: 3000,    // Ms between checking for new wind waves - increased for less frequent animations
+          windDuration: 2500,     // Ms each wind wave lasts - increased to allow for full propagation
           flowerFadeInTime: 15000 // Ms for new flowers to fade in
         };
 
@@ -426,7 +437,12 @@
           flower.dataset.y = y;
           flower.dataset.baseX = x * 1.0;
           flower.dataset.baseY = y * 1.2;
-
+          flower.dataset.animating = ""; // Initialize animation state
+          
+          // Prevent potential rendering issues for animation
+          flower.style.willChange = 'left, top'; // Hint to browser about properties that will change
+          flower.style.backfaceVisibility = 'hidden'; // Prevent flickering in some browsers
+          
           return flower;
         }
 
@@ -680,9 +696,11 @@
               break;
           }
           
-          // Wave animation parameters
+          // Wave animation parameters - defined globally so they can be used in timeout calculations
           const waveWidth = 4; // How many cells wide the wave is
           const waveFrameInterval = 100; // ms between wave animation frames
+          // Store in window for access from other functions
+          window.currentWaveFrameInterval = waveFrameInterval;
           
           // Calculate wave distance based on direction
           let waveDistance;
@@ -785,29 +803,45 @@
                     // Move the flower by adjusting its position
                     const origLeft = parseFloat(flower.dataset.baseX);
                     const origTop = parseFloat(flower.dataset.baseY);
-                    flower.style.left = `${origLeft + dx}em`;
-                    flower.style.top = `${origTop + dy}em`;
                     
-                    // Reset flower position after a brief time
-                    setTimeout(() => {
-                      flower.style.left = `${origLeft}em`;
-                      flower.style.top = `${origTop}em`;
-                    }, waveWidth * waveFrameInterval);
+                    // Check if this flower is already being animated
+                    if (!flower.dataset.animating) {
+                      // Mark as animating to prevent overlapping animations
+                      flower.dataset.animating = "true";
+                      
+                      // Apply the movement
+                      flower.style.left = `${origLeft + dx}em`;
+                      flower.style.top = `${origTop + dy}em`;
+                      
+                      // Reset flower position after a brief time
+                      setTimeout(() => {
+                        // Return to original position with transition
+                        flower.style.left = `${origLeft}em`;
+                        flower.style.top = `${origTop}em`;
+                        
+                        // After the transition completes, remove the animating flag
+                        setTimeout(() => {
+                          flower.dataset.animating = "";
+                        }, 300); // Slightly longer than the transition time
+                      }, waveWidth * 100); // Use fixed value of 100ms here
+                    }
                   }
                 }
               }
             }
           }, waveFrameInterval);
           
-          // Instead of using a fixed wind duration, let the wave complete naturally
-          // Only clear the timer if it takes too long (safety measure)
-          // Use the calculated duration plus a small buffer, rather than a fixed time
+          // Calculate how long it should take for the wave to complete
+          // We'll clear the wave timer once it completes its journey
+          const waveTimeout = waveTotalDuration + 500; // Add a small buffer
+          
+          // Only schedule one timeout to clear the timer and reset wind effect
           setTimeout(() => {
             if (waveTimer) {
               clearInterval(waveTimer);
-              resetWindEffect();
+              // Don't call resetWindEffect here as each flower resets itself
             }
-          }, waveTotalDuration + 500); // Add a small buffer
+          }, waveTimeout);
         }
 
         // Reset wind effect (return to normal position)
@@ -834,8 +868,10 @@
           let windCounter = 0;
           let waveInProgress = false;
           
-          // Use a shorter interval for wind effects, but only start a new wave if none is in progress
+          // Use a longer interval between wind effects to reduce animation frequency
+          // Only start a new wave if none is in progress
           const checkInterval = setInterval(() => {
+            // Don't start a new wave if one is already in progress
             if (waveInProgress) return;
             
             // Wind directions in a deterministic sequence
@@ -860,16 +896,20 @@
             // Start a wave
             applyWindEffect(direction, strength);
             
-            // After the wave is done, allow new waves
-            // We'll use a computed dynamic duration based on the wave's travel distance
-            // This gets calculated inside applyWindEffect as waveTotalDuration
-            // Estimate the max total duration: gridWidth or gridHeight * frameInterval + buffer
-            const estimatedMaxDuration = Math.max(config.gridWidth, config.gridHeight) * 100 + 1000;
+            // Calculate an appropriate timeout based on grid size
+            // We want to ensure the wave completes fully before allowing a new one
+            const maxGridDimension = Math.sqrt(
+              Math.pow(config.gridWidth, 2) + 
+              Math.pow(config.gridHeight, 2)
+            );
+            const timeoutDuration = maxGridDimension * window.currentWaveFrameInterval * 1.5;
             
+            // After the wave is done, allow new waves
             setTimeout(() => {
               waveInProgress = false;
-            }, estimatedMaxDuration); // Use the max possible duration to be safe
-          }, config.windInterval);
+              resetWindEffect(); // Ensure all flowers are reset
+            }, timeoutDuration);
+          }, config.windInterval * 3); // Increase interval between winds by 3x
         }
 
         // Create a static garden as fallback for network issues
