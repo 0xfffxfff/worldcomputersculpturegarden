@@ -780,9 +780,10 @@
                   // 1. It's close to the current wave front (within waveWidth in the direction of travel)
                   // 2. It's close to the diagonal path (within a wider range perpendicular to travel)
                   
-                  // Calculate diagonal width as a percentage of grid size to ensure good coverage
+                  // Use the full grid diagonal as the perpendicular width
                   const gridDiagonal = Math.sqrt(Math.pow(config.gridWidth, 2) + Math.pow(config.gridHeight, 2));
-                  const diagonalPerpWidth = Math.max(20, gridDiagonal / 15); // Wider perpendicular spread
+                  // Set the perpendicular width to the full grid diagonal for maximum coverage
+                  const diagonalPerpWidth = gridDiagonal;
                   
                   isInWave = (distanceFromWaveFront <= waveWidth * 1.5) && (perpendicular <= diagonalPerpWidth);
                 }
