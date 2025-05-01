@@ -615,30 +615,86 @@
             maxY = Math.max(maxY, y);
           });
           
-          // Direction vectors for the flower movement
+          // Direction vectors for the flower movement and wave direction
           let dx = 0, dy = 0;
+          let startX, startY, endX, endY;
+          
           switch (direction) {
-            case 'left': dx = -1; break;
-            case 'right': dx = 1; break;
-            case 'up': dy = -1; break;
-            case 'down': dy = 1; break;
-            case 'diagonal-up-right': dx = 1; dy = -1; break;
-            case 'diagonal-up-left': dx = -1; dy = -1; break;
-            case 'diagonal-down-right': dx = 1; dy = 1; break;
-            case 'diagonal-down-left': dx = -1; dy = 1; break;
+            case 'left': 
+              dx = -1;
+              startX = config.gridWidth - 1; // Start from right edge
+              startY = 0;
+              endX = 0; // End at left edge
+              endY = config.gridHeight - 1;
+              break;
+            case 'right': 
+              dx = 1;
+              startX = 0; // Start from left edge
+              startY = 0;
+              endX = config.gridWidth - 1; // End at right edge
+              endY = config.gridHeight - 1;
+              break;
+            case 'up': 
+              dy = -1;
+              startX = 0;
+              startY = config.gridHeight - 1; // Start from bottom edge
+              endX = config.gridWidth - 1;
+              endY = 0; // End at top edge
+              break;
+            case 'down': 
+              dy = 1;
+              startX = 0;
+              startY = 0; // Start from top edge
+              endX = config.gridWidth - 1;
+              endY = config.gridHeight - 1; // End at bottom edge
+              break;
+            case 'diagonal-up-right': 
+              dx = 1; dy = -1;
+              startX = 0; // Start from bottom-left
+              startY = config.gridHeight - 1;
+              endX = config.gridWidth - 1; // End at top-right
+              endY = 0;
+              break;
+            case 'diagonal-up-left': 
+              dx = -1; dy = -1;
+              startX = config.gridWidth - 1; // Start from bottom-right
+              startY = config.gridHeight - 1;
+              endX = 0; // End at top-left
+              endY = 0;
+              break;
+            case 'diagonal-down-right': 
+              dx = 1; dy = 1;
+              startX = 0; // Start from top-left
+              startY = 0;
+              endX = config.gridWidth - 1; // End at bottom-right
+              endY = config.gridHeight - 1;
+              break;
+            case 'diagonal-down-left': 
+              dx = -1; dy = 1;
+              startX = config.gridWidth - 1; // Start from top-right
+              startY = 0;
+              endX = 0; // End at bottom-left
+              endY = config.gridHeight - 1;
+              break;
           }
           
-          // Determine wave direction (perpendicular to wind)
-          const waveHorizontal = (dy !== 0);
+          // Determine if wave moves horizontally, vertically, or diagonally
+          const waveType = dx !== 0 && dy !== 0 ? 'diagonal' : (dx !== 0 ? 'horizontal' : 'vertical');
           
           // Wave animation parameters
           const waveWidth = 4; // How many cells wide the wave is
           const waveFrameInterval = 100; // ms between wave animation frames
           
-          // Calculate wave distance based on actual grid dimensions and direction
-          // For horizontal waves, use the full grid width
-          // For vertical waves, use the full grid height
-          const waveDistance = waveHorizontal ? config.gridWidth : config.gridHeight;
+          // Calculate wave distance based on direction
+          let waveDistance;
+          if (waveType === 'diagonal') {
+            // For diagonal, use Pythagorean distance
+            waveDistance = Math.ceil(Math.sqrt(config.gridWidth * config.gridWidth + config.gridHeight * config.gridHeight));
+          } else if (waveType === 'horizontal') {
+            waveDistance = config.gridWidth;
+          } else { // vertical
+            waveDistance = config.gridHeight;
+          }
           
           // Calculate total wave duration based on distance and frame interval
           // This ensures waves complete their full journey regardless of grid size
@@ -657,57 +713,60 @@
             }
             
             // Calculate which flowers are affected by the current wave position
-            if (waveHorizontal) {
-              // Wave moves horizontally (left to right)
-              // Use entire grid width for checking to ensure the wave crosses fully
-              const currentWavePos = minX + waveProgress;
-              
-              // Check all grid positions for better coverage
-              for (let y = 0; y < config.gridHeight; y++) {
-                for (let x = 0; x < config.gridWidth; x++) {
-                  // Check if this position is within the current wave front
-                  if (Math.abs(x - currentWavePos) <= waveWidth) {
-                    const flower = flowerMap[`${x},${y}`];
-                    if (flower) {
-                      // Move the flower by adjusting its position
-                      const origLeft = parseFloat(flower.dataset.baseX);
-                      const origTop = parseFloat(flower.dataset.baseY);
-                      flower.style.left = `${origLeft + dx}em`;
-                      flower.style.top = `${origTop + dy}em`;
-                      
-                      // Reset flower position after a brief time
-                      setTimeout(() => {
-                        flower.style.left = `${origLeft}em`;
-                        flower.style.top = `${origTop}em`;
-                      }, waveWidth * waveFrameInterval);
-                    }
-                  }
-                }
-              }
-            } else {
-              // Wave moves vertically (top to bottom)
-              // Use entire grid height for checking to ensure the wave crosses fully
-              const currentWavePos = minY + waveProgress;
-              
-              // Check all grid positions for better coverage
+            // Check all grid positions
+            for (let y = 0; y < config.gridHeight; y++) {
               for (let x = 0; x < config.gridWidth; x++) {
-                for (let y = 0; y < config.gridHeight; y++) {
-                  // Check if this position is within the current wave front 
-                  if (Math.abs(y - currentWavePos) <= waveWidth) {
-                    const flower = flowerMap[`${x},${y}`];
-                    if (flower) {
-                      // Move the flower by adjusting its position
-                      const origLeft = parseFloat(flower.dataset.baseX);
-                      const origTop = parseFloat(flower.dataset.baseY);
-                      flower.style.left = `${origLeft + dx}em`;
-                      flower.style.top = `${origTop + dy}em`;
-                      
-                      // Reset flower position after a brief time
-                      setTimeout(() => {
-                        flower.style.left = `${origLeft}em`;
-                        flower.style.top = `${origTop}em`;
-                      }, waveWidth * waveFrameInterval);
-                    }
+                let isInWave = false;
+                
+                if (waveType === 'horizontal') {
+                  // For left direction, wave travels right to left (startX -> endX)
+                  // For right direction, wave travels left to right (startX -> endX)
+                  const wavePos = dx > 0 ? 
+                    startX + waveProgress : // right: moves from left to right
+                    startX - waveProgress;  // left: moves from right to left
+                  
+                  isInWave = Math.abs(x - wavePos) <= waveWidth;
+                }
+                else if (waveType === 'vertical') {
+                  // For up direction, wave travels bottom to top (startY -> endY)
+                  // For down direction, wave travels top to bottom (startY -> endY)
+                  const wavePos = dy > 0 ? 
+                    startY + waveProgress : // down: moves from top to bottom
+                    startY - waveProgress;  // up: moves from bottom to top
+                  
+                  isInWave = Math.abs(y - wavePos) <= waveWidth;
+                }
+                else if (waveType === 'diagonal') {
+                  // For diagonal, we need to calculate positions along the line
+                  // Normalize progress along the diagonal path
+                  const progressRatio = waveProgress / waveDistance;
+                  
+                  // Interpolate between start and end points based on progress
+                  const waveX = startX + (endX - startX) * progressRatio;
+                  const waveY = startY + (endY - startY) * progressRatio;
+                  
+                  // Calculate distance from current point to the wave front
+                  const distToWave = Math.sqrt(Math.pow(x - waveX, 2) + Math.pow(y - waveY, 2));
+                  
+                  // Check if this point is within the wave width
+                  isInWave = distToWave <= waveWidth;
+                }
+                
+                // If this position is in the wave and has a flower, animate it
+                if (isInWave) {
+                  const flower = flowerMap[`${x},${y}`];
+                  if (flower) {
+                    // Move the flower by adjusting its position
+                    const origLeft = parseFloat(flower.dataset.baseX);
+                    const origTop = parseFloat(flower.dataset.baseY);
+                    flower.style.left = `${origLeft + dx}em`;
+                    flower.style.top = `${origTop + dy}em`;
+                    
+                    // Reset flower position after a brief time
+                    setTimeout(() => {
+                      flower.style.left = `${origLeft}em`;
+                      flower.style.top = `${origTop}em`;
+                    }, waveWidth * waveFrameInterval);
                   }
                 }
               }
