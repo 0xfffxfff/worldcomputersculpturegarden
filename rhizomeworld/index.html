@@ -57,7 +57,7 @@
       }
       .flower {
         display: inline-block;
-        transition: transform 5s ease-in-out, opacity 15s ease-in-out;
+        transition: opacity 15s ease-in-out;
         opacity: 0;
         position: absolute;
         font-size: 15px;
@@ -70,7 +70,7 @@
         opacity: 0;
         font-size: 15px;
         pointer-events: none;
-        transition: opacity 4s ease-in-out, transform 5s ease-in-out;
+        transition: opacity 4s ease-in-out;
         text-align: left;
         white-space: nowrap;
         background-color: rgba(255, 255, 255, 0.9); /* White background with slight transparency */
@@ -166,9 +166,9 @@
           gridWidth: 120,         // Characters per line
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
-          windStrength: 0.5,      // Wind effect strength (0-1)
-          windInterval: 20000,    // Ms between wind changes
-          windDuration: 10000,    // Ms each wind effect lasts
+          windStrength: 1.0,      // Wind effect strength (1 unit = 1 cell)
+          windInterval: 5000,     // Ms between checking for new wind waves
+          windDuration: 3000,     // Ms each wind wave lasts
           flowerFadeInTime: 15000 // Ms for new flowers to fade in
         };
 
@@ -587,56 +587,121 @@
           }
         }
 
-        // Apply wind effect to flowers
+        // Apply wave-like ripple effect across the garden
         function applyWindEffect(direction, strength) {
           if (isDebugMode) {
             windEffectEl.textContent = direction;
           }
-
-          // Get all visible flowers
-          const flowers = document.querySelectorAll('.flower.visible');
-
-          // Define transform based on direction
-          let transform = '';
-          switch (direction) {
-            case 'left':
-              transform = `translateX(-${strength}em)`;
-              break;
-            case 'right':
-              transform = `translateX(${strength}em)`;
-              break;
-            case 'up':
-              transform = `translateY(-${strength}em)`;
-              break;
-            case 'down':
-              transform = `translateY(${strength}em)`;
-              break;
-            case 'diagonal-up-right':
-              transform = `translate(${strength}em, -${strength}em)`;
-              break;
-            case 'diagonal-up-left':
-              transform = `translate(-${strength}em, -${strength}em)`;
-              break;
-            case 'diagonal-down-right':
-              transform = `translate(${strength}em, ${strength}em)`;
-              break;
-            case 'diagonal-down-left':
-              transform = `translate(-${strength}em, ${strength}em)`;
-              break;
-            default:
-              transform = '';
-          }
-
-          // Apply transform to each flower
+          
+          // Get all visible flowers and organize them by position
+          const flowers = Array.from(document.querySelectorAll('.flower.visible'));
+          const flowerMap = {};
+          
+          // Create a map of flowers by their position for quick lookup
           flowers.forEach(flower => {
-            flower.style.transform = transform;
+            const x = parseInt(flower.dataset.x, 10);
+            const y = parseInt(flower.dataset.y, 10);
+            flowerMap[`${x},${y}`] = flower;
           });
-
-          // Also apply gentle movement to text elements
-          const infoTexts = document.querySelectorAll('.info-text.visible');
-          infoTexts.forEach(text => {
-            text.style.transform = transform;
+          
+          // Get grid boundaries
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          flowers.forEach(flower => {
+            const x = parseInt(flower.dataset.x, 10);
+            const y = parseInt(flower.dataset.y, 10);
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
           });
+          
+          // Direction vectors for the flower movement
+          let dx = 0, dy = 0;
+          switch (direction) {
+            case 'left': dx = -1; break;
+            case 'right': dx = 1; break;
+            case 'up': dy = -1; break;
+            case 'down': dy = 1; break;
+            case 'diagonal-up-right': dx = 1; dy = -1; break;
+            case 'diagonal-up-left': dx = -1; dy = -1; break;
+            case 'diagonal-down-right': dx = 1; dy = 1; break;
+            case 'diagonal-down-left': dx = -1; dy = 1; break;
+          }
+          
+          // Determine wave direction (perpendicular to wind)
+          const waveHorizontal = (dy !== 0);
+          
+          // Wave animation parameters
+          const waveWidth = 4; // How many cells wide the wave is
+          const waveFrameInterval = 100; // ms between wave animation frames
+          const waveDistance = Math.max(maxX - minX, maxY - minY) + waveWidth * 2; // How far the wave travels
+          
+          // Animate the wave passing through the garden
+          let waveProgress = 0;
+          const waveTimer = setInterval(() => {
+            // Increment wave position
+            waveProgress++;
+            
+            if (waveProgress > waveDistance) {
+              clearInterval(waveTimer);
+              return;
+            }
+            
+            // Calculate which flowers are affected by the current wave position
+            if (waveHorizontal) {
+              // Wave moves horizontally (left to right)
+              for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                  // Check if this position is within the current wave front
+                  if (Math.abs(x - (minX + waveProgress)) <= waveWidth) {
+                    const flower = flowerMap[`${x},${y}`];
+                    if (flower) {
+                      // Move the flower by adjusting its position
+                      const origLeft = parseFloat(flower.dataset.baseX);
+                      const origTop = parseFloat(flower.dataset.baseY);
+                      flower.style.left = `${origLeft + dx}em`;
+                      flower.style.top = `${origTop + dy}em`;
+                      
+                      // Reset flower position after a brief time
+                      setTimeout(() => {
+                        flower.style.left = `${origLeft}em`;
+                        flower.style.top = `${origTop}em`;
+                      }, waveWidth * waveFrameInterval);
+                    }
+                  }
+                }
+              }
+            } else {
+              // Wave moves vertically (top to bottom)
+              for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                  // Check if this position is within the current wave front 
+                  if (Math.abs(y - (minY + waveProgress)) <= waveWidth) {
+                    const flower = flowerMap[`${x},${y}`];
+                    if (flower) {
+                      // Move the flower by adjusting its position
+                      const origLeft = parseFloat(flower.dataset.baseX);
+                      const origTop = parseFloat(flower.dataset.baseY);
+                      flower.style.left = `${origLeft + dx}em`;
+                      flower.style.top = `${origTop + dy}em`;
+                      
+                      // Reset flower position after a brief time
+                      setTimeout(() => {
+                        flower.style.left = `${origLeft}em`;
+                        flower.style.top = `${origTop}em`;
+                      }, waveWidth * waveFrameInterval);
+                    }
+                  }
+                }
+              }
+            }
+          }, waveFrameInterval);
+          
+          // Stop the wave after the total wind duration
+          setTimeout(() => {
+            clearInterval(waveTimer);
+            resetWindEffect();
+          }, config.windDuration);
         }
 
         // Reset wind effect (return to normal position)
@@ -645,14 +710,13 @@
             windEffectEl.textContent = 'None';
           }
 
+          // Reset all flowers to their original positions
           const flowers = document.querySelectorAll('.flower.visible');
           flowers.forEach(flower => {
-            flower.style.transform = '';
-          });
-
-          const infoTexts = document.querySelectorAll('.info-text.visible');
-          infoTexts.forEach(text => {
-            text.style.transform = '';
+            const origLeft = parseFloat(flower.dataset.baseX);
+            const origTop = parseFloat(flower.dataset.baseY);
+            flower.style.left = `${origLeft}em`;
+            flower.style.top = `${origTop}em`;
           });
         }
 
@@ -662,8 +726,12 @@
           // This creates a deterministic sequence that repeats
           const windRandom = createSeededRandom(54321);
           let windCounter = 0;
+          let waveInProgress = false;
           
-          setInterval(() => {
+          // Use a shorter interval for wind effects, but only start a new wave if none is in progress
+          const checkInterval = setInterval(() => {
+            if (waveInProgress) return;
+            
             // Wind directions in a deterministic sequence
             const directions = [
               'left', 'right', 'up', 'down',
@@ -677,10 +745,19 @@
             const dirIndex = Math.floor(windRandom() * directions.length);
             const direction = directions[dirIndex];
             
-            // Deterministic but varied strength
-            const strength = (0.3 + (0.7 * windRandom())) * config.windStrength;
-
+            // Deterministic but varied strength (use smaller values for the wave effect)
+            const strength = (0.3 + (0.5 * windRandom())) * config.windStrength;
+            
+            // Mark a wave as in progress
+            waveInProgress = true;
+            
+            // Start a wave
             applyWindEffect(direction, strength);
+            
+            // After the wave is done, allow new waves
+            setTimeout(() => {
+              waveInProgress = false;
+            }, config.windDuration + 500); // Add a small buffer
 
             // Reset after wind duration
             setTimeout(() => {
