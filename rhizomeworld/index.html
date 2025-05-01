@@ -911,7 +911,8 @@
         // Place text elements with artwork information
         function placeInfoText() {
           // Use same seeded random generator for consistent text placement
-          const random = createSeededRandom(789018); // Different seed from flower placement
+          const random = createSeededRandom(31); // Different seed from flower placement
+          // ok: 191231
 
           // Create an array of grid positions that match where flowers could be placed
           // We'll place text at these grid positions to ensure alignment
@@ -933,17 +934,26 @@
           // Keep track of used positions to avoid overlap
           const usedPositions = new Set();
 
+          // Define padding in grid cells - text will remain this far from the edges
+          const PADDING = 3;
+
           // Function to find an available position for text
           function findAvailablePosition(length, startIdx) {
             // Find a position that has enough space for the text
             for (let i = startIdx; i < gridPositions.length; i++) {
               const pos = gridPositions[i];
 
+              // First check if the position is within the padding boundary
+              if (pos.x < PADDING || pos.x + length > config.gridWidth - PADDING || 
+                  pos.y < PADDING || pos.y > config.gridHeight - PADDING) {
+                continue; // Skip positions too close to the edge
+              }
+
               // Check if this position and needed length is available
               let available = true;
               for (let j = 0; j < length; j++) {
                 const checkPos = `${pos.x + j},${pos.y}`;
-                if (usedPositions.has(checkPos) || (pos.x + j) >= config.gridWidth) {
+                if (usedPositions.has(checkPos) || (pos.x + j) >= config.gridWidth - PADDING) {
                   available = false;
                   break;
                 }
@@ -958,9 +968,8 @@
               }
             }
 
-            // If no position is found, return a fallback position
-            // Use a fixed fallback position that doesn't reference undefined variables
-            return { x: 5, y: 5 };
+            // If no position is found, return a fallback position that respects padding
+            return { x: PADDING, y: PADDING + 5 };
           }
 
           // Start index for art placements
@@ -1697,9 +1706,12 @@
           let newX = currentX + dx;
           let newY = currentY + dy;
 
-          // Ensure we stay within grid boundaries
-          newX = Math.max(0, Math.min(config.gridWidth - width, newX));
-          newY = Math.max(0, Math.min(config.gridHeight - height, newY));
+          // Define the padding in grid cells
+          const PADDING = 3;
+
+          // Ensure we stay within grid boundaries, respecting the padding
+          newX = Math.max(PADDING, Math.min(config.gridWidth - width - PADDING, newX));
+          newY = Math.max(PADDING, Math.min(config.gridHeight - height - PADDING, newY));
 
           // Check for collisions at the new position
           const collidingElement = checkCollision(el, newX, newY);
@@ -1709,8 +1721,9 @@
             const collidingY = parseInt(collidingElement.dataset.currentY, 10) + 1;
             const collidingDimensions = getElementDimensions(collidingElement);
             
-            // Make sure we don't go off the bottom of the screen
-            const safeY = Math.min(config.gridHeight - collidingDimensions.height, collidingY);
+            // Make sure we don't go off the bottom of the screen and respect padding
+            const safeY = Math.min(config.gridHeight - collidingDimensions.height - PADDING, 
+                                   Math.max(PADDING, collidingY));
 
             // Update position of colliding element
             collidingElement.style.top = `${safeY * 1.2}em`;
