@@ -178,7 +178,7 @@
           gridHeight: 40,         // Number of lines
           infoTextDensity: 10,    // Lower means more info texts
           windStrength: 1.0,      // Wind effect strength (1 unit = 1 cell)
-          windInterval: 3000,    // Ms between checking for new wind waves - increased for less frequent animations
+          windInterval: 1000,    // Ms between checking for new wind waves - increased for less frequent animations
           windDuration: 2500,     // Ms each wind wave lasts - increased to allow for full propagation
           flowerFadeInTime: 15000 // Ms for new flowers to fade in
         };
@@ -698,7 +698,7 @@
           
           // Wave animation parameters - defined globally so they can be used in timeout calculations
           const waveWidth = 2; // How many cells wide the wave is
-          const waveFrameInterval = 33; // ms between wave animation frames
+          const waveFrameInterval = 49; // ms between wave animation frames
           // Store in window for access from other functions
           window.currentWaveFrameInterval = waveFrameInterval;
           
@@ -801,9 +801,9 @@
                       // Mark as animating to prevent overlapping animations
                       flower.dataset.animating = "true";
                       
-                      // Apply the movement
-                      flower.style.left = `${origLeft + dx}em`;
-                      flower.style.top = `${origTop + dy}em`;
+                      // Apply the movement with a greatly reduced offset (quarter of the original)
+                      flower.style.left = `${origLeft + (dx * 0.5)}em`;
+                      flower.style.top = `${origTop + (dy * 0.5)}em`;
                       
                       // Reset flower position after a brief time
                       setTimeout(() => {
