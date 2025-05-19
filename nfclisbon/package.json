@@ -1,0 +1,17 @@
+{
+  "name": "nfclisbon-visualization",
+  "version": "1.0.0",
+  "description": "World Computer Sculpture Garden visualization for NFC Lisbon 2025",
+  "main": "generate.js",
+  "scripts": {
+    "start": "node generate.js",
+    "batch": "node batch-generate.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "fs-extra": "^11.2.0",
+    "yargs": "^17.7.2"
+  }
+}
