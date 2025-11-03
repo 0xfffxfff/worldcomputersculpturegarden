@@ -101,7 +101,7 @@ function createEmptyGrid(width, height) {
 // Place flowers using random placement with collision detection
 function placeFlowersRandomly(grid, count) {
   // Fixed seed for reproducibility
-  const fixedSeed = 12345;
+  const fixedSeed = Math.floor(Math.random()*100000); // 12345
   const random = createSeededRandom(fixedSeed);
   
   const positions = [];
@@ -126,7 +126,7 @@ function placeFlowersRandomly(grid, count) {
     const noiseVal = gridNoise(x, y, 0xf);
     
     // Use a fixed threshold that ensures we get enough flowers
-    const threshold = 0.3;
+    const threshold = 0.1;
     
     // Only place if position is valid according to noise and grid
     if (Math.abs(noiseVal) > threshold && grid[y][x] === ' ') {
@@ -156,8 +156,8 @@ async function generateFlowerField() {
   ctx.fillRect(0, 0, config.width, config.height);
   
   // Calculate grid dimensions based on font size
-  const charWidth = config.fontSize;
-  const charHeight = config.fontSize * 1.2;
+  const charWidth = config.fontSize * 0.6;
+  const charHeight = config.fontSize * 1.65;
   
   const gridWidth = Math.floor(config.width / charWidth);
   const gridHeight = Math.floor(config.height / charHeight);
@@ -185,9 +185,9 @@ async function generateFlowerField() {
   });
   
   // Generate filename with timestamp and resolution
-  const timestamp = Math.floor(Date.now() / 1000);
+  const timestamp = Date.now();
   const resolution = `${config.width}x${config.height}`;
-  const filename = `${resolution}_${timestamp}.png`;
+  const filename = `${resolution}_${config.inverted ? 'inverted' : 'normal'}_f${config.fontSize}_${timestamp}.jpg`;
   
   // Create output directory if it doesn't exist
   await fs.ensureDir(config.outputDir);
