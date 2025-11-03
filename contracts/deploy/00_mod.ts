@@ -2,9 +2,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getUnnamedAccounts } = hre;
+  const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
-  const [deployer] = await getUnnamedAccounts();
+  const { deployer } = await getNamedAccounts();
+  console.log(await getNamedAccounts())
 
   await deploy("Mod", {
     args: [],
@@ -15,4 +16,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["Web"];
+func.tags = ["Mod"];
